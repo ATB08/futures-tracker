@@ -492,6 +492,8 @@ function migrateData(){
   for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('af_entries_')&&k!=='af_entries'){try{me=[...me,...JSON.parse(localStorage.getItem(k)||'[]')];}catch(e){}}if(k&&k.startsWith('af_accs_')&&k!=='af_accs'){try{ma=[...ma,...JSON.parse(localStorage.getItem(k)||'[]')];}catch(e){}}}
   entries=[...new Map(me.map(e=>[e.id,e])).values()];
   accounts=[...new Map(ma.map(a=>[a.id,a])).values()];
+  const _old=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k!=='af_entries'&&k!=='af_accs'&&(k.startsWith('af_entries_')||k.startsWith('af_accs_')))_old.push(k);}
+  _old.forEach(k=>localStorage.removeItem(k));
   accounts.forEach(acc=>{
     if(!acc.dailyEntries)acc.dailyEntries=acc.profitableDays?acc.profitableDays.map(d=>({id:d.id,date:d.date,pnl:d.profit||0})):[];
     if(!acc.payouts){acc.payouts=[];if(acc.baseBalance!==undefined&&acc.lastPayoutAmount>0)acc.payouts.push({id:Date.now()+Math.random(),date:acc.lastPayoutDate||todayStr(),amount:acc.lastPayoutAmount});}
@@ -577,7 +579,7 @@ function triggerConfetti(){
   const colors=['#3b82f6','#1baf7a','#f59e0b','#8b5cf6','#ec4899','#ef4444','#14b8a6','#fbbf24','#f472b6','#fff','#a78bfa'];
   function addPopper(right,delay){
     const wrap=document.createElement('div');
-    wrap.style.cssText='position:fixed;bottom:4%;'+(right?'right:0':'left:0')+';font-size:72px;line-height:1;animation:popperBurst 2.6s ease '+delay+'s forwards';
+    wrap.style.cssText='position:fixed;bottom:4%;'+(right?'right:0':'left:0')+';font-size:58px;line-height:1;animation:popperBurst 2.6s ease '+delay+'s forwards';
     if(right){const s=document.createElement('span');s.textContent='🎉';s.style.cssText='display:inline-block;transform:scaleX(-1)';wrap.appendChild(s);}
     else wrap.textContent='🎉';
     c.appendChild(wrap);
@@ -585,10 +587,10 @@ function triggerConfetti(){
   function addParticles(pct,dir,delay){
     for(let i=0;i<85;i++){
       const p=document.createElement('div'),str=Math.random()>.45;
-      const w=str?2+Math.random()*3:5+Math.random()*11,h=str?18+Math.random()*26:w;
+      const w=str?1.5+Math.random()*2.5:4+Math.random()*9,h=str?14+Math.random()*21:w;
       const color=colors[Math.floor(Math.random()*colors.length)];
       const ang=(25+Math.random()*70)*(Math.PI/180);
-      const spd=120+Math.random()*800;
+      const spd=96+Math.random()*640;
       const tx=Math.cos(ang)*spd*dir,ty=-Math.sin(ang)*spd;
       const rot=(Math.random()-.5)*1440,d=delay+Math.random()*.5,dur=1.8+Math.random()*1.3;
       p.style.cssText='position:fixed;bottom:4%;left:'+pct+'%;width:'+w+'px;height:'+h+'px;background:'+color+';border-radius:'+(str?'2px':'3px')+';animation:confettiShoot '+dur+'s cubic-bezier(.08,.65,.2,1) '+d+'s forwards';
