@@ -428,41 +428,41 @@ tbody tr:hover td{background:var(--s2)}
   <div class="fcard" id="tradeForm">
     <div class="fgrid">
       <div class="fsection full">📋 Basics</div>
-      <div><label>Datum</label><input type="date" id="tj_date"></div>
-      <div><label>Account</label><select id="tj_acc" style="width:100%;padding:6px 10px;border:.5px solid var(--border-s);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:13px;outline:none"><option value="">— Kein Account —</option></select></div>
-      <div><label>Symbol</label><input type="text" id="tj_sym" placeholder="z.B. NQ, ES, GC, EUR/USD"></div>
-      <div class="full"><label>Richtung</label><div style="display:flex;gap:8px;margin-top:5px"><button type="button" id="jd_long" class="type-btn active" onclick="setJDir('long')">▲ Long</button><button type="button" id="jd_short" class="type-btn" onclick="setJDir('short')">▼ Short</button></div></div>
+      <div><label>Date</label><input type="date" id="tj_date"></div>
+      <div><label>Account</label><select id="tj_acc" style="width:100%;padding:6px 10px;border:.5px solid var(--border-s);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:13px;outline:none"><option value="">— No account —</option></select></div>
+      <div><label>Symbol</label><input type="text" id="tj_sym" placeholder="e.g. NQ, ES, GC, EUR/USD"></div>
+      <div class="full"><label>Direction</label><div style="display:flex;gap:8px;margin-top:5px"><button type="button" id="jd_long" class="type-btn active" onclick="setJDir('long')">▲ Long</button><button type="button" id="jd_short" class="type-btn" onclick="setJDir('short')">▼ Short</button></div></div>
       <div class="fsection full">🔍 Pre-Trade</div>
-      <div class="full"><label>Setup / Pattern</label><input type="text" id="tj_setup" placeholder="z.B. FVG Fill, BOS, Supply/Demand..."></div>
-      <div class="full"><label>Einstiegsgrund — warum genau jetzt?</label><textarea class="notes-area" style="min-height:60px" id="tj_entry_reason" placeholder="Was hat dich zum Einstieg bewegt?"></textarea></div>
-      <div><label>Erwartetes Ziel</label><input type="text" id="tj_target" placeholder="z.B. 50 pts, prev high"></div>
-      <div><label>Geplanter Stop Loss</label><input type="text" id="tj_sl" placeholder="z.B. 15 pts, below swing low"></div>
-      <div class="full"><label>Risiko / R:R</label><input type="text" id="tj_rr" placeholder="z.B. $100 Risiko / 1:3 R:R"></div>
-      <div class="fsection full">⚡ Während des Trades</div>
-      <div class="full"><label>Plan eingehalten?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jf_y" onclick="setJField('followed',true)">✓ Ja</button><button type="button" class="jyn-btn" id="jf_n" onclick="setJField('followed',false)">✗ Nein</button></div></div>
-      <div class="full"><label>Zweifel / wolltest du früher raus?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jdoubt_y" onclick="setJField('doubts',true)">✓ Ja</button><button type="button" class="jyn-btn" id="jdoubt_n" onclick="setJField('doubts',false)">✗ Nein</button></div></div>
-      <div class="full"><label>Stop bewegt?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jm_y" onclick="setJField('movedStop',true)">✓ Ja</button><button type="button" class="jyn-btn" id="jm_n" onclick="setJField('movedStop',false)">✗ Nein</button></div></div>
-      <div class="full" id="jMSRWrap" style="display:none"><label>Grund — Stop bewegt</label><input type="text" id="tj_move_reason" placeholder="Warum hast du den Stop bewegt?"></div>
+      <div class="full"><label>Setup / Pattern</label><input type="text" id="tj_setup" placeholder="e.g. FVG Fill, BOS, Supply/Demand..."></div>
+      <div class="full"><label>Entry Reason — why exactly now?</label><textarea class="notes-area" style="min-height:60px" id="tj_entry_reason" placeholder="What triggered your entry?"></textarea></div>
+      <div><label>Expected Target</label><input type="text" id="tj_target" placeholder="e.g. 50 pts, prev high"></div>
+      <div><label>Planned Stop Loss</label><input type="text" id="tj_sl" placeholder="e.g. 15 pts, below swing low"></div>
+      <div class="full"><label>Risk / R:R</label><input type="text" id="tj_rr" placeholder="e.g. $100 risk / 1:3 R:R"></div>
+      <div class="fsection full">⚡ During the Trade</div>
+      <div class="full"><label>Followed your plan?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jf_y" onclick="setJField('followed',true)">✓ Yes</button><button type="button" class="jyn-btn" id="jf_n" onclick="setJField('followed',false)">✗ No</button></div></div>
+      <div class="full"><label>Doubts / wanted to exit early?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jdoubt_y" onclick="setJField('doubts',true)">✓ Yes</button><button type="button" class="jyn-btn" id="jdoubt_n" onclick="setJField('doubts',false)">✗ No</button></div></div>
+      <div class="full"><label>Moved your stop?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jm_y" onclick="setJField('movedStop',true)">✓ Yes</button><button type="button" class="jyn-btn" id="jm_n" onclick="setJField('movedStop',false)">✗ No</button></div></div>
+      <div class="full" id="jMSRWrap" style="display:none"><label>Reason — stop moved</label><input type="text" id="tj_move_reason" placeholder="Why did you move the stop?"></div>
       <div class="fsection full">📊 Post-Trade</div>
-      <div class="full"><label>Ergebnis</label><div style="display:flex;gap:8px;margin-top:5px"><button type="button" id="jr_win" class="type-btn active" onclick="setJResult('win')">✓ Win</button><button type="button" id="jr_loss" class="type-btn" onclick="setJResult('loss')">✗ Loss</button><button type="button" id="jr_be" class="type-btn" onclick="setJResult('be')">○ Break Even</button></div></div>
-      <div class="full"><label>P&amp;L (USD)</label><input type="number" id="tj_pnl" placeholder="+250 oder −150" step="0.01"></div>
-      <div class="full"><label>War der Einstieg gut getimed?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jtimed_y" onclick="setJField('timed',true)">✓ Ja</button><button type="button" class="jyn-btn" id="jtimed_n" onclick="setJField('timed',false)">✗ Nein</button></div></div>
-      <div class="full"><label>Früher / später raus gesollt?</label><input type="text" id="tj_exit" placeholder="z.B. 10 Ticks früher, hätte gehalten..."></div>
-      <div class="full"><label>Was hättest du anders gemacht?</label><textarea class="notes-area" style="min-height:70px" id="tj_diff" placeholder="Reflexion nach dem Trade..."></textarea></div>
-      <div class="fsection full">🧠 Psychologie</div>
-      <div class="full"><label>Ruhe-Skala (1 = sehr nervös · 5 = sehr ruhig)</label><div class="jrate-row"><button type="button" class="jrate-btn" id="jc1" onclick="setJCalm(1)">1</button><button type="button" class="jrate-btn" id="jc2" onclick="setJCalm(2)">2</button><button type="button" class="jrate-btn active" id="jc3" onclick="setJCalm(3)">3</button><button type="button" class="jrate-btn" id="jc4" onclick="setJCalm(4)">4</button><button type="button" class="jrate-btn" id="jc5" onclick="setJCalm(5)">5</button></div></div>
-      <div class="full"><label>FOMO / Angst / Gier?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jfomo_y" onclick="setJToggle('fomo',true)">✓ Ja</button><button type="button" class="jyn-btn" id="jfomo_n" onclick="setJToggle('fomo',false)">✗ Nein</button></div></div>
-      <div class="full"><label>Revenge Trade?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jrev_y" onclick="setJToggle('revenge',true)">✓ Ja</button><button type="button" class="jyn-btn" id="jrev_n" onclick="setJToggle('revenge',false)">✗ Nein</button></div></div>
-      <div class="full"><label>Impuls oder geplant?</label><div style="display:flex;gap:8px;margin-top:5px"><button type="button" id="jimp_p" class="type-btn active" onclick="setJImpulse(false)">📋 Geplant</button><button type="button" id="jimp_i" class="type-btn" onclick="setJImpulse(true)">⚡ Impuls</button></div></div>
-      <div class="fsection full">🌍 Kontext</div>
-      <div class="full"><label>News / Ereignisse</label><input type="text" id="tj_news_ctx" placeholder="z.B. CPI, FOMC, kein Event heute"></div>
+      <div class="full"><label>Result</label><div style="display:flex;gap:8px;margin-top:5px"><button type="button" id="jr_win" class="type-btn active" onclick="setJResult('win')">✓ Win</button><button type="button" id="jr_loss" class="type-btn" onclick="setJResult('loss')">✗ Loss</button><button type="button" id="jr_be" class="type-btn" onclick="setJResult('be')">○ Break Even</button></div></div>
+      <div class="full"><label>P&amp;L (USD)</label><input type="number" id="tj_pnl" placeholder="+250 or −150" step="0.01"></div>
+      <div class="full"><label>Was the entry well-timed?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jtimed_y" onclick="setJField('timed',true)">✓ Yes</button><button type="button" class="jyn-btn" id="jtimed_n" onclick="setJField('timed',false)">✗ No</button></div></div>
+      <div class="full"><label>Should you have exited earlier/later?</label><input type="text" id="tj_exit" placeholder="e.g. 10 ticks earlier, should have held..."></div>
+      <div class="full"><label>What would you do differently?</label><textarea class="notes-area" style="min-height:70px" id="tj_diff" placeholder="Reflection after the trade..."></textarea></div>
+      <div class="fsection full">🧠 Psychology</div>
+      <div class="full"><label>Calm scale (1 = very nervous · 5 = very calm)</label><div class="jrate-row"><button type="button" class="jrate-btn" id="jc1" onclick="setJCalm(1)">1</button><button type="button" class="jrate-btn" id="jc2" onclick="setJCalm(2)">2</button><button type="button" class="jrate-btn active" id="jc3" onclick="setJCalm(3)">3</button><button type="button" class="jrate-btn" id="jc4" onclick="setJCalm(4)">4</button><button type="button" class="jrate-btn" id="jc5" onclick="setJCalm(5)">5</button></div></div>
+      <div class="full"><label>FOMO / fear / greed?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jfomo_y" onclick="setJToggle('fomo',true)">✓ Yes</button><button type="button" class="jyn-btn" id="jfomo_n" onclick="setJToggle('fomo',false)">✗ No</button></div></div>
+      <div class="full"><label>Revenge trade?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jrev_y" onclick="setJToggle('revenge',true)">✓ Yes</button><button type="button" class="jyn-btn" id="jrev_n" onclick="setJToggle('revenge',false)">✗ No</button></div></div>
+      <div class="full"><label>Impulse or planned?</label><div style="display:flex;gap:8px;margin-top:5px"><button type="button" id="jimp_p" class="type-btn active" onclick="setJImpulse(false)">📋 Planned</button><button type="button" id="jimp_i" class="type-btn" onclick="setJImpulse(true)">⚡ Impulse</button></div></div>
+      <div class="fsection full">🌍 Context</div>
+      <div class="full"><label>News / Events</label><input type="text" id="tj_news_ctx" placeholder="e.g. CPI, FOMC, no event today"></div>
       <div class="full"><label>Session</label><div class="jsess-row"><button type="button" class="jsess-btn" data-sess="asia" onclick="setJSession('asia')">🌏 Asia</button><button type="button" class="jsess-btn" data-sess="london" onclick="setJSession('london')">🇬🇧 London</button><button type="button" class="jsess-btn" data-sess="ny" onclick="setJSession('ny')">🇺🇸 New York</button><button type="button" class="jsess-btn" data-sess="overlap" onclick="setJSession('overlap')">🔀 Overlap</button></div></div>
-      <div class="full"><label>Tagesstart (Schlaf, Stress, Stimmung...)</label><input type="text" id="tj_daystart" placeholder="z.B. gut geschlafen, entspannt, fokussiert"></div>
+      <div class="full"><label>Day Start (sleep, stress, mood...)</label><input type="text" id="tj_daystart" placeholder="e.g. slept well, relaxed, focused"></div>
     </div>
     <div class="factions"><button class="savebtn" onclick="saveTrade()">Save Trade</button><button class="cancelbtn" onclick="toggleTradeForm()">Cancel</button></div>
   </div>
   <div id="tradeList"></div>
-  <div id="tradeEmpty" class="empty" style="display:none"><i class="ti ti-notebook"></i>Noch keine Trades gejournalt.<br><span style="font-size:12px;margin-top:4px;display:block">Klicke "+ Add Trade" um deinen ersten Trade zu journalen.</span></div>
+  <div id="tradeEmpty" class="empty" style="display:none"><i class="ti ti-notebook"></i>No trades journaled yet.<br><span style="font-size:12px;margin-top:4px;display:block">Click "+ Add Trade" to journal your first trade.</span></div>
 </div>
 
 <!-- TAB: ENTRIES -->
@@ -1226,7 +1226,7 @@ function toggleTradeForm(){
     ['tj_entry_reason','tj_diff'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
     const dp=document.getElementById('tj_date');if(dp)dp.value=todayStr();
     const pnl=document.getElementById('tj_pnl');if(pnl)pnl.value='';
-    const sel=document.getElementById('tj_acc');if(sel)sel.innerHTML='<option value="">— Kein Account —</option>'+accounts.map(a=>'<option value="'+a.id+'">'+a.name+'</option>').join('');
+    const sel=document.getElementById('tj_acc');if(sel)sel.innerHTML='<option value="">— No account —</option>'+accounts.map(a=>'<option value="'+a.id+'">'+a.name+'</option>').join('');
     setJDir('long');setJResult('win');setJCalm(3);setJImpulse(false);
     ['jf_y','jf_n','jdoubt_y','jdoubt_n','jm_y','jm_n','jtimed_y','jtimed_n','jfomo_y','jfomo_n','jrev_y','jrev_n'].forEach(id=>{const e=document.getElementById(id);if(e)e.className='jyn-btn';});
     document.querySelectorAll('.jsess-btn').forEach(b=>b.classList.remove('active'));
@@ -1236,7 +1236,7 @@ function toggleTradeForm(){
 }
 function saveTrade(){
   const date=(document.getElementById('tj_date')||{}).value,sym=((document.getElementById('tj_sym')||{}).value||'').trim();
-  if(!date||!sym){alert('Bitte Datum und Symbol eingeben.');return;}
+  if(!date||!sym){alert('Please enter date and symbol.');return;}
   const g=id=>(document.getElementById(id)||{}).value||'';
   const trade={id:_jEditId||Date.now(),date,accountId:g('tj_acc')||null,symbol:sym,direction:_jDir,
     setup:g('tj_setup').trim(),entryReason:g('tj_entry_reason').trim(),target:g('tj_target').trim(),
@@ -1249,15 +1249,15 @@ function saveTrade(){
   trades.sort((a,b)=>b.date.localeCompare(a.date));
   saveAll();toggleTradeForm();renderJournal();
 }
-function deleteTrade(id){if(!confirm('Trade löschen?'))return;trades=trades.filter(t=>t.id!==id);saveAll();renderTradeList();}
+function deleteTrade(id){if(!confirm('Delete this trade?'))return;trades=trades.filter(t=>t.id!==id);saveAll();renderTradeList();}
 function toggleJCard(id){const e=document.getElementById('jc_'+id);if(e)e.classList.toggle('open');}
 function renderJournal(){
   const chips=document.getElementById('jAccChips');
   if(chips){
     const used=[...new Set(trades.map(t=>t.accountId).filter(Boolean))];
     const am=Object.fromEntries(accounts.map(a=>[String(a.id),a.name]));
-    chips.innerHTML='<button class="chip'+(_jFilter==='all'?' active':'')+'" data-jf="all" onclick="setJFilter(\'all\')">Alle</button>'
-      +used.map(id=>'<button class="chip'+(_jFilter===id?' active':'')+'" data-jf="'+id+'" onclick="setJFilter(\''+id+'\')">'+( am[id]||'Gelöscht')+'</button>').join('');
+    chips.innerHTML='<button class="chip'+(_jFilter==='all'?' active':'')+'" data-jf="all" onclick="setJFilter(\'all\')">All</button>'
+      +used.map(id=>'<button class="chip'+(_jFilter===id?' active':'')+'" data-jf="'+id+'" onclick="setJFilter(\''+id+'\')">'+( am[id]||'Deleted')+'</button>').join('');
   }
   renderTradeList();
 }
@@ -1268,7 +1268,7 @@ function renderTradeList(){
   if(empty)empty.style.display='none';
   const am=Object.fromEntries(accounts.map(a=>[String(a.id),a.name]));
   if(list)list.innerHTML=vis.map(t=>{
-    const accN=t.accountId?(am[String(t.accountId)]||'Gelöscht'):'';
+    const accN=t.accountId?(am[String(t.accountId)]||'Deleted'):'';
     const dots=Array.from({length:5},(_,i)=>'<div class="jcalm-dot'+(i<t.calmRating?' on':'')+'"></div>').join('');
     const pnlH=t.pnl!==0?(t.pnl>0?'<span style="color:var(--green);font-weight:700">+ '+fmt(t.pnl)+'</span>':'<span style="color:var(--red);font-weight:700">- '+fmt(Math.abs(t.pnl))+'</span>'):'';
     return '<div class="jcard" id="jc_'+t.id+'">'
@@ -1286,26 +1286,26 @@ function renderTradeList(){
   }).join('');
 }
 function jDetailHTML(t){
-  const yn=v=>v===true?'✓ Ja':v===false?'✗ Nein':'—';
+  const yn=v=>v===true?'✓ Yes':v===false?'✗ No':'—';
   const fld=(l,v)=>'<div class="jfld"><div class="jfld-l">'+l+'</div><div class="jfld-v'+((!v||v==='—')?' empty':'')+'">'+(v||'—')+'</div></div>';
   const dots=Array.from({length:5},(_,i)=>'<div class="jcalm-dot'+(i<t.calmRating?' on':'')+'" style="width:10px;height:10px"></div>').join('');
   return '<div class="jsect" style="border-top:none;margin-top:0">🔍 Pre-Trade</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+fld('Setup / Pattern',t.setup)+fld('Ziel',t.target)+fld('Stop Loss',t.sl)+fld('R:R',t.rr)+'</div>'
-    +(t.entryReason?fld('Einstiegsgrund',t.entryReason):'')
-    +'<div class="jsect">⚡ Während</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">'+fld('Plan eingehalten',yn(t.followedPlan))+fld('Zweifel',yn(t.hadDoubts))+fld('Stop bewegt',yn(t.movedStop))+'</div>'
-    +(t.moveReason?fld('Stop-Grund',t.moveReason):'')
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+fld('Setup / Pattern',t.setup)+fld('Target',t.target)+fld('Stop Loss',t.sl)+fld('R:R',t.rr)+'</div>'
+    +(t.entryReason?fld('Entry Reason',t.entryReason):'')
+    +'<div class="jsect">⚡ During</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">'+fld('Followed Plan',yn(t.followedPlan))+fld('Doubts',yn(t.hadDoubts))+fld('Stop Moved',yn(t.movedStop))+'</div>'
+    +(t.moveReason?fld('Stop Reason',t.moveReason):'')
     +'<div class="jsect">📊 Post-Trade</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+fld('Einstieg getimed',yn(t.entryTimed))+fld('Früher/Später',t.exit||'—')+'</div>'
-    +(t.whatDiff?fld('Was anders gemacht',t.whatDiff):'')
-    +'<div class="jsect">🧠 Psychologie</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+fld('Entry Timed',yn(t.entryTimed))+fld('Earlier/Later',t.exit||'—')+'</div>'
+    +(t.whatDiff?fld('What to Change',t.whatDiff):'')
+    +'<div class="jsect">🧠 Psychology</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">'
-    +'<div class="jfld"><div class="jfld-l">Ruhe</div><div class="jcalm" style="margin-top:4px;gap:3px">'+dots+'</div><div style="font-size:11px;color:var(--amber);margin-top:3px">'+t.calmRating+'/5</div></div>'
-    +fld('FOMO / Gier',yn(t.hadFOMO))+fld('Revenge',yn(t.revenge))
-    +'<div class="jfld"><div class="jfld-l">Art</div><div class="jfld-v">'+(t.impulse?'⚡ Impuls':'📋 Geplant')+'</div></div></div>'
-    +'<div class="jsect">🌍 Kontext</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+fld('Session',t.session?(SESS_LBL[t.session]||t.session):'—')+fld('Tagesstart',t.dayStart||'—')+'</div>'
-    +(t.newsCtx?fld('News / Ereignisse',t.newsCtx):'');
+    +'<div class="jfld"><div class="jfld-l">Calm</div><div class="jcalm" style="margin-top:4px;gap:3px">'+dots+'</div><div style="font-size:11px;color:var(--amber);margin-top:3px">'+t.calmRating+'/5</div></div>'
+    +fld('FOMO / Greed',yn(t.hadFOMO))+fld('Revenge',yn(t.revenge))
+    +'<div class="jfld"><div class="jfld-l">Type</div><div class="jfld-v">'+(t.impulse?'⚡ Impulse':'📋 Planned')+'</div></div></div>'
+    +'<div class="jsect">🌍 Context</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+fld('Session',t.session?(SESS_LBL[t.session]||t.session):'—')+fld('Day Start',t.dayStart||'—')+'</div>'
+    +(t.newsCtx?fld('News / Events',t.newsCtx):'');
 }
 
 /* ── INIT ── */
