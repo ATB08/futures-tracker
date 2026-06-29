@@ -246,6 +246,33 @@ tbody tr:hover td{background:var(--s2)}
 .tl-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:1px}
 .tl-sub{font-size:11px;color:var(--muted)}
 .tl-amt{font-size:13px;font-weight:700;color:var(--green);margin-top:2px}
+/* JOURNAL */
+.jcard{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;overflow:hidden;transition:border-color .15s}
+.jcard:hover{border-color:var(--blue)}
+.jcard-head{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;flex-wrap:wrap}
+.jcard-body{padding:12px 14px;border-top:.5px solid var(--border);display:none}
+.jcard.open .jcard-body{display:block}
+.jdir,.jres{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}
+.jdir.long{background:var(--gbg);color:var(--gtx)}.jdir.short{background:var(--rbg);color:var(--rtx)}
+.jres.win{background:var(--gbg);color:var(--gtx)}.jres.loss{background:var(--rbg);color:var(--rtx)}.jres.be{background:var(--s2);color:var(--muted)}
+.jcalm{display:flex;gap:2px;align-items:center}
+.jcalm-dot{width:7px;height:7px;border-radius:50%;background:var(--border-s)}
+.jcalm-dot.on{background:var(--amber)}
+.jsect{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:14px 0 8px;padding-top:10px;border-top:.5px solid var(--border)}
+.jfld{margin-bottom:8px}
+.jfld-l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.jfld-v{font-size:13px;color:var(--text);line-height:1.5}
+.jfld-v.empty{color:var(--muted);font-style:italic}
+.jyn-row{display:flex;gap:6px;margin-top:5px}
+.jyn-btn{flex:1;padding:7px;border-radius:var(--r);border:.5px solid var(--border-s);background:var(--bg);color:var(--text2);font-size:12px;cursor:pointer;font-weight:500;transition:all .12s}
+.jyn-btn.j-yes{background:var(--gbg);color:var(--gtx);border-color:var(--green)}
+.jyn-btn.j-no{background:var(--rbg);color:var(--rtx);border-color:var(--red)}
+.jrate-row{display:flex;gap:4px;margin-top:5px}
+.jrate-btn{flex:1;padding:7px;border-radius:var(--r);border:.5px solid var(--border-s);background:var(--bg);color:var(--text2);font-size:13px;cursor:pointer;font-weight:700}
+.jrate-btn.active{background:var(--abg);color:var(--atx);border-color:var(--amber)}
+.jsess-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
+.jsess-btn{padding:4px 12px;border-radius:20px;font-size:12px;border:.5px solid var(--border-s);background:transparent;cursor:pointer;color:var(--text2)}
+.jsess-btn.active{background:var(--bbg);color:var(--btx);border-color:var(--blue)}
 /* WIN STREAK */
 .streak-box{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;background:var(--abg);color:var(--atx);font-size:12px;font-weight:700;border:.5px solid var(--amber)}
 .streak-card{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:var(--r);background:var(--abg);border:.5px solid var(--amber);font-size:12px;font-weight:700;color:var(--atx);margin-top:6px}
@@ -265,6 +292,7 @@ tbody tr:hover td{background:var(--s2)}
   <div class="navtabs">
     <button class="ntab active" data-view="accounts" onclick="showTab('accounts',this)"><i class="ti ti-layout-cards"></i> Accounts</button>
     <button class="ntab" data-view="notes" onclick="showTab('notes',this)"><i class="ti ti-notes"></i> Notes/News</button>
+    <button class="ntab" data-view="journal" onclick="showTab('journal',this)"><i class="ti ti-notebook"></i> Journal</button>
     <button class="ntab" data-view="entries" onclick="showTab('entries',this)"><i class="ti ti-list-details"></i> Entries</button>
     <button class="ntab" data-view="analytics" onclick="showTab('analytics',this)"><i class="ti ti-chart-bar"></i> Analytics</button>
     <button class="ntab" data-view="achievements" onclick="showTab('achievements',this)"><i class="ti ti-trophy"></i> Records</button>
@@ -391,6 +419,52 @@ tbody tr:hover td{background:var(--s2)}
   </div>
 </div>
 
+<!-- TAB: JOURNAL -->
+<div id="tabJournal" class="page" style="display:none">
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:1rem">
+    <div class="chips" id="jAccChips" style="margin-bottom:0;flex:1;min-width:0"></div>
+    <button class="addbtn" onclick="toggleTradeForm()" style="white-space:nowrap;flex-shrink:0"><i class="ti ti-plus"></i> Add Trade</button>
+  </div>
+  <div class="fcard" id="tradeForm">
+    <div class="fgrid">
+      <div class="fsection full">📋 Basics</div>
+      <div><label>Datum</label><input type="date" id="tj_date"></div>
+      <div><label>Account</label><select id="tj_acc" style="width:100%;padding:6px 10px;border:.5px solid var(--border-s);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:13px;outline:none"><option value="">— Kein Account —</option></select></div>
+      <div><label>Symbol</label><input type="text" id="tj_sym" placeholder="z.B. NQ, ES, GC, EUR/USD"></div>
+      <div class="full"><label>Richtung</label><div style="display:flex;gap:8px;margin-top:5px"><button type="button" id="jd_long" class="type-btn active" onclick="setJDir('long')">▲ Long</button><button type="button" id="jd_short" class="type-btn" onclick="setJDir('short')">▼ Short</button></div></div>
+      <div class="fsection full">🔍 Pre-Trade</div>
+      <div class="full"><label>Setup / Pattern</label><input type="text" id="tj_setup" placeholder="z.B. FVG Fill, BOS, Supply/Demand..."></div>
+      <div class="full"><label>Einstiegsgrund — warum genau jetzt?</label><textarea class="notes-area" style="min-height:60px" id="tj_entry_reason" placeholder="Was hat dich zum Einstieg bewegt?"></textarea></div>
+      <div><label>Erwartetes Ziel</label><input type="text" id="tj_target" placeholder="z.B. 50 pts, prev high"></div>
+      <div><label>Geplanter Stop Loss</label><input type="text" id="tj_sl" placeholder="z.B. 15 pts, below swing low"></div>
+      <div class="full"><label>Risiko / R:R</label><input type="text" id="tj_rr" placeholder="z.B. $100 Risiko / 1:3 R:R"></div>
+      <div class="fsection full">⚡ Während des Trades</div>
+      <div class="full"><label>Plan eingehalten?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jf_y" onclick="setJField('followed',true)">✓ Ja</button><button type="button" class="jyn-btn" id="jf_n" onclick="setJField('followed',false)">✗ Nein</button></div></div>
+      <div class="full"><label>Zweifel / wolltest du früher raus?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jdoubt_y" onclick="setJField('doubts',true)">✓ Ja</button><button type="button" class="jyn-btn" id="jdoubt_n" onclick="setJField('doubts',false)">✗ Nein</button></div></div>
+      <div class="full"><label>Stop bewegt?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jm_y" onclick="setJField('movedStop',true)">✓ Ja</button><button type="button" class="jyn-btn" id="jm_n" onclick="setJField('movedStop',false)">✗ Nein</button></div></div>
+      <div class="full" id="jMSRWrap" style="display:none"><label>Grund — Stop bewegt</label><input type="text" id="tj_move_reason" placeholder="Warum hast du den Stop bewegt?"></div>
+      <div class="fsection full">📊 Post-Trade</div>
+      <div class="full"><label>Ergebnis</label><div style="display:flex;gap:8px;margin-top:5px"><button type="button" id="jr_win" class="type-btn active" onclick="setJResult('win')">✓ Win</button><button type="button" id="jr_loss" class="type-btn" onclick="setJResult('loss')">✗ Loss</button><button type="button" id="jr_be" class="type-btn" onclick="setJResult('be')">○ Break Even</button></div></div>
+      <div class="full"><label>P&amp;L (USD)</label><input type="number" id="tj_pnl" placeholder="+250 oder −150" step="0.01"></div>
+      <div class="full"><label>War der Einstieg gut getimed?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jtimed_y" onclick="setJField('timed',true)">✓ Ja</button><button type="button" class="jyn-btn" id="jtimed_n" onclick="setJField('timed',false)">✗ Nein</button></div></div>
+      <div class="full"><label>Früher / später raus gesollt?</label><input type="text" id="tj_exit" placeholder="z.B. 10 Ticks früher, hätte gehalten..."></div>
+      <div class="full"><label>Was hättest du anders gemacht?</label><textarea class="notes-area" style="min-height:70px" id="tj_diff" placeholder="Reflexion nach dem Trade..."></textarea></div>
+      <div class="fsection full">🧠 Psychologie</div>
+      <div class="full"><label>Ruhe-Skala (1 = sehr nervös · 5 = sehr ruhig)</label><div class="jrate-row"><button type="button" class="jrate-btn" id="jc1" onclick="setJCalm(1)">1</button><button type="button" class="jrate-btn" id="jc2" onclick="setJCalm(2)">2</button><button type="button" class="jrate-btn active" id="jc3" onclick="setJCalm(3)">3</button><button type="button" class="jrate-btn" id="jc4" onclick="setJCalm(4)">4</button><button type="button" class="jrate-btn" id="jc5" onclick="setJCalm(5)">5</button></div></div>
+      <div class="full"><label>FOMO / Angst / Gier?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jfomo_y" onclick="setJToggle('fomo',true)">✓ Ja</button><button type="button" class="jyn-btn" id="jfomo_n" onclick="setJToggle('fomo',false)">✗ Nein</button></div></div>
+      <div class="full"><label>Revenge Trade?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jrev_y" onclick="setJToggle('revenge',true)">✓ Ja</button><button type="button" class="jyn-btn" id="jrev_n" onclick="setJToggle('revenge',false)">✗ Nein</button></div></div>
+      <div class="full"><label>Impuls oder geplant?</label><div style="display:flex;gap:8px;margin-top:5px"><button type="button" id="jimp_p" class="type-btn active" onclick="setJImpulse(false)">📋 Geplant</button><button type="button" id="jimp_i" class="type-btn" onclick="setJImpulse(true)">⚡ Impuls</button></div></div>
+      <div class="fsection full">🌍 Kontext</div>
+      <div class="full"><label>News / Ereignisse</label><input type="text" id="tj_news_ctx" placeholder="z.B. CPI, FOMC, kein Event heute"></div>
+      <div class="full"><label>Session</label><div class="jsess-row"><button type="button" class="jsess-btn" data-sess="asia" onclick="setJSession('asia')">🌏 Asia</button><button type="button" class="jsess-btn" data-sess="london" onclick="setJSession('london')">🇬🇧 London</button><button type="button" class="jsess-btn" data-sess="ny" onclick="setJSession('ny')">🇺🇸 New York</button><button type="button" class="jsess-btn" data-sess="overlap" onclick="setJSession('overlap')">🔀 Overlap</button></div></div>
+      <div class="full"><label>Tagesstart (Schlaf, Stress, Stimmung...)</label><input type="text" id="tj_daystart" placeholder="z.B. gut geschlafen, entspannt, fokussiert"></div>
+    </div>
+    <div class="factions"><button class="savebtn" onclick="saveTrade()">Save Trade</button><button class="cancelbtn" onclick="toggleTradeForm()">Cancel</button></div>
+  </div>
+  <div id="tradeList"></div>
+  <div id="tradeEmpty" class="empty" style="display:none"><i class="ti ti-notebook"></i>Noch keine Trades gejournalt.<br><span style="font-size:12px;margin-top:4px;display:block">Klicke "+ Add Trade" um deinen ersten Trade zu journalen.</span></div>
+</div>
+
 <!-- TAB: ENTRIES -->
 <div id="tabEntries" class="page" style="display:none">
   <div class="krow" id="kpiRow"></div>
@@ -467,8 +541,10 @@ const CATS={profit:'Profit Withdrawal',fee:'Platform Fee',subscription:'Subscrip
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const FEMOJI={'#3b82f6':'📁','#1baf7a':'📂','#f97316':'🗂️','#8b5cf6':'📋','#ec4899':'📌','#f59e0b':'⭐','#ef4444':'🏆','#14b8a6':'📎','#6b7280':'🗃️'};
 
-let entries=[],accounts=[],folders=[],filter='all',editId=null,currentPeriod='1M',currentTab='accounts';
+let entries=[],accounts=[],folders=[],trades=[],filter='all',editId=null,currentPeriod='1M',currentTab='accounts';
 let detailAccId=null,detailChart=null,cumulativeChart=null,selectedFolderId=null,selectedColor='#3b82f6';
+let _jFilter='all',_jDir='long',_jResult='win',_jFollowed=null,_jDoubts=null,_jMovedStop=null,_jTimed=null;
+let _jFOMO=null,_jRevenge=null,_jImpulse=false,_jCalm=3,_jSession='',_jEditId=null;
 
 /* ── FORMAT ── */
 function fmt(n){const a=Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});return(n<0?'- $':'$')+a;}
@@ -516,9 +592,10 @@ function migrateData(){
   });
   try{const f=localStorage.getItem('af_folders');if(f)folders=JSON.parse(f);}catch(e){}
   try{const n=localStorage.getItem('af_notes');if(n)notes=JSON.parse(n);}catch(e){}
+  try{const t=localStorage.getItem('af_trades');if(t)trades=JSON.parse(t);}catch(e){}
   saveAll();
 }
-function saveAll(){try{localStorage.setItem('af_entries',JSON.stringify(entries));}catch(e){}try{localStorage.setItem('af_accs',JSON.stringify(accounts));}catch(e){}try{localStorage.setItem('af_folders',JSON.stringify(folders));}catch(e){alert('Storage limit reached.');}}
+function saveAll(){try{localStorage.setItem('af_entries',JSON.stringify(entries));}catch(e){}try{localStorage.setItem('af_accs',JSON.stringify(accounts));}catch(e){}try{localStorage.setItem('af_folders',JSON.stringify(folders));}catch(e){alert('Storage limit reached.');}try{localStorage.setItem('af_trades',JSON.stringify(trades));}catch(e){}}
 
 /* ── BALANCE & STATS ── */
 function getBalance(acc){const p=(acc.dailyEntries||[]).reduce((s,e)=>s+e.pnl,0);const py=(acc.payouts||[]).reduce((s,x)=>s+x.amount,0);return(acc.size||0)+p-py;}
@@ -609,14 +686,14 @@ function triggerConfetti(){
 /* ── TAB SWITCHING ── */
 function showTab(tab,btn){
   currentTab=tab;document.getElementById('accountDetail').style.display='none';
-  ['Accounts','Notes','Entries','Analytics','Achievements'].forEach(t=>document.getElementById('tab'+t).style.display=t.toLowerCase()===tab?'block':'none');
+  ['Accounts','Notes','Journal','Entries','Analytics','Achievements'].forEach(t=>document.getElementById('tab'+t).style.display=t.toLowerCase()===tab?'block':'none');
   document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));if(btn)btn.classList.add('active');
-  if(tab==='entries')renderEntries();else if(tab==='analytics')renderAnalytics();else if(tab==='achievements')renderAchievements();else if(tab==='notes')renderNotes();else renderAccounts();
+  if(tab==='entries')renderEntries();else if(tab==='analytics')renderAnalytics();else if(tab==='achievements')renderAchievements();else if(tab==='notes')renderNotes();else if(tab==='journal')renderJournal();else renderAccounts();
 }
 
 /* ── ACCOUNT DETAIL ── */
 function openDetail(id,ev){if(ev)ev.stopPropagation();detailAccId=id;_detailView='stats';calYear=new Date().getFullYear();calMonth=new Date().getMonth();['tabAccounts','tabNotes','tabEntries','tabAnalytics','tabAchievements'].forEach(t=>document.getElementById(t).style.display='none');document.getElementById('accountDetail').style.display='block';renderDetail();}
-function closeDetail(){_detailView='stats';document.getElementById('accountDetail').style.display='none';document.getElementById('tabAccounts').style.display='block';document.querySelectorAll('.ntab').forEach(t=>t.classList.toggle('active',t.dataset.view==='accounts'));if(detailChart){detailChart.destroy();detailChart=null;}renderAccounts();}
+function closeDetail(){_detailView='stats';document.getElementById('accountDetail').style.display='none';['tabAccounts','tabNotes','tabJournal','tabEntries','tabAnalytics','tabAchievements'].forEach(el=>{const e=document.getElementById(el);if(e)e.style.display='none';});document.getElementById('tabAccounts').style.display='block';document.querySelectorAll('.ntab').forEach(t=>t.classList.toggle('active',t.dataset.view==='accounts'));if(detailChart){detailChart.destroy();detailChart=null;}renderAccounts();}
 
 function renderDetail(){
   // Reset tab to stats view
@@ -1114,6 +1191,121 @@ function renderTimeline(){
     ?'<div class="tl-wrap">'+events.map(ev=>'<div class="tl-item"><div class="tl-dot '+dotCls[ev.type]+'">'+icons[ev.type]+'</div><div class="tl-body"><div class="tl-title">'+ev.title+'</div>'+(ev.sub?'<div class="tl-sub">'+ev.sub+'</div>':'')+'<div class="tl-sub">'+fmtDate(ev.date)+'</div>'+(ev.amount?'<div class="tl-amt">+ '+fmt(ev.amount)+'</div>':'')+'</div></div>').join('')+'</div>'
     :'<div class="empty"><i class="ti ti-timeline"></i>No events yet.</div>';
   document.getElementById('timelineContent').innerHTML=html;
+}
+
+/* ── JOURNAL ── */
+const SESS_LBL={asia:'🌏 Asia',london:'🇬🇧 London',ny:'🇺🇸 New York',overlap:'🔀 Overlap'};
+function setJDir(v){_jDir=v;['long','short'].forEach(x=>{const e=document.getElementById('jd_'+x);if(e)e.classList.toggle('active',x===v);});}
+function setJResult(v){_jResult=v;['win','loss','be'].forEach(x=>{const e=document.getElementById('jr_'+x);if(e)e.classList.toggle('active',x===v);});}
+function setJField(f,v){
+  const ids={followed:['jf_y','jf_n'],doubts:['jdoubt_y','jdoubt_n'],movedStop:['jm_y','jm_n'],timed:['jtimed_y','jtimed_n']};
+  if(f==='followed')_jFollowed=v;else if(f==='doubts')_jDoubts=v;else if(f==='timed')_jTimed=v;
+  else if(f==='movedStop'){_jMovedStop=v;const w=document.getElementById('jMSRWrap');if(w)w.style.display=v?'block':'none';}
+  const [iy,in_]=ids[f]||[];
+  if(iy){document.getElementById(iy).className='jyn-btn'+(v===true?' j-yes':'');}
+  if(in_){document.getElementById(in_).className='jyn-btn'+(v===false?' j-no':'');}
+}
+function setJToggle(f,v){
+  if(f==='fomo')_jFOMO=v;else if(f==='revenge')_jRevenge=v;
+  const ids={fomo:['jfomo_y','jfomo_n'],revenge:['jrev_y','jrev_n']}[f];if(!ids)return;
+  document.getElementById(ids[0]).className='jyn-btn'+(v===true?' j-yes':'');
+  document.getElementById(ids[1]).className='jyn-btn'+(v===false?' j-no':'');
+}
+function setJCalm(v){_jCalm=v;for(let i=1;i<=5;i++){const e=document.getElementById('jc'+i);if(e)e.classList.toggle('active',i===v);}}
+function setJImpulse(v){_jImpulse=v;const p=document.getElementById('jimp_p'),i=document.getElementById('jimp_i');if(p)p.classList.toggle('active',!v);if(i)i.classList.toggle('active',v);}
+function setJSession(v){_jSession=_jSession===v?'':v;document.querySelectorAll('.jsess-btn').forEach(b=>b.classList.toggle('active',b.dataset.sess===_jSession));}
+function setJFilter(v){_jFilter=v;document.querySelectorAll('#jAccChips .chip').forEach(c=>c.classList.toggle('active',c.dataset.jf===v));renderTradeList();}
+
+function toggleTradeForm(){
+  const f=document.getElementById('tradeForm');if(!f)return;
+  const open=f.style.display==='block';f.style.display=open?'none':'block';
+  if(!open){
+    _jDir='long';_jResult='win';_jFollowed=null;_jDoubts=null;_jMovedStop=null;_jTimed=null;
+    _jFOMO=null;_jRevenge=null;_jImpulse=false;_jCalm=3;_jSession='';_jEditId=null;
+    ['tj_setup','tj_rr','tj_sl','tj_target','tj_move_reason','tj_exit','tj_news_ctx','tj_daystart','tj_sym'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+    ['tj_entry_reason','tj_diff'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+    const dp=document.getElementById('tj_date');if(dp)dp.value=todayStr();
+    const pnl=document.getElementById('tj_pnl');if(pnl)pnl.value='';
+    const sel=document.getElementById('tj_acc');if(sel)sel.innerHTML='<option value="">— Kein Account —</option>'+accounts.map(a=>'<option value="'+a.id+'">'+a.name+'</option>').join('');
+    setJDir('long');setJResult('win');setJCalm(3);setJImpulse(false);
+    ['jf_y','jf_n','jdoubt_y','jdoubt_n','jm_y','jm_n','jtimed_y','jtimed_n','jfomo_y','jfomo_n','jrev_y','jrev_n'].forEach(id=>{const e=document.getElementById(id);if(e)e.className='jyn-btn';});
+    document.querySelectorAll('.jsess-btn').forEach(b=>b.classList.remove('active'));
+    const w=document.getElementById('jMSRWrap');if(w)w.style.display='none';
+    setTimeout(()=>{const e=document.getElementById('tj_sym');if(e)e.focus();},50);
+  }
+}
+function saveTrade(){
+  const date=(document.getElementById('tj_date')||{}).value,sym=((document.getElementById('tj_sym')||{}).value||'').trim();
+  if(!date||!sym){alert('Bitte Datum und Symbol eingeben.');return;}
+  const g=id=>(document.getElementById(id)||{}).value||'';
+  const trade={id:_jEditId||Date.now(),date,accountId:g('tj_acc')||null,symbol:sym,direction:_jDir,
+    setup:g('tj_setup').trim(),entryReason:g('tj_entry_reason').trim(),target:g('tj_target').trim(),
+    sl:g('tj_sl').trim(),rr:g('tj_rr').trim(),followedPlan:_jFollowed,hadDoubts:_jDoubts,
+    movedStop:_jMovedStop,moveReason:g('tj_move_reason').trim(),result:_jResult,
+    pnl:parseFloat(g('tj_pnl'))||0,entryTimed:_jTimed,exit:g('tj_exit').trim(),
+    whatDiff:g('tj_diff').trim(),calmRating:_jCalm,hadFOMO:_jFOMO,revenge:_jRevenge,
+    impulse:_jImpulse,newsCtx:g('tj_news_ctx').trim(),session:_jSession,dayStart:g('tj_daystart').trim()};
+  if(_jEditId){const i=trades.findIndex(t=>t.id===_jEditId);if(i>-1)trades[i]=trade;}else trades.push(trade);
+  trades.sort((a,b)=>b.date.localeCompare(a.date));
+  saveAll();toggleTradeForm();renderJournal();
+}
+function deleteTrade(id){if(!confirm('Trade löschen?'))return;trades=trades.filter(t=>t.id!==id);saveAll();renderTradeList();}
+function toggleJCard(id){const e=document.getElementById('jc_'+id);if(e)e.classList.toggle('open');}
+function renderJournal(){
+  const chips=document.getElementById('jAccChips');
+  if(chips){
+    const used=[...new Set(trades.map(t=>t.accountId).filter(Boolean))];
+    const am=Object.fromEntries(accounts.map(a=>[String(a.id),a.name]));
+    chips.innerHTML='<button class="chip'+(_jFilter==='all'?' active':'')+'" data-jf="all" onclick="setJFilter(\'all\')">Alle</button>'
+      +used.map(id=>'<button class="chip'+(_jFilter===id?' active':'')+'" data-jf="'+id+'" onclick="setJFilter(\''+id+'\')">'+( am[id]||'Gelöscht')+'</button>').join('');
+  }
+  renderTradeList();
+}
+function renderTradeList(){
+  const list=document.getElementById('tradeList'),empty=document.getElementById('tradeEmpty');
+  const vis=_jFilter==='all'?trades:trades.filter(t=>String(t.accountId)===String(_jFilter));
+  if(!vis.length){if(list)list.innerHTML='';if(empty)empty.style.display='block';return;}
+  if(empty)empty.style.display='none';
+  const am=Object.fromEntries(accounts.map(a=>[String(a.id),a.name]));
+  if(list)list.innerHTML=vis.map(t=>{
+    const accN=t.accountId?(am[String(t.accountId)]||'Gelöscht'):'';
+    const dots=Array.from({length:5},(_,i)=>'<div class="jcalm-dot'+(i<t.calmRating?' on':'')+'"></div>').join('');
+    const pnlH=t.pnl!==0?(t.pnl>0?'<span style="color:var(--green);font-weight:700">+ '+fmt(t.pnl)+'</span>':'<span style="color:var(--red);font-weight:700">- '+fmt(Math.abs(t.pnl))+'</span>'):'';
+    return '<div class="jcard" id="jc_'+t.id+'">'
+      +'<div class="jcard-head" onclick="toggleJCard('+t.id+')">'
+      +'<span style="font-size:12px;color:var(--muted);flex-shrink:0">'+fmtDate(t.date)+'</span>'
+      +'<span class="jdir '+t.direction+'">'+(t.direction==='long'?'▲ Long':'▼ Short')+'</span>'
+      +'<span class="jres '+t.result+'">'+(t.result==='win'?'✓ Win':t.result==='loss'?'✗ Loss':'○ BE')+'</span>'
+      +(t.symbol?'<span style="font-size:13px;font-weight:600">'+t.symbol+'</span>':'')
+      +(pnlH||'')+(accN?'<span style="font-size:11px;color:var(--muted)">'+accN+'</span>':'')
+      +'<div style="margin-left:auto;display:flex;align-items:center;gap:8px"><div class="jcalm">'+dots+'</div>'
+      +'<button class="iconbtn" onclick="event.stopPropagation();deleteTrade('+t.id+')" style="font-size:12px;color:var(--red)"><i class="ti ti-trash"></i></button></div>'
+      +'</div>'
+      +(t.setup?'<div style="padding:0 14px 8px;font-size:12px;color:var(--muted)">'+t.setup+'</div>':'')
+      +'<div class="jcard-body">'+jDetailHTML(t)+'</div></div>';
+  }).join('');
+}
+function jDetailHTML(t){
+  const yn=v=>v===true?'✓ Ja':v===false?'✗ Nein':'—';
+  const fld=(l,v)=>'<div class="jfld"><div class="jfld-l">'+l+'</div><div class="jfld-v'+((!v||v==='—')?' empty':'')+'">'+(v||'—')+'</div></div>';
+  const dots=Array.from({length:5},(_,i)=>'<div class="jcalm-dot'+(i<t.calmRating?' on':'')+'" style="width:10px;height:10px"></div>').join('');
+  return '<div class="jsect" style="border-top:none;margin-top:0">🔍 Pre-Trade</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+fld('Setup / Pattern',t.setup)+fld('Ziel',t.target)+fld('Stop Loss',t.sl)+fld('R:R',t.rr)+'</div>'
+    +(t.entryReason?fld('Einstiegsgrund',t.entryReason):'')
+    +'<div class="jsect">⚡ Während</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">'+fld('Plan eingehalten',yn(t.followedPlan))+fld('Zweifel',yn(t.hadDoubts))+fld('Stop bewegt',yn(t.movedStop))+'</div>'
+    +(t.moveReason?fld('Stop-Grund',t.moveReason):'')
+    +'<div class="jsect">📊 Post-Trade</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+fld('Einstieg getimed',yn(t.entryTimed))+fld('Früher/Später',t.exit||'—')+'</div>'
+    +(t.whatDiff?fld('Was anders gemacht',t.whatDiff):'')
+    +'<div class="jsect">🧠 Psychologie</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">'
+    +'<div class="jfld"><div class="jfld-l">Ruhe</div><div class="jcalm" style="margin-top:4px;gap:3px">'+dots+'</div><div style="font-size:11px;color:var(--amber);margin-top:3px">'+t.calmRating+'/5</div></div>'
+    +fld('FOMO / Gier',yn(t.hadFOMO))+fld('Revenge',yn(t.revenge))
+    +'<div class="jfld"><div class="jfld-l">Art</div><div class="jfld-v">'+(t.impulse?'⚡ Impuls':'📋 Geplant')+'</div></div></div>'
+    +'<div class="jsect">🌍 Kontext</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+fld('Session',t.session?(SESS_LBL[t.session]||t.session):'—')+fld('Tagesstart',t.dayStart||'—')+'</div>'
+    +(t.newsCtx?fld('News / Ereignisse',t.newsCtx):'');
 }
 
 /* ── INIT ── */
