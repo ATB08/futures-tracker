@@ -476,7 +476,7 @@ function fmtDate(s){if(!s)return'—';const d=new Date(s+'T00:00:00');return d.g
 function fmtShort(s){if(!s||s==='START')return'Start';const d=new Date(s+'T00:00:00');return d.getDate()+'/'+(d.getMonth()+1);}
 function todayStr(){return new Date().toISOString().slice(0,10);}
 function winDaysOf(acc){return acc.winDays===undefined?5:Number(acc.winDays);}
-function getWinStreak(acc){const days=(acc.dailyEntries||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));let s=0;for(const d of days){if(d.pnl>0)s++;else break;}return s;}
+function getWinStreak(acc){const dm={};(acc.dailyEntries||[]).forEach(e=>{dm[e.date]=(dm[e.date]||0)+e.pnl;});const dates=Object.entries(dm).sort((a,b)=>b[0].localeCompare(a[0]));let s=0;for(const[,v]of dates){if(v>0)s++;else break;}return s;}
 function getIsDark(){const t=document.documentElement.getAttribute('data-theme');if(t==='dark')return true;if(t==='light')return false;return window.matchMedia('(prefers-color-scheme: dark)').matches;}
 
 /* ── THEME ── */
@@ -524,7 +524,8 @@ function getBalance(acc){const p=(acc.dailyEntries||[]).reduce((s,e)=>s+e.pnl,0)
 function getPeriodStats(acc){
   const lastDate=acc.status==='funded'?acc.lastPayoutDate:null;
   const rel=lastDate?(acc.dailyEntries||[]).filter(e=>e.date>lastDate):(acc.dailyEntries||[]);
-  return{netPnL:rel.reduce((s,e)=>s+e.pnl,0),profitDays:rel.filter(e=>e.pnl>0).length,lossDays:rel.filter(e=>e.pnl<0).length,relEntries:rel};
+  const dm={};rel.forEach(e=>{dm[e.date]=(dm[e.date]||0)+e.pnl;});
+  return{netPnL:rel.reduce((s,e)=>s+e.pnl,0),profitDays:Object.values(dm).filter(v=>v>0).length,lossDays:Object.values(dm).filter(v=>v<0).length,relEntries:rel};
 }
 
 /* ── CONSISTENCY RULE ──
