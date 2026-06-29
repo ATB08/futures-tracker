@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patience — Futures Tracker</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f8f8f7;--surface:#fff;--s2:#f1f0ec;--border:rgba(0,0,0,.1);--border-s:rgba(0,0,0,.18);--text:#0b0b0b;--text2:#52514e;--muted:#898781;--r:8px;--green:#1baf7a;--red:#ef4444;--blue:#3b82f6;--amber:#f59e0b;--gbg:#eaf3de;--gtx:#3b6d11;--rbg:#fef2f2;--rtx:#b91c1c;--bbg:#eff6ff;--btx:#1d4ed8;--abg:#fef3c7;--atx:#92400e;--obg:#fff7ed;--otx:#c2410c;}
+@media(prefers-color-scheme:dark){:root{--bg:#141413;--surface:#1e1e1c;--s2:#262624;--border:rgba(255,255,255,.1);--border-s:rgba(255,255,255,.18);--text:#f5f5f0;--text2:#c3c2b7;--muted:#898781;--gbg:#173404;--gtx:#97c459;--rbg:#450a0a;--rtx:#fca5a5;--bbg:#1e3a5f;--btx:#93c5fd;--abg:#3d2800;--atx:#fde68a;--obg:#431407;--otx:#fdba74;}}
+html[data-theme="dark"]{--bg:#141413;--surface:#1e1e1c;--s2:#262624;--border:rgba(255,255,255,.1);--border-s:rgba(255,255,255,.18);--text:#f5f5f0;--text2:#c3c2b7;--muted:#898781;--gbg:#173404;--gtx:#97c459;--rbg:#450a0a;--rtx:#fca5a5;--bbg:#1e3a5f;--btx:#93c5fd;--abg:#3d2800;--atx:#fde68a;--obg:#431407;--otx:#fdba74;}
+html[data-theme="light"]{--bg:#f8f8f7;--surface:#fff;--s2:#f1f0ec;--border:rgba(0,0,0,.1);--border-s:rgba(0,0,0,.18);--text:#0b0b0b;--text2:#52514e;--muted:#898781;--gbg:#eaf3de;--gtx:#3b6d11;--rbg:#fef2f2;--rtx:#b91c1c;--bbg:#eff6ff;--btx:#1d4ed8;--abg:#fef3c7;--atx:#92400e;--obg:#fff7ed;--otx:#c2410c;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
+.app-header{display:flex;align-items:center;gap:10px;padding:11px 1.5rem;border-bottom:.5px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100}
+.app-logo{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;flex-shrink:0}
+.app-logo-icon{width:30px;height:30px;border-radius:7px;overflow:hidden;flex-shrink:0}
+.navtabs{display:flex;gap:2px;background:var(--s2);border-radius:var(--r);padding:3px;border:.5px solid var(--border);flex:1;max-width:530px;margin:0 auto}
+.ntab{flex:1;padding:5px 2px;text-align:center;font-size:11px;border:none;background:transparent;cursor:pointer;border-radius:6px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:3px;white-space:nowrap}
+.ntab.active{background:var(--surface);color:var(--text);font-weight:500;box-shadow:0 .5px 2px rgba(0,0,0,.1)}
+.theme-btn{background:none;border:none;cursor:pointer;color:var(--muted);padding:5px;border-radius:var(--r);font-size:17px;display:flex;align-items:center;flex-shrink:0}
+.theme-btn:hover{color:var(--text);background:var(--s2)}
+.page{padding:1.5rem;max-width:1020px;margin:0 auto}
+.krow{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:10px;margin-bottom:1.25rem}
+.kpi{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);padding:.75rem 1rem}
+.klbl{font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.kval{font-size:20px;font-weight:500}.kval.g{color:var(--green)}.kval.r{color:var(--red)}.kval.b{color:var(--blue)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
+.chip,.pchip{padding:4px 14px;border-radius:20px;font-size:12px;border:.5px solid var(--border-s);background:transparent;cursor:pointer;color:var(--text2)}
+.chip.active,.pchip.active{background:var(--bbg);color:var(--btx);border-color:var(--blue)}
+.addbtn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:.5px solid var(--border-s);border-radius:var(--r);background:transparent;color:var(--text);font-size:13px;cursor:pointer;margin-bottom:1rem}
+.addbtn:hover{background:var(--s2)}
+.savebtn{padding:6px 16px;border-radius:var(--r);border:.5px solid var(--blue);background:var(--bbg);color:var(--btx);font-size:13px;cursor:pointer;font-weight:500}
+.cancelbtn{padding:6px 16px;border-radius:var(--r);border:.5px solid var(--border);background:transparent;color:var(--text2);font-size:13px;cursor:pointer}
+.greenbtn{padding:10px 20px;border-radius:var(--r);border:none;background:var(--green);color:#fff;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+.greenbtn:hover{opacity:.88}
+.iconbtn{background:none;border:none;cursor:pointer;color:var(--muted);padding:3px 5px;border-radius:4px;font-size:15px}
+.iconbtn:hover{color:var(--text);background:var(--s2)}
+.backbtn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:.5px solid var(--border-s);border-radius:var(--r);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;margin-bottom:1.25rem;font-weight:500}
+.backbtn:hover{background:var(--s2)}
+.fcard{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:1rem;display:none}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:12px}
+.fgrid label{font-size:11px;color:var(--muted);display:block;margin-bottom:3px}
+.fgrid input,.fgrid select{width:100%;padding:6px 10px;border:.5px solid var(--border-s);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:13px;outline:none}
+.fgrid input:focus,.fgrid select:focus{border-color:var(--blue)}
+.full{grid-column:1/-1}.factions{display:flex;gap:8px}
+.type-btn{flex:1;padding:9px;border-radius:var(--r);border:.5px solid var(--border-s);background:var(--bg);color:var(--text2);font-size:13px;cursor:pointer;font-weight:500;transition:all .15s}
+.type-btn.active{background:var(--bbg);color:var(--btx);border-color:var(--blue)}
+.fsection{grid-column:1/-1;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding-top:8px;border-top:.5px solid var(--border);margin-top:4px}
+.twrap{overflow-x:auto;border:.5px solid var(--border);border-radius:var(--r);background:var(--surface);margin-bottom:1.25rem}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 12px;color:var(--muted);font-weight:400;border-bottom:.5px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+td{padding:9px 12px;border-bottom:.5px solid var(--border);color:var(--text)}
+tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--s2)}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500}
+.bg{background:var(--gbg);color:var(--gtx)}.br{background:var(--rbg);color:var(--rtx)}.bb{background:var(--bbg);color:var(--btx)}.ba{background:var(--abg);color:var(--atx)}.bo{background:var(--obg);color:var(--otx)}
+.ract{display:flex;gap:2px}
+.stitle{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.05em}
+.divider{height:.5px;background:var(--border);margin:1.5rem 0}
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--muted);font-size:13px}
+.empty i{font-size:28px;display:block;margin-bottom:8px;opacity:.5}
+.tar{text-align:right}.nw{white-space:nowrap}
+/* ACCOUNT CARDS */
+.accgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin-bottom:1.25rem}
+.acccard{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:1.1rem;display:flex;flex-direction:column;gap:10px;cursor:pointer;transition:transform .12s,box-shadow .12s,border-color .15s}
+.acccard:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08);border-color:var(--blue)}
+.acccard.funded-ready{border-color:var(--green);border-width:1.5px}.acccard.funded-ready:hover{border-color:var(--green)}
+.acccard.pass-ready{border-color:var(--green);border-width:1.5px;background:linear-gradient(135deg,rgba(27,175,122,.06),var(--surface))}.acccard.pass-ready:hover{border-color:var(--green)}
+.acccard.pending-card{border-color:var(--amber);border-width:1.5px}
+.acchead{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.acchead-left{flex:1;min-width:0}
+.accname{font-size:16px;font-weight:600;word-break:break-word;line-height:1.3}
+.accnumber{font-size:12px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:3px}
+.acc-status-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.card-hint{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.balance-box{background:var(--s2);border:.5px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.balance-box.up{background:linear-gradient(135deg,rgba(59,130,246,.08),var(--surface));border-color:var(--blue)}
+.balance-box.down{background:linear-gradient(135deg,rgba(239,68,68,.08),var(--surface));border-color:var(--red)}
+.balance-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.balance-value{font-size:26px;font-weight:700;letter-spacing:-.5px}
+.balance-change-label{font-size:10px;color:var(--muted);margin-bottom:2px;text-align:right}
+.balance-change{font-size:15px;font-weight:600;text-align:right}
+.stat2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sbox{background:var(--s2);border-radius:var(--r);padding:9px 10px}
+.sbox-l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.sbox-v{font-size:15px;font-weight:600}
+.prog-lbl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px}
+.prog-bar{height:8px;background:var(--s2);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;transition:width .4s}
+.pd-dots{display:flex;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.pd-dot{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border-s);display:flex;align-items:center;justify-content:center;font-size:14px;background:var(--s2);color:var(--muted)}
+.pd-dot.ok{background:var(--gbg);border-color:var(--green);color:var(--gtx)}.pd-dot.empty-dot{border-style:dashed}
+.day-list{display:flex;flex-direction:column;gap:4px;max-height:220px;overflow-y:auto}
+.day-item{display:flex;align-items:center;justify-content:space-between;border-radius:6px;padding:6px 10px;font-size:12px}
+.day-item.pos{background:var(--gbg)}.day-item.neg{background:var(--rbg)}.day-item.pay{background:var(--bbg)}
+.day-item-left{display:flex;gap:8px;align-items:center}
+.day-item-date{color:var(--text2);font-weight:500}
+.day-item-tag{font-size:10px;font-weight:600;padding:1px 6px;border-radius:3px;color:#fff}
+.day-item.pos .day-item-tag{background:var(--green)}.day-item.neg .day-item-tag{background:var(--red)}.day-item.pay .day-item-tag{background:var(--blue)}
+.day-item-pnl{font-weight:700;font-size:13px}
+.day-item.pos .day-item-pnl{color:var(--green)}.day-item.neg .day-item-pnl{color:var(--red)}.day-item.pay .day-item-pnl{color:var(--blue)}
+.day-add-form{background:var(--s2);border-radius:10px;padding:12px;display:none;border:.5px solid var(--border-s)}
+.daf-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;font-weight:500}
+.day-add-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.day-add-row label{font-size:11px;color:var(--muted);display:block;margin-bottom:5px;font-weight:500}
+.day-add-row input{width:100%;padding:10px 12px;border:1.5px solid var(--border-s);border-radius:var(--r);background:var(--surface);color:var(--text);font-size:18px;font-weight:600;outline:none}
+.day-add-row input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--bbg)}
+.pnl-hint{font-size:10px;color:var(--muted);margin-top:4px}
+.day-add-submit{width:100%;padding:11px;border-radius:var(--r);border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.day-add-submit:hover{opacity:.88}
+.payout-form{background:var(--gbg);border:.5px solid var(--green);border-radius:10px;padding:12px;display:none}
+.payout-form-title{font-size:12px;font-weight:600;color:var(--gtx);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.payout-form label{font-size:11px;color:var(--muted);display:block;margin-bottom:5px;font-weight:500}
+.payout-form input{width:100%;padding:10px 12px;border:1.5px solid var(--green);border-radius:var(--r);background:var(--surface);color:var(--text);font-size:20px;font-weight:700;outline:none;margin-bottom:10px}
+.payout-form-info{font-size:11px;color:var(--gtx);margin-bottom:10px;padding:6px 8px;background:rgba(0,0,0,.05);border-radius:6px;line-height:1.6}
+.payout-form-actions{display:flex;gap:8px}
+.payout-confirm-btn{flex:1;padding:9px;border-radius:var(--r);border:none;background:var(--green);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+.payout-cancel-btn{padding:9px 14px;border-radius:var(--r);border:.5px solid var(--border);background:transparent;color:var(--text2);font-size:13px;cursor:pointer}
+.acc-footer{display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:.5px solid var(--border);gap:8px;flex-wrap:wrap}
+.payoutbtn{padding:8px 16px;border-radius:var(--r);border:.5px solid var(--green);background:var(--gbg);color:var(--gtx);font-size:12px;cursor:pointer;font-weight:600}
+.payoutbtn:disabled{opacity:.35;cursor:not-allowed}
+.pending-notice{background:var(--abg);border:.5px solid var(--amber);border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px}
+.pending-notice-icon{font-size:20px;flex-shrink:0}
+.pending-notice-body{flex:1}
+.pending-notice-title{font-size:13px;font-weight:600;color:var(--atx);margin-bottom:2px}
+.pending-notice-sub{font-size:12px;color:var(--atx);opacity:.8}
+/* CONSISTENCY */
+.con-card{border-radius:var(--r);padding:12px;margin-bottom:1rem}
+.con-card.ok{background:var(--gbg);border:.5px solid var(--green)}
+.con-card.warn{background:var(--rbg);border:.5px solid var(--red)}
+.con-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.con-status{font-size:16px;font-weight:700;margin-bottom:4px}
+/* DETAIL */
+#accountDetail{display:none}
+.detail-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:1.25rem;flex-wrap:wrap}
+.detail-name{font-size:22px;font-weight:700;line-height:1.2}
+.detail-number{font-size:13px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:4px}
+.chart-wrap{background:var(--surface);border:.5px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1.25rem}
+.chart-sub{font-size:11px;color:var(--muted);margin-bottom:1rem}
+.chart-container{position:relative;height:300px;width:100%}
+.chart-container-sm{position:relative;height:220px;width:100%}
+.ccard{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:1.25rem}
+.ctitle{font-size:13px;font-weight:500;margin-bottom:.75rem;display:flex;justify-content:space-between;align-items:center}
+.barchart{display:flex;align-items:flex-end;gap:4px;height:150px;border-bottom:.5px solid var(--border);margin-bottom:6px;padding-bottom:2px}
+.bcol{flex:1;min-width:20px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.bpair{display:flex;gap:2px;align-items:flex-end;width:100%;justify-content:center}
+.bseg{flex:1;max-width:22px;min-width:5px;border-radius:3px 3px 0 0}
+.blbl{font-size:9px;color:var(--muted);margin-top:4px;white-space:nowrap;text-align:center;max-width:42px;overflow:hidden;text-overflow:ellipsis}
+.clegend{display:flex;gap:14px;flex-wrap:wrap;margin-top:4px}
+.cli{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.cldot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+/* ACHIEVEMENTS */
+.folder-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:1.5rem}
+.folder-card{border-radius:12px;padding:1.1rem;cursor:pointer;border:.5px solid var(--border);display:flex;flex-direction:column;gap:8px;transition:transform .1s,box-shadow .1s}
+.folder-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.1)}
+.folder-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.folder-name{font-size:14px;font-weight:600}
+.folder-count{font-size:11px;color:var(--muted)}
+.cert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:1.5rem}
+.cert-card{background:var(--surface);border:.5px solid var(--border);border-radius:10px;overflow:hidden;transition:transform .1s,box-shadow .1s}
+.cert-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.cert-img{width:100%;height:110px;background:var(--s2);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:32px;cursor:pointer;overflow:hidden}
+.cert-img img{width:100%;height:100%;object-fit:cover}
+.cert-info{padding:9px 10px}
+.cert-name-inp{width:100%;font-size:13px;font-weight:500;border:none;background:transparent;color:var(--text);outline:none;padding:0;margin-bottom:4px;cursor:text;font-family:inherit}
+.cert-name-inp:hover,.cert-name-inp:focus{background:var(--s2);border-radius:3px;padding:0 3px;margin-left:-3px}
+.cert-date{font-size:11px;color:var(--muted)}
+.color-picker{display:flex;gap:8px;flex-wrap:wrap}
+.color-opt{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .15s}
+.color-opt.selected{border-color:var(--text);transform:scale(1.1)}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;display:none;align-items:center;justify-content:center;padding:2rem}
+.lightbox.open{display:flex}
+.lightbox img{max-width:90vw;max-height:85vh;border-radius:8px}
+.lightbox-close{position:fixed;top:16px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+/* CONFETTI */
+.notes-area{width:100%;min-height:150px;padding:12px 14px;border:.5px solid var(--border-s);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;resize:vertical;outline:none;line-height:1.7;transition:border-color .15s}
+.notes-area:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--bbg)}
+.notes-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px}
+.clearbtn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border:.5px solid var(--border-s);border-radius:var(--r);background:transparent;color:var(--red);font-size:12px;cursor:pointer;font-weight:500}
+.clearbtn:hover{background:var(--rbg);border-color:var(--red)}
+.week-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media(max-width:600px){.week-grid{grid-template-columns:1fr}}
+.day-block{margin-bottom:10px}
+.day-lbl{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.day-lbl span{font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0}
+.day-area{min-height:70px}
+.news-section{margin-top:8px;padding-top:8px;border-top:.5px solid var(--border)}
+.news-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.news-lbl{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:5px}
+.news-add-toggle{background:none;border:.5px solid var(--border-s);border-radius:4px;color:var(--muted);cursor:pointer;font-size:11px;padding:2px 7px}
+.news-add-toggle:hover{color:var(--text);background:var(--s2)}
+.news-item{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;margin-bottom:3px;background:var(--s2);font-size:12px}
+.news-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.news-meta{color:var(--muted);font-size:11px;flex-shrink:0}
+.news-text{flex:1;color:var(--text);font-weight:500}
+.news-form{margin-top:6px;padding:8px;background:var(--s2);border-radius:var(--r);border:.5px solid var(--border-s);display:none}
+.impact-row{display:flex;gap:5px;margin-bottom:7px;align-items:center}
+.impact-opt{width:24px;height:24px;border-radius:4px;cursor:pointer;border:2px solid transparent;transition:border-color .1s;flex-shrink:0}
+.impact-opt.sel{border-color:var(--text);box-shadow:0 0 0 2px rgba(255,255,255,.2)}
+.news-row{display:flex;gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
+.ni{flex:1;min-width:60px;padding:5px 8px;border:.5px solid var(--border-s);border-radius:6px;background:var(--bg);color:var(--text);font-size:12px;outline:none;font-family:inherit}
+.ni:focus{border-color:var(--blue)}
+.niadd{padding:5px 12px;border-radius:6px;border:none;background:var(--blue);color:#fff;font-size:12px;cursor:pointer;font-weight:500;flex-shrink:0}
+.tmpl-bar{display:flex;gap:6px;flex-wrap:wrap}
+.tmpl-btn{padding:3px 10px;border-radius:4px;border:.5px solid var(--border-s);background:transparent;color:var(--text2);font-size:11px;cursor:pointer}
+.tmpl-btn:hover{background:var(--bbg);color:var(--btx)}
+.save-tmpl{padding:3px 10px;border-radius:4px;border:.5px solid var(--border-s);background:transparent;color:var(--muted);font-size:11px;cursor:pointer}
+.save-tmpl:hover{color:var(--amber);border-color:var(--amber)}
+@keyframes confettiRise{0%{transform:translate(0,0) rotate(0deg) scale(1);opacity:1}70%{opacity:.9}100%{transform:translate(var(--tx),var(--ty)) rotate(var(--rot)) scale(.4);opacity:0}}
+@keyframes emojiPop{0%{transform:scale(0) translateY(0);opacity:0}40%{transform:scale(1.3) translateY(-12px);opacity:1}70%{transform:scale(.9) translateY(-8px);opacity:1}100%{transform:scale(1) translateY(-28px);opacity:0}}
+
+.dtab{padding:7px 16px;border:.5px solid var(--border-s);border-radius:8px;background:transparent;color:var(--text2);font-size:13px;cursor:pointer;font-weight:500}
+.dtab.active{background:var(--bbg);color:var(--btx);border-color:var(--blue);font-weight:600}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-hdr{text-align:center;font-size:10px;font-weight:600;color:var(--muted);padding:6px 2px;text-transform:uppercase;letter-spacing:.05em}
+.cal-cell{border-radius:10px;padding:8px 6px;min-height:72px;background:var(--s2);border:.5px solid var(--border)}
+.cal-cell.empty{background:transparent;border-color:transparent;pointer-events:none}
+.cal-cell.cal-profit{background:var(--gbg);border-color:var(--green)}
+.cal-cell.cal-loss{background:var(--rbg);border-color:var(--red)}
+.cal-cell.cal-today{border-color:var(--blue);border-width:1.5px}
+.cal-cell.cal-weekend{opacity:.55}
+.cal-day{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px}
+.cal-cell.empty .cal-day{color:var(--muted);opacity:.4}
+.cal-pnl{font-size:11px;font-weight:700}
+.cal-cell.cal-profit .cal-pnl{color:var(--green)}
+.cal-cell.cal-loss .cal-pnl{color:var(--red)}
+.cal-nav{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:1rem}
+.cal-nav-btn{padding:5px 12px;border:.5px solid var(--border-s);border-radius:var(--r);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;font-weight:600}
+.cal-nav-btn:hover{background:var(--s2)}
+.cal-month-lbl{font-size:18px;font-weight:700;min-width:160px;text-align:center}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="app-logo">
+    <div class="app-logo-icon">
+      <svg width="30" height="30" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#0a1628"/><defs><linearGradient id="hl" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#1e40af"/><stop offset="100%" stop-color="#7dd3fc"/></linearGradient><linearGradient id="hv" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#0f2044"/><stop offset="100%" stop-color="#3b82f6" stop-opacity=".8"/></linearGradient></defs>
+      <path d="M14,72 C24,66 32,58 40,52 C46,47 47,55 54,51 C62,46 70,32 80,20" fill="none" stroke="url(#hl)" stroke-width="5.5" stroke-linecap="round"/>
+      <rect x="14" y="78" width="6" height="12" rx="1.5" fill="url(#hv)" opacity=".6"/><rect x="24" y="75" width="6" height="15" rx="1.5" fill="url(#hv)" opacity=".7"/><rect x="34" y="78" width="6" height="12" rx="1.5" fill="url(#hv)" opacity=".7"/><rect x="44" y="74" width="6" height="16" rx="1.5" fill="url(#hv)" opacity=".8"/><rect x="54" y="71" width="6" height="19" rx="1.5" fill="url(#hv)" opacity=".85"/><rect x="64" y="66" width="6" height="24" rx="1.5" fill="url(#hv)" opacity=".9"/><rect x="74" y="60" width="6" height="30" rx="1.5" fill="url(#hv)" opacity=".95"/>
+      <circle cx="80" cy="20" r="7" fill="#1e40af" opacity=".3"/><circle cx="80" cy="20" r="4" fill="#dbeafe"/></svg>
+    </div>Patience
+  </div>
+  <div class="navtabs">
+    <button class="ntab active" data-view="accounts" onclick="showTab('accounts',this)"><i class="ti ti-layout-cards"></i> Accounts</button>
+    <button class="ntab" data-view="notes" onclick="showTab('notes',this)"><i class="ti ti-notes"></i> Notes/News</button>
+    <button class="ntab" data-view="entries" onclick="showTab('entries',this)"><i class="ti ti-list-details"></i> Entries</button>
+    <button class="ntab" data-view="analytics" onclick="showTab('analytics',this)"><i class="ti ti-chart-bar"></i> Analytics</button>
+    <button class="ntab" data-view="achievements" onclick="showTab('achievements',this)"><i class="ti ti-trophy"></i> Records</button>
+  </div>
+  <button class="theme-btn" onclick="toggleTheme()"><i class="ti ti-moon" id="themeIcon"></i></button>
+</div>
+
+<!-- ACCOUNT DETAIL -->
+<div id="accountDetail"><div class="page">
+  <button class="backbtn" onclick="closeDetail()"><i class="ti ti-arrow-left"></i> Back to Accounts</button>
+  <div class="detail-header"><div style="flex:1"><div class="detail-name" id="detailName"></div><div class="detail-number" id="detailNumber"></div></div><div id="detailBadge"></div></div>
+  <!-- Tab bar -->
+  <div style="display:flex;gap:8px;margin-bottom:1.25rem">
+    <button class="dtab active" data-view="stats" onclick="setDetailTab('stats')"><i class="ti ti-chart-line"></i> Account Stats</button>
+    <button class="dtab" data-view="calendar" onclick="setDetailTab('calendar')"><i class="ti ti-calendar-month"></i> Trade Calendar</button>
+  </div>
+  <!-- Stats view -->
+  <div id="detail_stats">
+    <div id="detailPendingNotice" style="margin-bottom:1.25rem"></div>
+    <div id="detailBalBox" class="balance-box" style="margin-bottom:1.25rem"></div>
+    <div class="chart-wrap"><div id="chartSubLabel" class="chart-sub"></div><div id="chartArea"></div></div>
+    <div id="detailConsistency"></div>
+    <div id="detailStats" style="margin-bottom:1.25rem"></div>
+    <div id="detailProgress" style="margin-bottom:1.25rem"></div>
+    <div id="detailDots" style="margin-bottom:1rem"></div>
+    <div id="detailPassSection"></div>
+    <div class="stitle" style="margin-top:1rem"><i class="ti ti-calendar-event"></i> Trading Days</div>
+    <div id="detailDayList" style="margin-bottom:.75rem"></div>
+    <div id="detailAddDaySection"></div>
+    <div id="detailPayoutSection" style="margin-top:1rem"></div>
+    <div id="detailPayoutForm" style="margin-top:.75rem"></div>
+    <div id="detailApproveSection" style="margin-top:1rem"></div>
+  </div>
+  <!-- Calendar view -->
+  <div id="detail_cal" style="display:none">
+    <div id="calContent"></div>
+  </div>
+</div></div>
+
+<!-- TAB: ACCOUNTS -->
+<div id="tabAccounts" class="page">
+  <button class="addbtn" onclick="toggleAccForm()"><i class="ti ti-plus"></i> Add Account</button>
+  <div class="fcard" id="accForm">
+    <div class="fgrid">
+      <!-- Account type toggle -->
+      <div class="full">
+        <label>Account Type</label>
+        <div style="display:flex;gap:8px;margin-top:5px">
+          <button type="button" id="typeEval" class="type-btn active" onclick="setAccType('eval')">◎ Evaluation</button>
+          <button type="button" id="typeFunded" class="type-btn" onclick="setAccType('funded')">✓ Already Funded</button>
+        </div>
+      </div>
+      <!-- General -->
+      <div class="full"><label>Account Name</label><input type="text" id="af_name" placeholder="e.g. AF 50k #1"></div>
+      <div class="full"><label>Account Number</label><input type="text" id="af_number" placeholder="e.g. 123456"></div>
+      <div><label>Account Size (USD)</label><select id="af_size">
+        <option value="10000">$10,000</option><option value="25000">$25,000</option>
+        <option value="50000" selected>$50,000</option><option value="100000">$100,000</option>
+        <option value="150000">$150,000</option><option value="200000">$200,000</option>
+      </select></div>
+      <div><label>Start Date</label><input type="date" id="af_start"></div>
+      <!-- Eval-only fields -->
+      <div class="fsection af-eval-only">◎ Evaluation Stage</div>
+      <div class="af-eval-only"><label>Profit Target (USD)</label><input type="number" id="af_target" placeholder="e.g. 4000" step="0.01"></div>
+      <div class="af-eval-only"><label>Loss Limit — Eval (USD)</label><input type="number" id="af_evalLoss" placeholder="e.g. 2000" step="0.01"></div>
+      <div class="af-eval-only"><label>Consistency Rule — Eval</label><select id="af_evalCon">
+        <option value="0">None</option><option value="1">Yes — apply rule</option>
+      </select></div>
+      <div class="af-eval-only"><label>Consistency % — Eval</label><input type="number" id="af_evalConPct" placeholder="e.g. 30" min="0.1" max="100" step="0.1"></div>
+      <!-- Funded fields (always shown, label changes) -->
+      <div class="fsection" id="af_fundedLabel">✓ Funded Stage (pre-configure)</div>
+      <div><label>Loss Limit — Funded / Trailing (USD)</label><input type="number" id="af_loss" placeholder="e.g. 3000" step="0.01"></div>
+      <div><label>Required Win Days</label><select id="af_windays">
+        <option value="0">None</option><option value="1">1 day</option><option value="2">2 days</option>
+        <option value="3">3 days</option><option value="4">4 days</option><option value="5" selected>5 days</option>
+        <option value="6">6 days</option><option value="7">7 days</option><option value="8">8 days</option><option value="10">10 days</option>
+      </select></div>
+      <div><label>Consistency Rule — Funded</label><select id="af_fundedCon">
+        <option value="0">None</option><option value="1">Yes — apply rule</option>
+      </select></div>
+      <div><label>Consistency % — Funded</label><input type="number" id="af_conPct" placeholder="e.g. 50.5" min="0.1" max="100" step="0.1"></div>
+    </div>
+    <div class="factions"><button class="savebtn" onclick="saveAccount()">Save</button><button class="cancelbtn" onclick="toggleAccForm()">Cancel</button></div>
+  </div>
+  <div class="accgrid" id="accGrid"></div>
+  <div id="accEmpty" class="empty" style="display:none"><i class="ti ti-layout-cards"></i>No accounts yet.</div>
+</div>
+
+<!-- TAB: NOTES / NEWS -->
+<div id="tabNotes" class="page" style="display:none">
+  <div style="margin-bottom:1rem">
+    <div class="notes-hdr">
+      <div>
+        <div class="stitle" style="margin-bottom:2px"><i class="ti ti-calendar-week"></i> Notes / News</div>
+        <div id="weekLabel" style="font-size:11px;color:var(--muted)"></div>
+      </div>
+      <button class="clearbtn" onclick="clearWeeklyNotes()"><i class="ti ti-trash"></i> Clear week</button>
+    </div>
+  </div>
+  <div class="week-grid">
+    <!-- Left: Mon–Fri day + news boxes (rendered by JS) -->
+    <div>
+      <div class="day-block"><div class="day-lbl">Monday <span id="d0"></span></div><textarea class="notes-area day-area" id="dayNote_mon" placeholder="Monday notes..." oninput="autoSaveNotes()"></textarea><div id="ns_mon"></div></div>
+      <div class="day-block"><div class="day-lbl">Tuesday <span id="d1"></span></div><textarea class="notes-area day-area" id="dayNote_tue" placeholder="Tuesday notes..." oninput="autoSaveNotes()"></textarea><div id="ns_tue"></div></div>
+      <div class="day-block"><div class="day-lbl">Wednesday <span id="d2"></span></div><textarea class="notes-area day-area" id="dayNote_wed" placeholder="Wednesday notes..." oninput="autoSaveNotes()"></textarea><div id="ns_wed"></div></div>
+      <div class="day-block"><div class="day-lbl">Thursday <span id="d3"></span></div><textarea class="notes-area day-area" id="dayNote_thu" placeholder="Thursday notes..." oninput="autoSaveNotes()"></textarea><div id="ns_thu"></div></div>
+      <div class="day-block" style="margin-bottom:0"><div class="day-lbl">Friday <span id="d4"></span></div><textarea class="notes-area day-area" id="dayNote_fri" placeholder="Friday notes..." oninput="autoSaveNotes()"></textarea><div id="ns_fri"></div></div>
+    </div>
+    <!-- Right: General week -->
+    <div>
+      <div class="day-lbl">General — This Week</div>
+      <textarea class="notes-area" id="weekGeneral" style="min-height:420px" placeholder="Weekly overview, goals, reflections..." oninput="autoSaveNotes()"></textarea>
+    </div>
+  </div>
+  <div style="margin-top:2rem">
+    <div class="notes-hdr"><div class="stitle"><i class="ti ti-notebook"></i> General Notes</div><span style="font-size:11px;color:var(--muted)">Auto-saved</span></div>
+    <textarea class="notes-area" id="generalNotes" style="min-height:200px" placeholder="Strategies, rules, reminders — anything permanent..." oninput="autoSaveNotes()"></textarea>
+  </div>
+</div>
+
+<!-- TAB: ENTRIES -->
+<div id="tabEntries" class="page" style="display:none">
+  <div class="krow" id="kpiRow"></div>
+  <div class="chips"><button class="chip active" onclick="setFilter('all',this)">All</button><button class="chip" onclick="setFilter('payout',this)">Payouts</button><button class="chip" onclick="setFilter('expense',this)">Expenses</button></div>
+  <button class="addbtn" onclick="toggleEntryForm()"><i class="ti ti-plus"></i> Add Entry</button>
+  <div class="fcard" id="entryForm">
+    <div class="fgrid">
+      <div><label>Date</label><input type="date" id="fd"></div>
+      <div><label>Type</label><select id="ft"><option value="payout">Payout</option><option value="expense">Expense</option></select></div>
+      <div><label>Amount (USD)</label><input type="number" id="fa" placeholder="0.00" step="0.01"></div>
+      <div><label>Category</label><select id="fc"><option value="profit">Profit Withdrawal</option><option value="fee">Platform Fee</option><option value="subscription">Subscription</option><option value="reset">Account Reset</option><option value="news">News/Data</option><option value="hardware">Hardware</option><option value="other">Other</option></select></div>
+      <div class="full"><label>Note</label><input type="text" id="fn" placeholder="e.g. Payout"></div>
+    </div>
+    <div class="factions"><button class="savebtn" onclick="saveEntry()">Save</button><button class="cancelbtn" onclick="toggleEntryForm()">Cancel</button></div>
+  </div>
+  <div class="stitle"><i class="ti ti-list"></i> All Entries</div>
+  <div class="twrap"><table><thead><tr><th>Date</th><th>Type</th><th>Category</th><th>Note</th><th class="tar">Amount</th><th></th></tr></thead><tbody id="tBody"></tbody></table><div id="tEmpty" class="empty" style="display:none"><i class="ti ti-chart-line"></i>No entries yet.</div></div>
+  <div class="divider"></div>
+  <div class="stitle"><i class="ti ti-calendar-stats"></i> Monthly Summary</div>
+  <div class="twrap"><table><thead><tr><th>Month</th><th class="tar">Payouts</th><th class="tar">Count</th><th class="tar">Expenses</th><th class="tar">Net</th><th>Best Day</th></tr></thead><tbody id="mBody"></tbody></table><div id="mEmpty" class="empty" style="display:none"><i class="ti ti-calendar"></i>No monthly data.</div></div>
+</div>
+
+<!-- TAB: ANALYTICS -->
+<div id="tabAnalytics" class="page" style="display:none">
+  <div class="chips" id="periodChips"><button class="pchip active" onclick="setPeriod('1M',this)">1 Month</button><button class="pchip" onclick="setPeriod('3M',this)">3 Months</button><button class="pchip" onclick="setPeriod('6M',this)">6 Months</button><button class="pchip" onclick="setPeriod('1J',this)">1 Year</button><button class="pchip" onclick="setPeriod('ALL',this)">All Time</button></div>
+  <div class="krow" id="chartKpi"></div>
+  <div class="ccard"><div class="ctitle"><span id="chartTitle">–</span><span style="font-size:11px;color:var(--muted)">Green = Payouts · Red = Expenses</span></div><div class="barchart" id="barChart"><div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;color:var(--muted);font-size:13px">No data yet</div></div><div class="clegend"><div class="cli"><div class="cldot" style="background:var(--green)"></div>Payouts</div><div class="cli"><div class="cldot" style="background:var(--red)"></div>Expenses</div></div></div>
+  <div class="stitle"><i class="ti ti-trending-up"></i> Cumulative Earnings</div>
+  <div class="ccard"><div class="ctitle"><span>Total payouts over time</span><span style="font-size:11px;color:var(--muted)">All payouts accumulated</span></div><div class="chart-container-sm" id="cumulChartArea"><div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:13px">No payouts yet</div></div></div>
+  <div class="stitle"><i class="ti ti-trophy"></i> Top Days</div><div id="topDays"></div>
+</div>
+
+<!-- TAB: RECORDS / ACHIEVEMENTS -->
+<div id="tabAchievements" class="page" style="display:none">
+  <div id="achFolderView">
+    <button class="addbtn" onclick="toggleFolderForm()"><i class="ti ti-folder-plus"></i> New Folder</button>
+    <div class="fcard" id="folderForm">
+      <div class="fgrid">
+        <div class="full"><label>Folder Name</label><input type="text" id="ff_name" placeholder="e.g. Alpha Futures Payouts"></div>
+        <div class="full"><label>Folder Color</label><div class="color-picker" id="colorPicker">
+          <div class="color-opt selected" data-color="#3b82f6" style="background:#3b82f6" onclick="selectColor('#3b82f6',this)"></div>
+          <div class="color-opt" data-color="#1baf7a" style="background:#1baf7a" onclick="selectColor('#1baf7a',this)"></div>
+          <div class="color-opt" data-color="#f97316" style="background:#f97316" onclick="selectColor('#f97316',this)"></div>
+          <div class="color-opt" data-color="#8b5cf6" style="background:#8b5cf6" onclick="selectColor('#8b5cf6',this)"></div>
+          <div class="color-opt" data-color="#ec4899" style="background:#ec4899" onclick="selectColor('#ec4899',this)"></div>
+          <div class="color-opt" data-color="#f59e0b" style="background:#f59e0b" onclick="selectColor('#f59e0b',this)"></div>
+          <div class="color-opt" data-color="#ef4444" style="background:#ef4444" onclick="selectColor('#ef4444',this)"></div>
+          <div class="color-opt" data-color="#14b8a6" style="background:#14b8a6" onclick="selectColor('#14b8a6',this)"></div>
+          <div class="color-opt" data-color="#6b7280" style="background:#6b7280" onclick="selectColor('#6b7280',this)"></div>
+        </div></div>
+      </div>
+      <div class="factions"><button class="savebtn" onclick="saveFolder()">Create</button><button class="cancelbtn" onclick="toggleFolderForm()">Cancel</button></div>
+    </div>
+    <div class="folder-grid" id="folderGrid"></div>
+    <div id="folderEmpty" class="empty" style="display:none"><i class="ti ti-folder"></i>No folders yet. Create one to organise your certificates!</div>
+  </div>
+  <div id="achDetailView" style="display:none">
+    <button class="backbtn" onclick="closeFolder()"><i class="ti ti-arrow-left"></i> Back to Records</button>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem">
+      <div id="folderDetailIcon" class="folder-icon"></div>
+      <div><div id="folderDetailName" style="font-size:20px;font-weight:700"></div><div id="folderDetailCount" style="font-size:12px;color:var(--muted)"></div></div>
+      <button class="iconbtn" style="margin-left:auto;color:var(--red)" onclick="deleteFolder()"><i class="ti ti-trash"></i></button>
+    </div>
+    <label class="addbtn" style="cursor:pointer"><i class="ti ti-upload"></i> Upload Certificate<input type="file" id="certUpload" accept="image/*" style="display:none" onchange="uploadCertificate(event)"></label>
+    <div class="cert-grid" id="certGrid"></div>
+    <div id="certEmpty" class="empty" style="display:none"><i class="ti ti-certificate"></i>No certificates yet.</div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()"><button class="lightbox-close" onclick="closeLightbox()"><i class="ti ti-x"></i></button><img id="lightboxImg" src="" alt=""></div>
+
+<script>
+const CATS={profit:'Profit Withdrawal',fee:'Platform Fee',subscription:'Subscription',reset:'Account Reset',news:'News/Data',hardware:'Hardware',other:'Other'};
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const FEMOJI={'#3b82f6':'📁','#1baf7a':'📂','#f97316':'🗂️','#8b5cf6':'📋','#ec4899':'📌','#f59e0b':'⭐','#ef4444':'🏆','#14b8a6':'📎','#6b7280':'🗃️'};
+
+let entries=[],accounts=[],folders=[],filter='all',editId=null,currentPeriod='1M',currentTab='accounts';
+let detailAccId=null,detailChart=null,cumulativeChart=null,selectedFolderId=null,selectedColor='#3b82f6';
+
+/* ── FORMAT ── */
+function fmt(n){const a=Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});return(n<0?'- $':'$')+a;}
+function fmtS(n){return(n>=0?'+ $':'- $')+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmtDate(s){if(!s)return'—';const d=new Date(s+'T00:00:00');return d.getDate()+' '+MONTHS[d.getMonth()]+' '+d.getFullYear();}
+function fmtShort(s){if(!s||s==='START')return'Start';const d=new Date(s+'T00:00:00');return d.getDate()+'/'+(d.getMonth()+1);}
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function winDaysOf(acc){return acc.winDays===undefined?5:Number(acc.winDays);}
+function getIsDark(){const t=document.documentElement.getAttribute('data-theme');if(t==='dark')return true;if(t==='light')return false;return window.matchMedia('(prefers-color-scheme: dark)').matches;}
+
+/* ── THEME ── */
+function initTheme(){const s=localStorage.getItem('af_theme');if(s)document.documentElement.setAttribute('data-theme',s);updateThemeIcon();}
+function updateThemeIcon(){const i=document.getElementById('themeIcon');if(i)i.className='ti ti-'+(getIsDark()?'sun':'moon');}
+function toggleTheme(){const n=getIsDark()?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('af_theme',n);updateThemeIcon();if(detailAccId!==null){const a=accounts.find(x=>x.id===detailAccId);if(a)renderDetailChart(a);}if(currentTab==='analytics')renderCumulativeChart();}
+
+/* ── MIGRATION ── */
+function migrateData(){
+  let me=[],ma=[];
+  try{const e=localStorage.getItem('af_entries');if(e)me=JSON.parse(e);}catch(e){}
+  try{const a=localStorage.getItem('af_accs');if(a)ma=JSON.parse(a);}catch(e){}
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('af_entries_')&&k!=='af_entries'){try{me=[...me,...JSON.parse(localStorage.getItem(k)||'[]')];}catch(e){}}if(k&&k.startsWith('af_accs_')&&k!=='af_accs'){try{ma=[...ma,...JSON.parse(localStorage.getItem(k)||'[]')];}catch(e){}}}
+  entries=[...new Map(me.map(e=>[e.id,e])).values()];
+  accounts=[...new Map(ma.map(a=>[a.id,a])).values()];
+  accounts.forEach(acc=>{
+    if(!acc.dailyEntries)acc.dailyEntries=acc.profitableDays?acc.profitableDays.map(d=>({id:d.id,date:d.date,pnl:d.profit||0})):[];
+    if(!acc.payouts){acc.payouts=[];if(acc.baseBalance!==undefined&&acc.lastPayoutAmount>0)acc.payouts.push({id:Date.now()+Math.random(),date:acc.lastPayoutDate||todayStr(),amount:acc.lastPayoutAmount});}
+    if(!acc.number)acc.number='';
+    if(acc.lossLimit===undefined)acc.lossLimit=0;
+    if(!acc.startDate)acc.startDate=todayStr();
+    if(acc.winDays===undefined)acc.winDays=5;
+    // Migrate old consistencyStage to new per-stage fields
+    if(acc.evalConsistencyEnabled===undefined){
+      const s=acc.consistencyStage||'none';
+      acc.evalConsistencyEnabled=s==='eval'||s==='both';
+      acc.fundedConsistencyEnabled=s==='funded'||s==='both';
+      acc.evalConsistencyPct=Number(acc.consistencyPct)||30;
+    }
+    if(!acc.consistencyPct)acc.consistencyPct=30;
+    if(acc.evalLossLimit===undefined)acc.evalLossLimit=acc.lossLimit||0;
+    if(acc.payoutPending===undefined)acc.payoutPending=null;
+  });
+  try{const f=localStorage.getItem('af_folders');if(f)folders=JSON.parse(f);}catch(e){}
+  try{const n=localStorage.getItem('af_notes');if(n)notes=JSON.parse(n);}catch(e){}
+  saveAll();
+}
+function saveAll(){try{localStorage.setItem('af_entries',JSON.stringify(entries));}catch(e){}try{localStorage.setItem('af_accs',JSON.stringify(accounts));}catch(e){}try{localStorage.setItem('af_folders',JSON.stringify(folders));}catch(e){alert('Storage limit reached.');}}
+
+/* ── BALANCE & STATS ── */
+function getBalance(acc){const p=(acc.dailyEntries||[]).reduce((s,e)=>s+e.pnl,0);const py=(acc.payouts||[]).reduce((s,x)=>s+x.amount,0);return(acc.size||0)+p-py;}
+function getPeriodStats(acc){
+  const lastDate=acc.status==='funded'?acc.lastPayoutDate:null;
+  const rel=lastDate?(acc.dailyEntries||[]).filter(e=>e.date>lastDate):(acc.dailyEntries||[]);
+  return{netPnL:rel.reduce((s,e)=>s+e.pnl,0),profitDays:rel.filter(e=>e.pnl>0).length,lossDays:rel.filter(e=>e.pnl<0).length,relEntries:rel};
+}
+
+/* ── CONSISTENCY RULE ──
+   Denominator = actual total profit (dynamic).
+   Per-stage: eval uses evalConsistencyEnabled + evalConsistencyPct,
+              funded uses fundedConsistencyEnabled + consistencyPct.
+   If inconsistent: shows "to fix" section + max new day formula.
+*/
+function checkConsistency(acc,relEntries,netPnL){
+  const isFunded=acc.status==='funded';
+  const enabled=isFunded?acc.fundedConsistencyEnabled:acc.evalConsistencyEnabled;
+  if(!enabled)return null;
+  const threshold=Number(isFunded?acc.consistencyPct:acc.evalConsistencyPct)||0;
+  if(!threshold)return null;
+  const T=threshold/100;
+  if(netPnL<=0)return{threshold,ok:true,noData:true};
+  const dayMap={};relEntries.filter(e=>e.pnl>0).forEach(e=>{dayMap[e.date]=(dayMap[e.date]||0)+e.pnl;});
+  const best=Object.entries(dayMap).sort((a,b)=>b[1]-a[1])[0];
+  const bestDayAmount=best?best[1]:0;
+  const bestDayPct=(bestDayAmount/netPnL)*100;
+  const ok=bestDayAmount<=netPnL*T;
+  const requiredTotal=bestDayAmount/T;
+  const needFromOtherDays=Math.max(0,requiredTotal-netPnL);
+  const maxNewDay=(T*netPnL)/(1-T);
+  return{threshold,totalProfit:netPnL,ok,bestDay:best?best[0]:null,bestDayAmount,
+    bestDayPct:Math.round(bestDayPct*100)/100,requiredTotal,needFromOtherDays,maxNewDay};
+}
+
+/* ── CHART DATA ── Eval uses evalLossLimit (static floor), Funded uses lossLimit (trailing) */
+function buildChartData(acc){
+  const size=acc.size||0,isFunded=acc.status==='funded';
+  const lossLimit=isFunded?(acc.lossLimit||0):(acc.evalLossLimit!==undefined?acc.evalLossLimit:acc.lossLimit||0);
+  const entryMap={};(acc.dailyEntries||[]).forEach(e=>{entryMap[e.date]=(entryMap[e.date]||0)+e.pnl;});
+  const payoutMap={};(acc.payouts||[]).forEach(p=>{payoutMap[p.date]=(payoutMap[p.date]||0)+p.amount;});
+  const eventDates=[...new Set([...Object.keys(entryMap),...Object.keys(payoutMap)])].sort();
+  const labels=['START'],balData=[size];
+  let floor=lossLimit>0?size-lossLimit:null;const floorData=lossLimit>0?[floor]:null;
+  let bal=size,peak=size;
+  eventDates.forEach(date=>{
+    const pnl=entryMap[date]||0,payout=payoutMap[date]||0;bal+=pnl;
+    if(lossLimit>0){peak=Math.max(peak,bal);if(isFunded){const pot=Math.min(peak-lossLimit,size);floor=Math.max(floor,pot);}else{const pot=peak-lossLimit;floor=Math.max(floor,pot);}}
+    bal-=payout;labels.push(date);balData.push(bal);if(floorData!==null)floorData.push(floor);
+  });
+  if(labels.length<2){labels.push(todayStr());balData.push(bal);if(floorData!==null)floorData.push(floor);}
+  const profitTargetLevel=(!isFunded&&acc.target>0)?size+acc.target:null;
+  return{labels,balData,floorData,profitTargetLevel};
+}
+
+/* ── CONFETTI ── */
+function triggerConfetti(){
+  const c=document.createElement('div');c.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden';document.body.appendChild(c);
+  const colors=['#3b82f6','#1baf7a','#f59e0b','#8b5cf6','#ec4899','#ef4444','#14b8a6'];
+  ['left:16px','right:16px'].forEach(pos=>{const em=document.createElement('div');em.textContent='🎉';em.style.cssText='position:fixed;bottom:16px;'+pos+';font-size:28px;animation:emojiPop 1.8s ease forwards';c.appendChild(em);});
+  [12,88].forEach(sx=>{for(let i=0;i<22;i++){const p=document.createElement('div');const size=4+Math.random()*5;const color=colors[Math.floor(Math.random()*colors.length)];const tx=(Math.random()-.5)*180;const ty=-(100+Math.random()*300);const rot=(Math.random()-.5)*720;const delay=Math.random()*.45;const dur=1.1+Math.random()*.7;p.style.cssText='position:fixed;bottom:20px;left:'+sx+'%;width:'+size+'px;height:'+size+'px;background:'+color+';border-radius:'+(Math.random()>.5?'50%':'2px')+';animation:confettiRise '+dur+'s ease '+delay+'s forwards';p.style.setProperty('--tx',tx+'px');p.style.setProperty('--ty',ty+'px');p.style.setProperty('--rot',rot+'deg');c.appendChild(p);}});
+  setTimeout(()=>c.remove(),2500);
+}
+
+/* ── TAB SWITCHING ── */
+function showTab(tab,btn){
+  currentTab=tab;document.getElementById('accountDetail').style.display='none';
+  ['Accounts','Notes','Entries','Analytics','Achievements'].forEach(t=>document.getElementById('tab'+t).style.display=t.toLowerCase()===tab?'block':'none');
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));if(btn)btn.classList.add('active');
+  if(tab==='entries')renderEntries();else if(tab==='analytics')renderAnalytics();else if(tab==='achievements')renderAchievements();else if(tab==='notes')renderNotes();else renderAccounts();
+}
+
+/* ── ACCOUNT DETAIL ── */
+function openDetail(id,ev){if(ev)ev.stopPropagation();detailAccId=id;_detailView='stats';calYear=new Date().getFullYear();calMonth=new Date().getMonth();['tabAccounts','tabNotes','tabEntries','tabAnalytics','tabAchievements'].forEach(t=>document.getElementById(t).style.display='none');document.getElementById('accountDetail').style.display='block';renderDetail();}
+function closeDetail(){_detailView='stats';document.getElementById('accountDetail').style.display='none';document.getElementById('tabAccounts').style.display='block';document.querySelectorAll('.ntab').forEach(t=>t.classList.toggle('active',t.dataset.view==='accounts'));if(detailChart){detailChart.destroy();detailChart=null;}renderAccounts();}
+
+function renderDetail(){
+  // Reset tab to stats view
+  document.getElementById('detail_stats').style.display='block';
+  document.getElementById('detail_cal').style.display='none';
+  document.querySelectorAll('.dtab').forEach(t=>t.classList.toggle('active',t.dataset.view==='stats'));
+  _detailView='stats';
+  const acc=accounts.find(a=>a.id===detailAccId);if(!acc){closeDetail();return;}
+  const isFunded=acc.status==='funded',wd=winDaysOf(acc),isPending=!!(acc.payoutPending);
+  const bal=getBalance(acc);const{netPnL,profitDays,lossDays,relEntries}=getPeriodStats(acc);
+  const canPayout=isFunded&&!isPending&&(wd===0||profitDays>=wd);
+  const balDelta=bal-(acc.size||0);
+
+  document.getElementById('detailName').textContent=acc.name;
+  document.getElementById('detailNumber').innerHTML=acc.number?'<i class="ti ti-hash" style="font-size:11px"></i>'+acc.number:'';
+  document.getElementById('detailBadge').innerHTML='<span class="badge '+(isPending?'bo':isFunded?'bg':'ba')+'">'+(isPending?'⏳ Payout Pending':isFunded?'✓ Funded':'◎ Evaluation')+'</span>';
+  document.getElementById('detailPendingNotice').innerHTML=isPending?'<div class="pending-notice" style="margin-bottom:1.25rem"><div class="pending-notice-icon">⏳</div><div class="pending-notice-body"><div class="pending-notice-title">Payout Pending — '+fmt(acc.payoutPending.amount)+'</div><div class="pending-notice-sub">Requested '+fmtDate(acc.payoutPending.requestDate)+' · Trading paused until firm approves</div></div></div>':'';
+  document.getElementById('detailBalBox').className='balance-box '+(balDelta>0?'up':balDelta<0?'down':'');
+  document.getElementById('detailBalBox').innerHTML='<div><div class="balance-label">Account Balance</div><div class="balance-value" style="color:'+(bal>=(acc.size||0)?'var(--blue)':'var(--red)')+'">'+fmt(bal)+'</div></div><div><div class="balance-change-label">P&L '+(isFunded?'since last payout':'since start')+'</div><div class="balance-change" style="color:'+(netPnL>=0?'var(--green)':'var(--red)')+'">'+fmtS(netPnL)+'</div></div>';
+
+  renderDetailChart(acc);
+
+  // Consistency display
+  const con=checkConsistency(acc,relEntries,netPnL);
+  if(con&&!con.noData){
+    const ok=con.ok,clr=ok?'var(--green)':'var(--red)';
+    const fixSection=!ok?'<div style="margin-top:10px;padding:10px 12px;background:rgba(0,0,0,.18);border-radius:8px;border-left:3px solid var(--amber)"><div style="font-size:12px;font-weight:600;color:var(--amber);margin-bottom:6px">△ To fix inconsistency:</div><div style="font-size:12px;margin-bottom:4px">Need <strong>'+fmt(con.needFromOtherDays)+'</strong> more from <em>other</em> days to reach '+con.threshold+'%</div><div style="font-size:11px;color:var(--text2);opacity:.8">Formula: '+fmt(con.bestDayAmount)+' ÷ '+con.threshold+'% = '+fmt(con.requiredTotal)+' required total</div></div>':'';
+    const maxSection='<div style="margin-top:8px;padding:10px 12px;background:rgba(0,0,0,.15);border-radius:8px"><div style="font-size:12px;font-weight:600;margin-bottom:5px">📊 Max single day (if adding more trades):</div><div style="font-size:15px;font-weight:700;color:var(--amber);margin-bottom:4px">'+fmt(con.maxNewDay)+' before violating '+con.threshold+'% rule</div><div style="font-size:11px;color:var(--text2);opacity:.8">Formula: '+fmt(con.totalProfit)+' × '+con.threshold+'% ÷ (100% – '+con.threshold+'%) = '+fmt(con.maxNewDay)+'</div></div>';
+    document.getElementById('detailConsistency').innerHTML='<div class="con-card '+(ok?'ok':'warn')+'" style="margin-bottom:1rem"><div class="con-label">Consistency Rule (max '+con.threshold+'% per day)</div><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px"><div class="con-status" style="color:'+clr+'">'+(ok?'✓ Consistent':'⚠ Inconsistent')+'</div><div style="font-size:13px;color:'+clr+';font-weight:500">'+con.bestDayPct.toFixed(2)+'% of total profit</div></div>'+(con.bestDayAmount>0?'<div style="font-size:12px;color:var(--text2);margin-bottom:2px">Best day: <strong>'+fmt(con.bestDayAmount)+'</strong>'+(con.bestDay?' on '+fmtDate(con.bestDay):'')+'</div>':'')+fixSection+maxSection+'</div>';
+  }else document.getElementById('detailConsistency').innerHTML='';
+
+  if(isFunded){
+    document.getElementById('detailStats').innerHTML='<div class="stat2"><div class="sbox"><div class="sbox-l">Win Days (this period)</div><div class="sbox-v" style="color:'+(canPayout?'var(--green)':'var(--text')+'">'+(wd===0?'No req.':profitDays+'/'+wd+(canPayout?' ✓':''))+'</div></div><div class="sbox"><div class="sbox-l">Loss Days</div><div class="sbox-v" style="color:'+(lossDays>0?'var(--red)':'var(--muted)')+'">'+lossDays+'</div></div></div>';
+    document.getElementById('detailProgress').innerHTML='';
+    document.getElementById('detailPassSection').innerHTML='';
+    if(wd>0){const dots=Array.from({length:wd},(_,i)=>'<div class="pd-dot '+(i<profitDays?'ok':'empty-dot')+'">'+(i<profitDays?'✓':'')+'</div>').join('');document.getElementById('detailDots').innerHTML='<div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+wd+' profitable days required</div><div class="pd-dots">'+dots+'</div>';}
+    else document.getElementById('detailDots').innerHTML='<div style="font-size:11px;color:var(--muted)">No day requirement</div>';
+    if(!isPending){
+      document.getElementById('detailPayoutSection').innerHTML='<div class="acc-footer"><span style="font-size:11px;color:var(--muted)">Last payout: '+fmtDate(acc.lastPayoutDate)+'</span><button class="payoutbtn" '+(canPayout?'':'disabled')+' onclick="toggleDetailPayoutForm()">'+(canPayout?'💰 Request Payout':wd>0?'⏳ '+(wd-profitDays)+' days needed':'⏳ Pending')+'</button></div>';
+      document.getElementById('detailPayoutForm').innerHTML='<div class="payout-form" id="dPayoutForm"><div class="payout-form-title"><i class="ti ti-cash"></i> Request Payout</div><div class="payout-form-info">Net P&L since last payout: <strong>'+fmtS(netPnL)+'</strong><br>Balance: <strong>'+fmt(bal)+'</strong><br><span style="opacity:.8">Trading pauses until firm approves.</span></div><label>Payout Amount (USD)</label><input type="number" id="dPayoutAmt" placeholder="Enter amount" step="0.01" value="'+Math.max(0,netPnL).toFixed(2)+'"><div class="payout-form-actions"><button class="payout-confirm-btn" onclick="confirmDetailPayout()">✓ Request</button><button class="payout-cancel-btn" onclick="toggleDetailPayoutForm()">Cancel</button></div></div>';
+      document.getElementById('detailApproveSection').innerHTML='';
+    }else{
+      document.getElementById('detailPayoutSection').innerHTML='';document.getElementById('detailPayoutForm').innerHTML='';
+      document.getElementById('detailApproveSection').innerHTML='<div style="padding:1.25rem;background:var(--gbg);border:.5px solid var(--green);border-radius:12px;text-align:center"><div style="font-size:32px;margin-bottom:8px">🏦</div><div style="font-size:15px;font-weight:600;color:var(--gtx);margin-bottom:4px">Waiting for Firm Approval</div><div style="font-size:12px;color:var(--gtx);opacity:.8;margin-bottom:16px">Amount: '+fmt(acc.payoutPending.amount)+'</div><button class="greenbtn" style="margin:0 auto" onclick="approvePayout()"><i class="ti ti-check"></i> Payout Approved ✓</button></div>';
+    }
+  }else{
+    // EVAL stage
+    const target=acc.target||0,pct=target>0?Math.min(100,Math.round((netPnL/target)*100)):0,missing=Math.max(0,target-netPnL);
+    const pctColor=pct>=100?'var(--green)':pct>=60?'var(--amber)':'var(--blue)';
+    document.getElementById('detailStats').innerHTML='<div class="stat3"><div class="sbox"><div class="sbox-l">Current P&L</div><div class="sbox-v" style="color:'+(netPnL>=0?'var(--green)':'var(--red)')+'">'+fmtS(netPnL)+'</div></div><div class="sbox"><div class="sbox-l">Still Needed</div><div class="sbox-v" style="color:'+(missing>0?'var(--red)':'var(--green)')+'">'+( missing>0?'- '+fmt(missing):'✓ Done')+'</div></div><div class="sbox"><div class="sbox-l">Days</div><div class="sbox-v">'+profitDays+'✓ '+lossDays+'✗</div></div></div>';
+    document.getElementById('detailProgress').innerHTML=target>0?'<div class="prog-lbl"><span>Progress '+pct+'%</span><span>Target: '+fmt((acc.size||0)+target)+'</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%;background:'+pctColor+'"></div></div>':'';
+    document.getElementById('detailDots').innerHTML='';
+    document.getElementById('detailPayoutSection').innerHTML='';document.getElementById('detailPayoutForm').innerHTML='';document.getElementById('detailApproveSection').innerHTML='';
+
+    // Pass to Funded section
+    const conCheck=checkConsistency(acc,relEntries,netPnL);
+    const conOk=!conCheck||conCheck.noData||conCheck.ok;
+    const targetHit=target>0&&netPnL>=target;
+    const canPass=targetHit&&conOk;
+    if(target>0){
+      document.getElementById('detailPassSection').innerHTML='<div style="margin-top:1.25rem;padding:1.25rem;background:'+(canPass?'var(--gbg)':'var(--s2)')+';border:'+(canPass?'1.5px solid var(--green)':'.5px solid var(--border)')+';border-radius:14px;text-align:center">'+(canPass?'<div style="font-size:36px;margin-bottom:10px">🎓</div><div style="font-size:16px;font-weight:700;color:var(--gtx);margin-bottom:4px">Profit Target Reached!</div><div style="font-size:12px;color:var(--gtx);opacity:.8;margin-bottom:18px">All conditions satisfied — ready to convert to Funded</div><button class="greenbtn" style="margin:0 auto" onclick="passToFunded()"><i class="ti ti-badge"></i> Convert to Funded Account ✓</button>':'<div style="font-size:13px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px"><i class="ti ti-lock" style="font-size:16px"></i>'+(targetHit?'Consistency rule not yet satisfied — see rule card above':'Still '+fmt(missing)+' away from target')+'</div>')+'</div>';
+    }else{
+      document.getElementById('detailPassSection').innerHTML='';
+    }
+  }
+  renderDetailDayList(acc);
+  document.getElementById('detailAddDaySection').innerHTML=isPending
+    ?'<div style="padding:10px 14px;background:var(--s2);border-radius:var(--r);border:.5px solid var(--border);font-size:12px;color:var(--muted);text-align:center;margin-bottom:.75rem"><i class="ti ti-lock"></i> Trading paused — payout pending approval</div>'
+    :'<button class="addbtn" style="width:100%;justify-content:center;margin-bottom:.5rem" onclick="toggleDetailDayForm()"><i class="ti ti-plus"></i> Add Trading Day (+/− allowed)</button><div class="day-add-form" id="detailDayForm"><div class="daf-title"><i class="ti ti-plus-circle"></i> Add Trading Day</div><div class="day-add-row"><div><label>Date</label><input type="date" id="dd_date" value="'+todayStr()+'"></div><div><label>Day P&L (USD)</label><input type="number" id="dd_pnl" placeholder="+250 or −150" step="0.01"><div class="pnl-hint">+ for profit · − for loss</div></div></div><button class="day-add-submit" onclick="addDetailDay()"><i class="ti ti-check"></i> Save Day</button></div>';
+}
+
+function renderDetailDayList(acc){
+  const de=(acc.dailyEntries||[]).map(e=>({...e,_t:'day'}));
+  const py=(acc.payouts||[]).map(p=>({...p,_t:'payout'}));
+  const all=[...de,...py].sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById('detailDayList').innerHTML=all.length?'<div class="day-list">'+all.map(item=>item._t==='payout'
+    ?'<div class="day-item pay"><div class="day-item-left"><span class="day-item-date">'+fmtDate(item.date)+'</span><span class="day-item-tag">PAYOUT</span></div><span class="day-item-pnl">- '+fmt(item.amount)+'</span></div>'
+    :'<div class="day-item '+(item.pnl>=0?'pos':'neg')+'"><div class="day-item-left"><span class="day-item-date">'+fmtDate(item.date)+'</span><span class="day-item-tag">'+(item.pnl>0?'PROFIT':'LOSS')+'</span></div><div style="display:flex;align-items:center;gap:6px"><span class="day-item-pnl">'+(item.pnl>=0?'+ ':'- ')+fmt(Math.abs(item.pnl))+'</span><button class="iconbtn" onclick="removeDetailDay('+item.id+')" style="font-size:12px"><i class="ti ti-x"></i></button></div></div>'
+  ).join('')+'</div>':'<div style="text-align:center;padding:16px;font-size:12px;color:var(--muted);background:var(--s2);border-radius:var(--r)">No trading days yet</div>';
+}
+
+function renderDetailChart(acc){
+  if(detailChart){detailChart.destroy();detailChart=null;}
+  const{labels,balData,floorData,profitTargetLevel}=buildChartData(acc);
+  const isDark=getIsDark(),gc=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
+  const hasHistory=labels.length>2||(labels.length===2&&labels[1]!==todayStr());
+  document.getElementById('chartSubLabel').textContent=hasHistory?'Balance over time':'Starting balance — add trading days to see history';
+  document.getElementById('chartArea').innerHTML='<div class="chart-container"><canvas id="accChart"></canvas></div>';
+  const ctx=document.getElementById('accChart').getContext('2d');
+  const grad=ctx.createLinearGradient(0,0,0,280);grad.addColorStop(0,'rgba(59,130,246,0.22)');grad.addColorStop(1,'rgba(59,130,246,0)');
+  const dl=labels.map(l=>l==='START'?fmtShort(acc.startDate||todayStr()):fmtShort(l));
+  const ds=[{label:'Balance',data:balData,borderColor:'#3b82f6',backgroundColor:grad,borderWidth:2.5,tension:0.4,fill:true,pointRadius:balData.length>10?0:3,pointHoverRadius:5,pointBackgroundColor:'#3b82f6'}];
+  if(floorData)ds.push({label:'Loss Limit',data:floorData,borderColor:'#ef4444',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,4],tension:0,fill:false,pointRadius:0,pointHoverRadius:0});
+  if(profitTargetLevel!==null)ds.push({label:'Profit Target',data:labels.map(()=>profitTargetLevel),borderColor:'#f59e0b',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,4],tension:0,fill:false,pointRadius:0,pointHoverRadius:0});
+  const to={backgroundColor:isDark?'#1e1e1c':'#fff',borderColor:isDark?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.1)',borderWidth:1,titleColor:isDark?'#f5f5f0':'#0b0b0b',bodyColor:isDark?'#c3c2b7':'#52514e',padding:10};
+  detailChart=new Chart(ctx,{type:'line',data:{labels:dl,datasets:ds},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'top',labels:{color:isDark?'#c3c2b7':'#52514e',usePointStyle:true,padding:16,font:{size:12}}},tooltip:{...to,callbacks:{label:c=>' '+c.dataset.label+': '+fmt(c.parsed.y)}}},scales:{x:{grid:{color:gc},ticks:{color:'#898781',maxTicksLimit:10,font:{size:11}}},y:{grid:{color:gc},ticks:{color:'#898781',font:{size:11},callback:v=>'$'+Math.round(v).toLocaleString('en-US')}}}}});
+}
+
+function toggleDetailDayForm(){const el=document.getElementById('detailDayForm');if(!el)return;const o=el.style.display==='block';el.style.display=o?'none':'block';if(!o)setTimeout(()=>{const p=document.getElementById('dd_pnl');if(p)p.focus();},50);}
+function addDetailDay(){
+  const date=document.getElementById('dd_date').value,pnl=parseFloat(document.getElementById('dd_pnl').value);
+  if(!date){alert('Please enter a date.');return;}if(isNaN(pnl)||pnl===0){alert('Please enter a P&L value.');return;}
+  const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
+  if(!accounts[i].dailyEntries)accounts[i].dailyEntries=[];
+  accounts[i].dailyEntries.push({id:Date.now(),date,pnl});accounts[i].dailyEntries.sort((a,b)=>a.date.localeCompare(b.date));
+  saveAll();renderDetail();
+}
+function removeDetailDay(dayId){const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;accounts[i].dailyEntries=(accounts[i].dailyEntries||[]).filter(e=>e.id!==dayId);saveAll();renderDetail();}
+function toggleDetailPayoutForm(){const f=document.getElementById('dPayoutForm');if(!f)return;f.style.display=f.style.display==='block'?'none':'block';}
+function confirmDetailPayout(){
+  const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
+  const acc=accounts[i],wd=winDaysOf(acc);const{profitDays,relEntries,netPnL}=getPeriodStats(acc);
+  if(wd>0&&profitDays<wd){alert('You need at least '+wd+' profitable days!');return;}
+  const con=checkConsistency(acc,relEntries,netPnL);
+  if(con&&!con.ok){if(!confirm('Consistency rule warning!\n\nBest day ('+con.bestDayPct+'%) exceeds the '+con.threshold+'% limit.\n\nProceed anyway?'))return;}
+  const payoutAmt=parseFloat(document.getElementById('dPayoutAmt').value)||0;
+  if(payoutAmt<=0){alert('Please enter a payout amount.');return;}
+  if(!confirm('Request payout of '+fmt(payoutAmt)+'?\n\nTrading pauses until the firm approves.'))return;
+  accounts[i].payoutPending={amount:payoutAmt,requestDate:todayStr()};
+  saveAll();renderDetail();
+}
+function approvePayout(){
+  const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
+  const acc=accounts[i];if(!acc.payoutPending)return;
+  const{amount}=acc.payoutPending;
+  if(!confirm('Confirm payout approval of '+fmt(amount)+'?\n\nBalance drops by this amount and trading resumes.'))return;
+  if(!accounts[i].payouts)accounts[i].payouts=[];
+  accounts[i].payouts.push({id:Date.now(),date:todayStr(),amount});
+  accounts[i].lastPayoutDate=todayStr();accounts[i].lastPayoutAmount=amount;accounts[i].payoutPending=null;
+  entries.push({id:Date.now()+1,date:todayStr(),type:'payout',amount,cat:'profit',note:'Payout Approved — '+acc.name});
+  entries.sort((a,b)=>b.date.localeCompare(a.date));saveAll();triggerConfetti();renderDetail();
+}
+
+/* ── PASS TO FUNDED ── */
+function passToFunded(){
+  const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
+  const acc=accounts[i];
+  if(!confirm('Convert "'+acc.name+'" to Funded?\n\nThe account restarts from '+fmt(acc.size)+' with funded stage rules.\n\nEval trading history is cleared.'))return;
+  accounts[i].status='funded';
+  accounts[i].startDate=todayStr();
+  accounts[i].dailyEntries=[];
+  accounts[i].payouts=[];
+  accounts[i].lastPayoutDate=null;
+  accounts[i].payoutPending=null;
+  saveAll();triggerConfetti();renderDetail();
+}
+
+/* ── ACCOUNTS TAB ── */
+let accFormType='eval';
+function setAccType(type){accFormType=type;document.getElementById('typeEval').classList.toggle('active',type==='eval');document.getElementById('typeFunded').classList.toggle('active',type==='funded');document.querySelectorAll('.af-eval-only').forEach(el=>el.style.display=type==='eval'?'':'none');document.getElementById('af_fundedLabel').textContent=type==='eval'?'✓ Funded Stage (pre-configure)':'✓ Funded Stage Settings';}
+function toggleAccForm(){const f=document.getElementById('accForm');const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){['af_name','af_number','af_target','af_evalLoss','af_evalConPct','af_loss','af_conPct'].forEach(id=>document.getElementById(id).value='');document.getElementById('af_start').value=todayStr();document.getElementById('af_size').value='50000';document.getElementById('af_windays').value='5';document.getElementById('af_evalCon').value='0';document.getElementById('af_fundedCon').value='0';setAccType('eval');}}
+function saveAccount(){
+  const name=document.getElementById('af_name').value.trim();if(!name){alert('Please enter an account name.');return;}
+  const size=parseFloat(document.getElementById('af_size').value)||50000;
+  accounts.push({id:Date.now(),name,
+    number:document.getElementById('af_number').value.trim(),size,
+    status:accFormType,
+    target:parseFloat(document.getElementById('af_target').value)||0,
+    evalLossLimit:parseFloat(document.getElementById('af_evalLoss').value)||0,
+    evalConsistencyEnabled:document.getElementById('af_evalCon').value==='1',
+    evalConsistencyPct:parseFloat(document.getElementById('af_evalConPct').value)||30,
+    lossLimit:parseFloat(document.getElementById('af_loss').value)||0,
+    winDays:parseInt(document.getElementById('af_windays').value)||0,
+    fundedConsistencyEnabled:document.getElementById('af_fundedCon').value==='1',
+    consistencyPct:parseFloat(document.getElementById('af_conPct').value)||30,
+    startDate:document.getElementById('af_start').value,
+    lastPayoutDate:null,lastPayoutAmount:0,dailyEntries:[],payouts:[],payoutPending:null});
+  saveAll();renderAccounts();document.getElementById('accForm').style.display='none';
+}
+function deleteAccount(id,e){e.stopPropagation();if(!confirm('Delete this account?'))return;accounts=accounts.filter(a=>a.id!==id);saveAll();renderAccounts();}
+function toggleStatus(id,e){e.stopPropagation();const i=accounts.findIndex(a=>a.id===id);if(i<0)return;accounts[i].status=accounts[i].status==='eval'?'funded':'eval';saveAll();renderAccounts();}
+
+function renderAccounts(){
+  const grid=document.getElementById('accGrid'),empty=document.getElementById('accEmpty');
+  if(!accounts.length){grid.innerHTML='';empty.style.display='block';return;}empty.style.display='none';
+  grid.innerHTML=accounts.map(acc=>{
+    const isFunded=acc.status==='funded',bal=getBalance(acc),isPending=!!(acc.payoutPending);
+    const{netPnL,profitDays,relEntries}=getPeriodStats(acc);const wd=winDaysOf(acc);
+    const canPayout=isFunded&&!isPending&&(wd===0||profitDays>=wd);const balDelta=bal-(acc.size||0);
+    const target=acc.target||0,pct=!isFunded&&target>0?Math.min(100,Math.round((netPnL/target)*100)):0;
+    const con=checkConsistency(acc,relEntries,netPnL);const conBadge=con&&!con.ok?'<span class="badge bo">⚠ Consistency</span>':'';
+    const conOk=!con||con.noData||con.ok;
+    const passReady=!isFunded&&target>0&&netPnL>=target&&conOk;
+    const cardClass=isPending?'pending-card':passReady?'pass-ready':canPayout?'funded-ready':'';
+    return '<div class="acccard '+cardClass+'" onclick="openDetail('+acc.id+',event)"><div class="acchead"><div class="acchead-left"><div class="accname">'+acc.name+'</div>'+(acc.number?'<div class="accnumber"><i class="ti ti-hash" style="font-size:11px"></i>'+acc.number+'</div>':'')+'</div><div style="display:flex;gap:3px"><button class="iconbtn" onclick="toggleStatus('+acc.id+',event)"><i class="ti ti-refresh"></i></button><button class="iconbtn" onclick="deleteAccount('+acc.id+',event)"><i class="ti ti-trash"></i></button></div></div>'
+      +'<div class="acc-status-row"><span class="badge '+(isPending?'bo':passReady?'bg':isFunded?'bg':'ba')+'">'+(isPending?'⏳ Pending':passReady?'🎓 Pass Ready':isFunded?'✓ Funded':'◎ Evaluation')+'</span>'+conBadge+'<span style="font-size:11px;color:var(--muted);margin-left:auto">$'+Number(acc.size).toLocaleString('en-US')+'</span></div>'
+      +'<div class="balance-box '+(balDelta>0?'up':balDelta<0?'down':'')+'"><div><div class="balance-label">Balance</div><div style="font-size:22px;font-weight:700;color:'+(bal>=(acc.size||0)?'var(--blue)':'var(--red)')+'">'+fmt(bal)+'</div></div><div style="text-align:right"><div class="balance-change-label">P&L</div><div style="font-size:14px;font-weight:600;color:'+(netPnL>=0?'var(--green)':'var(--red)')+'">'+fmtS(netPnL)+'</div></div></div>'
+      +(isFunded?'<div style="font-size:12px;color:var(--muted)">'+(isPending?'⏳ Awaiting payout approval':wd===0?'No day req.':profitDays+'/'+wd+' win days')+(canPayout?' <span style="color:var(--green);font-weight:600">✓ Ready</span>':'')+'</div>'
+        :target>0?'<div><div class="prog-lbl"><span>Progress '+pct+'%</span><span>Target: '+fmt((acc.size||0)+target)+'</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%;background:'+(passReady?'var(--green)':'var(--amber)')+'"></div></div>'+(passReady?'<div style="font-size:11px;color:var(--green);font-weight:600;margin-top:4px;display:flex;align-items:center;gap:4px"><i class="ti ti-badge" style="font-size:13px"></i> Ready to pass to Funded!</div>':'')+'</div>':'')
+      +'<div class="card-hint"><i class="ti ti-chart-line" style="font-size:12px"></i> Click for chart & details</div></div>';
+  }).join('');
+}
+
+/* ── ENTRIES ── */
+function toggleEntryForm(){const f=document.getElementById('entryForm');const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){document.getElementById('fd').value=todayStr();['fa','fn'].forEach(id=>document.getElementById(id).value='');document.getElementById('ft').value='payout';document.getElementById('fc').value='profit';editId=null;}}
+function saveEntry(){const date=document.getElementById('fd').value,type=document.getElementById('ft').value,amount=parseFloat(document.getElementById('fa').value)||0,cat=document.getElementById('fc').value,note=document.getElementById('fn').value;if(!date||!amount){alert('Please enter date and amount.');return;}if(editId!==null){const i=entries.findIndex(e=>e.id===editId);if(i>-1)entries[i]={...entries[i],date,type,amount,cat,note};editId=null;}else entries.push({id:Date.now(),date,type,amount,cat,note});entries.sort((a,b)=>b.date.localeCompare(a.date));saveAll();renderEntries();document.getElementById('entryForm').style.display='none';}
+function deleteEntry(id){if(!confirm('Delete?'))return;entries=entries.filter(e=>e.id!==id);saveAll();renderEntries();}
+function editEntry(id){const e=entries.find(x=>x.id===id);if(!e)return;editId=id;document.getElementById('fd').value=e.date;document.getElementById('ft').value=e.type;document.getElementById('fa').value=e.amount;document.getElementById('fc').value=e.cat;document.getElementById('fn').value=e.note||'';document.getElementById('entryForm').style.display='block';}
+function setFilter(f,btn){filter=f;document.querySelectorAll('#tabEntries .chip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');renderEntries();}
+function renderEntries(){
+  const vis=filter==='all'?entries:entries.filter(e=>e.type===filter);const tbody=document.getElementById('tBody'),empty=document.getElementById('tEmpty');
+  if(!vis.length){tbody.innerHTML='';empty.style.display='block';}
+  else{empty.style.display='none';tbody.innerHTML=vis.map(e=>'<tr><td class="nw">'+fmtDate(e.date)+'</td><td><span class="badge '+(e.type==='payout'?'bg':'br')+'">'+(e.type==='payout'?'Payout':'Expense')+'</span></td><td>'+(CATS[e.cat]||e.cat)+'</td><td style="color:var(--text2)">'+(e.note||'—')+'</td><td class="tar nw" style="font-weight:500;color:'+(e.type==='payout'?'var(--green)':'var(--red)')+'"> '+(e.type==='payout'?'+ ':'- ')+fmt(e.amount)+'</td><td><div class="ract"><button class="iconbtn" onclick="editEntry('+e.id+')"><i class="ti ti-edit"></i></button><button class="iconbtn" onclick="deleteEntry('+e.id+')"><i class="ti ti-trash"></i></button></div></td></tr>').join('');}
+  const pay=entries.filter(e=>e.type==='payout'),exp=entries.filter(e=>e.type==='expense');
+  const totP=pay.reduce((s,e)=>s+e.amount,0),totE=exp.reduce((s,e)=>s+e.amount,0),net=totP-totE;
+  const dm={};pay.forEach(e=>{dm[e.date]=(dm[e.date]||0)+e.amount;});const bd=Object.entries(dm).sort((a,b)=>b[1]-a[1])[0];const ms=new Set(pay.map(e=>e.date.slice(0,7)));
+  document.getElementById('kpiRow').innerHTML='<div class="kpi"><div class="klbl">Total Payouts</div><div class="kval g">+ '+fmt(totP)+'</div></div><div class="kpi"><div class="klbl">Total Expenses</div><div class="kval r">- '+fmt(totE)+'</div></div><div class="kpi"><div class="klbl">Net</div><div class="kval '+(net>=0?'g':'r')+'">'+fmtS(net)+'</div></div><div class="kpi"><div class="klbl">Avg/Month</div><div class="kval b">'+(ms.size>0?fmt(totP/ms.size):'—')+'</div></div><div class="kpi"><div class="klbl">Count</div><div class="kval">'+pay.length+'</div></div><div class="kpi"><div class="klbl">Best Day</div><div class="kval g" style="font-size:15px">'+(bd?'★ '+fmt(bd[1]):'—')+'</div></div>';
+  const md={};entries.forEach(e=>{const m=e.date.slice(0,7);if(!md[m])md[m]={p:0,pc:0,e:0,bd:{}};if(e.type==='payout'){md[m].p+=e.amount;md[m].pc++;md[m].bd[e.date]=(md[m].bd[e.date]||0)+e.amount;}else md[m].e+=e.amount;});
+  const mk=Object.keys(md).sort((a,b)=>b.localeCompare(a)),mb=document.getElementById('mBody');
+  if(!mk.length){mb.innerHTML='';document.getElementById('mEmpty').style.display='block';}
+  else{document.getElementById('mEmpty').style.display='none';mb.innerHTML=mk.map(m=>{const d=md[m],n2=d.p-d.e,bd2=Object.entries(d.bd).sort((a,b)=>b[1]-a[1])[0],[y,mo]=m.split('-');return'<tr><td style="font-weight:500" class="nw">'+MONTHS[parseInt(mo,10)-1]+' '+y+'</td><td class="tar nw" style="color:var(--green)">+ '+fmt(d.p)+'</td><td class="tar" style="color:var(--text2)">'+d.pc+'×</td><td class="tar nw" style="color:var(--red)">- '+fmt(d.e)+'</td><td class="tar nw" style="font-weight:500;color:'+(n2>=0?'var(--green)':'var(--red)')+'">'+fmtS(n2)+'</td><td class="nw" style="color:var(--text2)">'+(bd2?'★ '+fmtDate(bd2[0])+' ('+fmt(bd2[1])+')'+'':'—')+'</td></tr>';}).join('');}
+}
+
+/* ── ANALYTICS ── */
+function setPeriod(p,btn){currentPeriod=p;document.querySelectorAll('#periodChips .pchip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');renderAnalytics();}
+function renderCumulativeChart(){
+  if(cumulativeChart){cumulativeChart.destroy();cumulativeChart=null;}
+  const area=document.getElementById('cumulChartArea');if(!area)return;
+  const pouts=[...entries].filter(e=>e.type==='payout').sort((a,b)=>a.date.localeCompare(b.date));
+  if(!pouts.length){area.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:13px">No payouts yet</div>';return;}
+  const dm={};pouts.forEach(p=>{dm[p.date]=(dm[p.date]||0)+p.amount;});
+  let cum=0;const labels=['Start'],data=[0];Object.keys(dm).sort().forEach(d=>{cum+=dm[d];labels.push(d);data.push(cum);});
+  area.innerHTML='<canvas id="cumulCanvas" style="width:100%;height:100%"></canvas>';
+  const isDark=getIsDark(),gc=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
+  const ctx=document.getElementById('cumulCanvas').getContext('2d');
+  const grad=ctx.createLinearGradient(0,0,0,200);grad.addColorStop(0,'rgba(59,130,246,0.22)');grad.addColorStop(1,'rgba(59,130,246,0)');
+  cumulativeChart=new Chart(ctx,{type:'line',data:{labels:labels.map((l,i)=>i===0?'Start':fmtDate(l)),datasets:[{label:'Cumulative Payouts',data,borderColor:'#3b82f6',backgroundColor:grad,borderWidth:2.5,tension:0.4,fill:true,pointRadius:data.length>15?0:4,pointHoverRadius:6,pointBackgroundColor:'#3b82f6'}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:isDark?'#c3c2b7':'#52514e',usePointStyle:true,font:{size:12}}},tooltip:{backgroundColor:isDark?'#1e1e1c':'#fff',borderColor:isDark?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.1)',borderWidth:1,titleColor:isDark?'#f5f5f0':'#0b0b0b',bodyColor:isDark?'#c3c2b7':'#52514e',padding:10,callbacks:{label:c=>' Total earned: '+fmt(c.parsed.y)}}},scales:{x:{grid:{color:gc},ticks:{color:'#898781',maxTicksLimit:10,font:{size:11}}},y:{grid:{color:gc},ticks:{color:'#898781',font:{size:11},callback:v=>'$'+Math.round(v).toLocaleString('en-US')}}}}});
+}
+function renderAnalytics(){
+  const now=new Date(),yr=now.getFullYear(),mo=now.getMonth();let labels=[],pData=[],eData=[],pEntries=[];
+  const titles={'1M':'Last Month','3M':'Last 3 Months','6M':'Last 6 Months','1J':'Last Year','ALL':'All Time'};
+  document.getElementById('chartTitle').textContent=titles[currentPeriod];
+  if(currentPeriod==='1M'){for(let i=3;i>=0;i--){const end=new Date(now);end.setDate(end.getDate()-i*7);const start=new Date(end);start.setDate(start.getDate()-6);const es=start.toISOString().slice(0,10),ee=end.toISOString().slice(0,10);const be=entries.filter(e=>e.date>=es&&e.date<=ee);pData.push(be.filter(e=>e.type==='payout').reduce((s,e)=>s+e.amount,0));eData.push(be.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0));labels.push(start.getDate()+'/'+(start.getMonth()+1)+'–'+end.getDate()+'/'+(end.getMonth()+1));}const cut=new Date(now);cut.setDate(cut.getDate()-30);pEntries=entries.filter(e=>new Date(e.date)>=cut&&e.type==='payout');}
+  else if(currentPeriod!=='ALL'){const cnt=currentPeriod==='3M'?3:currentPeriod==='6M'?6:12,months=[];for(let i=cnt-1;i>=0;i--){const d=new Date(yr,mo-i,1);months.push({p:d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'),l:MONTHS[d.getMonth()]});}const agg={};months.forEach(m=>{agg[m.p]={p:0,e:0};});entries.forEach(e=>{const p=e.date.slice(0,7);if(agg[p]){if(e.type==='payout')agg[p].p+=e.amount;else agg[p].e+=e.amount;}});labels=months.map(m=>m.l);pData=months.map(m=>agg[m.p].p);eData=months.map(m=>agg[m.p].e);pEntries=entries.filter(e=>months.some(m=>e.date.startsWith(m.p))&&e.type==='payout');}
+  else{const mm={};entries.forEach(e=>{const p=e.date.slice(0,7);if(!mm[p])mm[p]={p:0,e:0};if(e.type==='payout')mm[p].p+=e.amount;else mm[p].e+=e.amount;});const sk=Object.keys(mm).sort();labels=sk.map(k=>{const[y2,m2]=k.split('-');return MONTHS[parseInt(m2)-1]+'\''+y2.slice(2);});pData=sk.map(k=>mm[k].p);eData=sk.map(k=>mm[k].e);pEntries=entries.filter(e=>e.type==='payout');}
+  const totP=pData.reduce((s,v)=>s+v,0),totE=eData.reduce((s,v)=>s+v,0),net=totP-totE;
+  const dm={};pEntries.forEach(e=>{dm[e.date]=(dm[e.date]||0)+e.amount;});const bd=Object.entries(dm).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('chartKpi').innerHTML='<div class="kpi"><div class="klbl">Payouts</div><div class="kval g">+ '+fmt(totP)+'</div></div><div class="kpi"><div class="klbl">Expenses</div><div class="kval r">- '+fmt(totE)+'</div></div><div class="kpi"><div class="klbl">Net</div><div class="kval '+(net>=0?'g':'r')+'">'+fmtS(net)+'</div></div><div class="kpi"><div class="klbl">Count</div><div class="kval">'+pEntries.length+'</div></div><div class="kpi"><div class="klbl">Best Day</div><div class="kval g" style="font-size:14px">'+(bd?'★ '+fmt(bd[1]):'—')+'</div></div>';
+  const bc=document.getElementById('barChart');
+  if(!labels.length||(!totP&&!totE)){bc.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;color:var(--muted);font-size:13px">No data for this period</div>';}
+  else{const max=Math.max(...pData,...eData,1);bc.innerHTML=labels.map((lbl,i)=>{const ph=Math.round((pData[i]/max)*130),eh=Math.round((eData[i]/max)*130);return'<div class="bcol"><div class="bpair"><div class="bseg" style="height:'+ph+'px;background:var(--green);min-height:'+(pData[i]>0?2:0)+'px"></div><div class="bseg" style="height:'+eh+'px;background:var(--red);min-height:'+(eData[i]>0?2:0)+'px"></div></div><div class="blbl">'+lbl+'</div></div>';}).join('');}
+  const sorted=Object.entries(dm).sort((a,b)=>b[1]-a[1]).slice(0,5);const medals=['🥇','🥈','🥉','4.','5.'];
+  document.getElementById('topDays').innerHTML=sorted.length?sorted.map(([date,val],i)=>'<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:.5px solid var(--border);font-size:13px"><span>'+medals[i]+'</span><span style="flex:1;color:var(--text2)">'+fmtDate(date)+'</span><span style="font-weight:500;color:var(--green)">+ '+fmt(val)+'</span></div>').join(''):'<div class="empty"><i class="ti ti-trophy"></i>No data</div>';
+  renderCumulativeChart();
+}
+
+/* ── ACHIEVEMENTS / RECORDS ── */
+function selectColor(color,el){selectedColor=color;document.querySelectorAll('.color-opt').forEach(e=>e.classList.remove('selected'));el.classList.add('selected');}
+function toggleFolderForm(){const f=document.getElementById('folderForm');const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){document.getElementById('ff_name').value='';selectedColor='#3b82f6';document.querySelectorAll('.color-opt').forEach((e,i)=>e.classList.toggle('selected',i===0));}}
+function saveFolder(){const name=document.getElementById('ff_name').value.trim();if(!name){alert('Please enter a folder name.');return;}folders.push({id:Date.now(),name,color:selectedColor,certificates:[]});saveAll();document.getElementById('folderForm').style.display='none';renderAchievements();}
+function deleteFolder(){if(!selectedFolderId)return;if(!confirm('Delete this folder and all its certificates?'))return;folders=folders.filter(f=>f.id!==selectedFolderId);selectedFolderId=null;saveAll();closeFolder();}
+function openFolder(id){selectedFolderId=id;document.getElementById('achFolderView').style.display='none';document.getElementById('achDetailView').style.display='block';renderFolderDetail();}
+function closeFolder(){selectedFolderId=null;document.getElementById('achDetailView').style.display='none';document.getElementById('achFolderView').style.display='block';renderAchievements();}
+function renderAchievements(){
+  const grid=document.getElementById('folderGrid'),empty=document.getElementById('folderEmpty');
+  if(!folders.length){grid.innerHTML='';empty.style.display='block';return;}empty.style.display='none';
+  grid.innerHTML=folders.map(f=>'<div class="folder-card" style="background:'+f.color+'18;border-color:'+f.color+'40" onclick="openFolder('+f.id+')"><div class="folder-icon" style="background:'+f.color+'25;font-size:22px">'+(FEMOJI[f.color]||'📁')+'</div><div class="folder-name">'+f.name+'</div><div class="folder-count">'+(f.certificates||[]).length+' certificate'+((f.certificates||[]).length!==1?'s':'')+'</div><div style="height:3px;background:'+f.color+';border-radius:2px;margin-top:4px;opacity:.6"></div></div>').join('');
+}
+function renderFolderDetail(){
+  const folder=folders.find(f=>f.id===selectedFolderId);if(!folder)return;
+  document.getElementById('folderDetailIcon').innerHTML='<span style="font-size:22px">'+(FEMOJI[folder.color]||'📁')+'</span>';
+  document.getElementById('folderDetailIcon').style.background=folder.color+'25';
+  document.getElementById('folderDetailName').textContent=folder.name;
+  const certs=(folder.certificates||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  document.getElementById('folderDetailCount').textContent=certs.length+' certificate'+(certs.length!==1?'s':'');
+  const grid=document.getElementById('certGrid'),empty=document.getElementById('certEmpty');
+  if(!certs.length){grid.innerHTML='';empty.style.display='block';return;}empty.style.display='none';
+  grid.innerHTML=certs.map(cert=>'<div class="cert-card"><div class="cert-img" onclick="openLightbox('+cert.id+')">'+(cert.imageData?'<img src="'+cert.imageData+'" alt="'+cert.name+'">':`<span>📄</span>`)+'</div><div class="cert-info" onclick="event.stopPropagation()"><input class="cert-name-inp" value="'+cert.name.replace(/"/g,'&quot;')+'" onchange="updateCert('+cert.id+',\'name\',this.value)" title="Click to rename"><div style="display:flex;justify-content:space-between;align-items:center;gap:4px"><input type="date" value="'+(cert.date||'')+'" onchange="updateCert('+cert.id+',\'date\',this.value)" style="font-size:11px;border:none;background:transparent;color:var(--muted);outline:none;padding:0;cursor:pointer;flex:1;min-width:0;font-family:inherit"><button class="iconbtn" style="font-size:12px;color:var(--red);flex-shrink:0" onclick="deleteCert('+cert.id+')"><i class="ti ti-trash"></i></button></div></div></div>').join('');
+}
+function updateCert(certId,field,value){const folder=folders.find(f=>f.id===selectedFolderId);if(!folder)return;const cert=folder.certificates.find(c=>c.id===certId);if(!cert)return;if(value.trim())cert[field]=value.trim();saveAll();if(field==='date')renderFolderDetail();}
+async function uploadCertificate(event){
+  const file=event.target.files[0];if(!file)return;
+  const folder=folders.find(f=>f.id===selectedFolderId);if(!folder)return;
+  const name=file.name.replace(/\.[^.]+$/,'');
+  const imageData=await new Promise(resolve=>{if(!file.type.startsWith('image/')){resolve(null);return;}const img=new Image();const reader=new FileReader();reader.onload=e=>{img.src=e.target.result;img.onload=()=>{const canvas=document.createElement('canvas');let w=img.width,h=img.height;const MAX=900;if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);resolve(canvas.toDataURL('image/jpeg',0.75));};};reader.readAsDataURL(file);});
+  if(!folder.certificates)folder.certificates=[];
+  folder.certificates.push({id:Date.now(),name,date:todayStr(),imageData});
+  saveAll();renderFolderDetail();event.target.value='';
+}
+function deleteCert(certId){if(!confirm('Delete this certificate?'))return;const folder=folders.find(f=>f.id===selectedFolderId);if(!folder)return;folder.certificates=(folder.certificates||[]).filter(c=>c.id!==certId);saveAll();renderFolderDetail();}
+function openLightbox(certId){const folder=folders.find(f=>f.id===selectedFolderId);if(!folder)return;const cert=folder.certificates.find(c=>c.id===Number(certId)||c.id===certId);if(!cert||!cert.imageData)return;document.getElementById('lightboxImg').src=cert.imageData;document.getElementById('lightbox').classList.add('open');}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.getElementById('lightboxImg').src='';}
+
+/* ── NOTES / NEWS ── */
+const IMPACT_COLORS={high:'#dc2626',medium:'#f97316',low:'#f5c518',holiday:'#1e3a5f'};
+const IMPACT_LABELS={high:'High',medium:'Medium',low:'Low',holiday:'Non-Econ'};
+let notes={weekly:'',general:'',mon:'',tue:'',wed:'',thu:'',fri:'',weekGeneral:'',news:{mon:[],tue:[],wed:[],thu:[],fri:[]},newsTemplates:[]};
+let _newsImpact={mon:'high',tue:'high',wed:'high',thu:'high',fri:'high'};
+
+function renderNotes(){
+  const now=new Date();const day=now.getDay();
+  const monday=new Date(now);monday.setDate(now.getDate()-(day===0?6:day-1));
+  const friday=new Date(monday);friday.setDate(monday.getDate()+4);
+  const fmtD=d=>d.getDate()+' '+MONTHS[d.getMonth()];
+  const wl=document.getElementById('weekLabel');
+  if(wl)wl.textContent=fmtD(monday)+' – '+fmtD(friday)+' '+friday.getFullYear();
+  const dayKeys=['mon','tue','wed','thu','fri'];
+  dayKeys.forEach((k,i)=>{
+    const dateLbl=document.getElementById('d'+i);
+    if(dateLbl){const d=new Date(monday);d.setDate(monday.getDate()+i);dateLbl.textContent=fmtD(d);}
+    const ta=document.getElementById('dayNote_'+k);if(ta)ta.value=notes[k]||'';
+    renderNewsList(k);
+  });
+  const wg=document.getElementById('weekGeneral');if(wg)wg.value=notes.weekGeneral||'';
+  const gn=document.getElementById('generalNotes');if(gn)gn.value=notes.general||'';
+}
+
+function renderNewsList(dayKey){
+  const el=document.getElementById('ns_'+dayKey);if(!el)return;
+  const items=(notes.news||{})[dayKey]||[];
+  const templates=notes.newsTemplates||[];
+  const impact=_newsImpact[dayKey]||'high';
+  let impH="";
+  Object.keys(IMPACT_COLORS).forEach(function(k){
+    impH+='<div class="impact-opt'+(impact===k?' sel':'')+'" style="background:'+IMPACT_COLORS[k]+'" title="'+IMPACT_LABELS[k]+'" onclick="setNewsImpact(&quot;'+dayKey+'&quot;,&quot;'+k+'&quot;)"></div>';
+  });
+  let itemsH="";
+  items.forEach(function(item){
+    itemsH+='<div class="news-item"><div class="news-dot" style="background:'+(IMPACT_COLORS[item.impact||"high"]||"#dc2626")+'"></div>'+(item.time?'<span class="news-meta">'+item.time+'</span>':'')+( item.currency?'<span class="news-meta" style="font-weight:600">'+item.currency+'</span>':'')+' <span class="news-text">'+item.text+'</span><button class="iconbtn" style="font-size:12px" onclick="removeNewsItem(&quot;'+dayKey+'&quot;,'+item.id+')"><i class="ti ti-x"></i></button></div>';
+  });
+  let tmplH="";
+  if(templates.length){
+    tmplH='<div class="tmpl-bar" style="margin-top:5px">';
+    templates.forEach(function(t){
+      tmplH+='<button class="tmpl-btn" style="border-left:3px solid '+(IMPACT_COLORS[t.impact||"high"]||"#dc2626")+'" onclick="useTemplate(&quot;'+dayKey+'&quot;,'+t.id+')">'+t.text+'</button>';
+    });
+    tmplH+='</div>';
+  }
+  el.innerHTML='<div class="news-section"><div class="news-hdr"><div class="news-lbl"><i class="ti ti-news" style="font-size:12px"></i> News</div>'
+    +'<button class="news-add-toggle" onclick="toggleNewsForm(&quot;'+dayKey+'&quot;)">+ Add</button></div>'
+    +itemsH
+    +'<div class="news-form" id="nf_'+dayKey+'"><div style="display:flex;justify-content:flex-end;margin-bottom:6px"><button class="iconbtn" style="font-size:18px;font-weight:300" onclick="toggleNewsForm(&quot;'+dayKey+'&quot;)">×</button></div><div class="impact-row">'+impH+'<span style="font-size:10px;color:var(--muted);margin-left:4px">'+IMPACT_LABELS[impact]+'</span></div>'
+    +'<div class="news-row"><input class="ni" id="nt_'+dayKey+'" placeholder="14:30" style="max-width:75px"><input class="ni" id="nc_'+dayKey+'" placeholder="USD" style="max-width:55px"><input class="ni" id="ne_'+dayKey+'" placeholder="Event name..."><button class="niadd" onclick="addNewsItem(&quot;'+dayKey+'&quot;)">Add</button></div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:5px"><span style="font-size:10px;color:var(--muted)">Templates:</span><button class="save-tmpl" onclick="saveNewsTemplate(&quot;'+dayKey+'&quot;)"><i class="ti ti-bookmark"></i> Save as template</button></div>'
+    +tmplH+'</div></div>';
+}
+
+function toggleNewsForm(dayKey){const f=document.getElementById('nf_'+dayKey);if(!f)return;const open=f.style.display==='block';f.style.display=open?'none':'block';if(!open)setTimeout(()=>{const e=document.getElementById('ne_'+dayKey);if(e)e.focus();},50);}
+function setNewsImpact(dayKey,impact){_newsImpact[dayKey]=impact;renderNewsList(dayKey);const f=document.getElementById('nf_'+dayKey);if(f)f.style.display='block';}
+function addNewsItem(dayKey){
+  const text=(document.getElementById('ne_'+dayKey)||{}).value||'';if(!text.trim())return;
+  const time=(document.getElementById('nt_'+dayKey)||{}).value||'';
+  const cur=(document.getElementById('nc_'+dayKey)||{}).value||'';
+  if(!notes.news)notes.news={mon:[],tue:[],wed:[],thu:[],fri:[]};
+  if(!notes.news[dayKey])notes.news[dayKey]=[];
+  notes.news[dayKey].push({id:Date.now(),impact:_newsImpact[dayKey]||'high',text:text.trim(),time,currency:cur.trim()});
+  saveNotesNow();renderNewsList(dayKey);const f=document.getElementById('nf_'+dayKey);if(f)f.style.display='block';
+  const ne=document.getElementById('ne_'+dayKey);if(ne)ne.value='';
+  const nt=document.getElementById('nt_'+dayKey);if(nt)nt.value='';
+  const nc=document.getElementById('nc_'+dayKey);if(nc)nc.value='';
+}
+function removeNewsItem(dayKey,id){notes.news[dayKey]=(notes.news[dayKey]||[]).filter(x=>x.id!==id);saveNotesNow();renderNewsList(dayKey);const f=document.getElementById('nf_'+dayKey);if(f)f.style.display='none';}
+function saveNewsTemplate(dayKey){
+  const text=(document.getElementById('ne_'+dayKey)||{}).value||'';
+  const cur=(document.getElementById('nc_'+dayKey)||{}).value||'';
+  if(!text.trim()){alert('Enter an event name first.');return;}
+  if(!notes.newsTemplates)notes.newsTemplates=[];
+  notes.newsTemplates.push({id:Date.now(),impact:_newsImpact[dayKey]||'high',text:text.trim(),currency:cur.trim()});
+  saveNotesNow();renderNewsList(dayKey);const f=document.getElementById('nf_'+dayKey);if(f)f.style.display='block';
+}
+function useTemplate(dayKey,id){
+  // id may come in as string from HTML attribute — coerce both to compare
+  const t=(notes.newsTemplates||[]).find(x=>String(x.id)===String(id));if(!t)return;
+  _newsImpact[dayKey]=t.impact||'high';
+  // Rebuild DOM first (impact selector needs updating)
+  renderNewsList(dayKey);
+  // Now set inputs (DOM exists again)
+  const ne=document.getElementById('ne_'+dayKey);if(ne)ne.value=t.text;
+  const nc=document.getElementById('nc_'+dayKey);if(nc)nc.value=t.currency||'';
+  // Show add form
+  const f=document.getElementById('nf_'+dayKey);if(f)f.style.display='block';
+}
+
+let _notesSaveTimer=null;
+function saveNotesNow(){try{localStorage.setItem('af_notes',JSON.stringify(notes));}catch(e){}}
+function autoSaveNotes(){
+  ['mon','tue','wed','thu','fri'].forEach(k=>{const el=document.getElementById('dayNote_'+k);if(el)notes[k]=el.value;});
+  const wg=document.getElementById('weekGeneral');if(wg)notes.weekGeneral=wg.value;
+  const gn=document.getElementById('generalNotes');if(gn)notes.general=gn.value;
+  clearTimeout(_notesSaveTimer);_notesSaveTimer=setTimeout(saveNotesNow,600);
+}
+function clearWeeklyNotes(){
+  if(!confirm("Clear all notes and news for this week?"))return;
+  ['mon','tue','wed','thu','fri'].forEach(k=>{notes[k]='';if(!notes.news)notes.news={};notes.news[k]=[];const el=document.getElementById('dayNote_'+k);if(el)el.value='';});
+  notes.weekGeneral='';const wg=document.getElementById('weekGeneral');if(wg)wg.value='';
+  saveNotesNow();renderNotes();
+}
+
+/* ── DETAIL TABS ── */
+let _detailView='stats',calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
+function setDetailTab(view){
+  _detailView=view;
+  document.getElementById('detail_stats').style.display=view==='stats'?'block':'none';
+  document.getElementById('detail_cal').style.display=view==='calendar'?'block':'none';
+  document.querySelectorAll('.dtab').forEach(t=>t.classList.toggle('active',t.dataset.view===view));
+  if(view==='calendar'){calYear=new Date().getFullYear();calMonth=new Date().getMonth();renderTradeCalendar();}
+}
+
+/* ── TRADE CALENDAR ── */
+function renderTradeCalendar(){
+  const acc=accounts.find(a=>a.id===detailAccId);if(!acc)return;
+  const el=document.getElementById('calContent');if(!el)return;
+  // Build daily P&L map for current month
+  const pnlMap={};
+  (acc.dailyEntries||[]).forEach(e=>{
+    const d=new Date(e.date+'T00:00:00');
+    if(d.getFullYear()===calYear&&d.getMonth()===calMonth){
+      const k=e.date;pnlMap[k]=(pnlMap[k]||0)+e.pnl;
+    }
+  });
+  const firstDay=new Date(calYear,calMonth,1);
+  const lastDay=new Date(calYear,calMonth+1,0);
+  const startDow=firstDay.getDay();
+  const today=todayStr();
+  // Navigation
+  let html='<div class="cal-nav">'
+    +'<button class="cal-nav-btn" onclick="moveCalYear(-1)">&lt;&lt;</button>'
+    +'<button class="cal-nav-btn" onclick="moveCalMonth(-1)">&lt;</button>'
+    +'<div class="cal-month-lbl">'+MONTHS[calMonth]+' '+calYear+'</div>'
+    +'<button class="cal-nav-btn" onclick="moveCalMonth(1)">&gt;</button>'
+    +'<button class="cal-nav-btn" onclick="moveCalYear(1)">&gt;&gt;</button>'
+    +'</div>';
+  // Grid headers
+  html+='<div class="cal-grid">';
+  ['SUN','MON','TUE','WED','THU','FRI','SAT'].forEach(d=>{html+='<div class="cal-hdr">'+d+'</div>';});
+  // Empty cells before first day
+  for(let i=0;i<startDow;i++)html+='<div class="cal-cell empty"></div>';
+  // Day cells
+  for(let d=1;d<=lastDay.getDate();d++){
+    const mo=String(calMonth+1).padStart(2,'0');
+    const da=String(d).padStart(2,'0');
+    const dateStr=calYear+'-'+mo+'-'+da;
+    const pnl=pnlMap[dateStr];
+    const isToday=dateStr===today;
+    const dow=new Date(calYear,calMonth,d).getDay();
+    const isWeekend=dow===0||dow===6;
+    let cls='cal-cell';
+    if(isToday)cls+=' cal-today';
+    if(pnl!==undefined)cls+=pnl>=0?' cal-profit':' cal-loss';
+    else if(isWeekend)cls+=' cal-weekend';
+    html+='<div class="'+cls+'">'
+      +'<div class="cal-day">'+d+'</div>'
+      +(pnl!==undefined?'<div class="cal-pnl">'+(pnl>=0?'+ ':'− ')+fmt(Math.abs(pnl))+'</div>':'')
+      +'</div>';
+  }
+  html+='</div>';
+  // Month summary
+  const monthPnl=Object.values(pnlMap).reduce((s,v)=>s+v,0);
+  const tradeDays=Object.keys(pnlMap).length;
+  const profitDays=Object.values(pnlMap).filter(v=>v>0).length;
+  if(tradeDays>0){
+    html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:1rem">'
+      +'<div class="sbox"><div class="sbox-l">Month P&L</div><div class="sbox-v" style="color:'+(monthPnl>=0?'var(--green)':'var(--red)')+'">'+fmtS(monthPnl)+'</div></div>'
+      +'<div class="sbox"><div class="sbox-l">Trade Days</div><div class="sbox-v">'+tradeDays+'</div></div>'
+      +'<div class="sbox"><div class="sbox-l">Win / Loss</div><div class="sbox-v">'+profitDays+' / '+(tradeDays-profitDays)+'</div></div>'
+      +'</div>';
+  }
+  el.innerHTML=html;
+}
+function moveCalMonth(dir){calMonth+=dir;if(calMonth<0){calMonth=11;calYear--;}else if(calMonth>11){calMonth=0;calYear++;}renderTradeCalendar();}
+function moveCalYear(dir){calYear+=dir;renderTradeCalendar();}
+
+/* ── INIT ── */
+migrateData();initTheme();renderAccounts();
+</script>
+</body>
+</html>
