@@ -354,6 +354,7 @@ tbody tr:hover td{background:var(--s2)}
     </div>
     <div class="factions"><button class="savebtn" onclick="saveAccount()">Save</button><button class="cancelbtn" onclick="toggleAccForm()">Cancel</button></div>
   </div>
+  <div id="portfolioBar" style="display:none;margin-bottom:1.25rem;background:var(--surface);border:.5px solid var(--border);border-left:3px solid var(--blue);border-radius:var(--r);padding:1rem"></div>
   <div class="accgrid" id="accGrid"></div>
   <div id="accEmpty" class="empty" style="display:none"><i class="ti ti-layout-cards"></i>No accounts yet.</div>
 </div>
@@ -792,8 +793,22 @@ function deleteAccount(id,e){e.stopPropagation();if(!confirm('Delete this accoun
 function toggleStatus(id,e){e.stopPropagation();const i=accounts.findIndex(a=>a.id===id);if(i<0)return;accounts[i].status=accounts[i].status==='eval'?'funded':'eval';saveAll();renderAccounts();}
 
 function renderAccounts(){
-  const grid=document.getElementById('accGrid'),empty=document.getElementById('accEmpty');
-  if(!accounts.length){grid.innerHTML='';empty.style.display='block';return;}empty.style.display='none';
+  const grid=document.getElementById('accGrid'),empty=document.getElementById('accEmpty'),bar=document.getElementById('portfolioBar');
+  if(!accounts.length){grid.innerHTML='';empty.style.display='block';if(bar)bar.style.display='none';return;}empty.style.display='none';
+  const funded=accounts.filter(a=>a.status==='funded');
+  if(bar&&funded.length){
+    const totBal=funded.reduce((s,a)=>s+getBalance(a),0);
+    const totPnL=funded.reduce((s,a)=>s+getPeriodStats(a).netPnL,0);
+    const totPay=funded.reduce((s,a)=>s+(a.payouts||[]).reduce((p,x)=>p+x.amount,0),0);
+    bar.style.display='block';
+    bar.innerHTML='<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="ti ti-layout-dashboard" style="font-size:13px"></i> Funded Portfolio</div>'
+      +'<div class="krow" style="margin-bottom:0">'
+      +'<div class="kpi"><div class="klbl">Total Balance</div><div class="kval b">'+fmt(totBal)+'</div></div>'
+      +'<div class="kpi"><div class="klbl">P&L this period</div><div class="kval '+(totPnL>=0?'g':'r')+'">'+fmtS(totPnL)+'</div></div>'
+      +'<div class="kpi"><div class="klbl">Total Payouts</div><div class="kval g">'+fmt(totPay)+'</div></div>'
+      +'<div class="kpi"><div class="klbl">Funded Accounts</div><div class="kval">'+funded.length+'</div></div>'
+      +'</div>';
+  }else if(bar){bar.style.display='none';}
   grid.innerHTML=accounts.map(acc=>{
     const isFunded=acc.status==='funded',bal=getBalance(acc),isPending=!!(acc.payoutPending);
     const{netPnL,profitDays,relEntries}=getPeriodStats(acc);const wd=winDaysOf(acc);
