@@ -799,7 +799,7 @@ function renderAccounts(){
   if(bar&&funded.length){
     const totBal=funded.reduce((s,a)=>s+getBalance(a),0);
     const totPnL=funded.reduce((s,a)=>s+getPeriodStats(a).netPnL,0);
-    const totPay=funded.reduce((s,a)=>s+(a.payouts||[]).reduce((p,x)=>p+x.amount,0),0);
+    const totPay=entries.filter(e=>e.type==='payout').reduce((s,e)=>s+e.amount,0);
     bar.style.display='block';
     bar.innerHTML='<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="ti ti-layout-dashboard" style="font-size:13px"></i> Funded Portfolio</div>'
       +'<div class="krow" style="margin-bottom:0">'
