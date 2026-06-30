@@ -273,6 +273,19 @@ tbody tr:hover td{background:var(--s2)}
 .jsess-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
 .jsess-btn{padding:4px 12px;border-radius:20px;font-size:12px;border:.5px solid var(--border-s);background:transparent;cursor:pointer;color:var(--text2)}
 .jsess-btn.active{background:var(--bbg);color:var(--btx);border-color:var(--blue)}
+/* PLAYBOOKS */
+.pb-card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:10px}
+.pb-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.pb-name{font-size:15px;font-weight:600}
+.pb-desc{font-size:12px;color:var(--text2);margin-top:3px;line-height:1.5}
+.pb-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+/* INSIGHTS */
+.insight-card{background:var(--surface);border:.5px solid var(--border);border-left:3px solid var(--blue);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;font-size:13px;line-height:1.5}
+.insight-card.warn{border-left-color:var(--amber)}
+.insight-card.good{border-left-color:var(--green)}
+/* RISK TOOLS */
+.risk-result{background:var(--gbg);border:.5px solid var(--green);border-radius:var(--r);padding:1rem;text-align:center;margin-top:1rem}
+.risk-result-val{font-size:28px;font-weight:700;color:var(--gtx)}
 /* WIN STREAK */
 .streak-box{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;background:var(--abg);color:var(--atx);font-size:12px;font-weight:700;border:.5px solid var(--amber)}
 .streak-card{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:var(--r);background:var(--abg);border:.5px solid var(--amber);font-size:12px;font-weight:700;color:var(--atx);margin-top:6px}
@@ -421,6 +434,13 @@ tbody tr:hover td{background:var(--s2)}
 
 <!-- TAB: JOURNAL -->
 <div id="tabJournal" class="page" style="display:none">
+  <div style="display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap">
+    <button class="dtab active" data-jview="trades" onclick="setJournalView('trades')"><i class="ti ti-notebook"></i> Trades</button>
+    <button class="dtab" data-jview="playbooks" onclick="setJournalView('playbooks')"><i class="ti ti-books"></i> Playbooks</button>
+    <button class="dtab" data-jview="insights" onclick="setJournalView('insights')"><i class="ti ti-bulb"></i> Insights</button>
+    <button class="dtab" data-jview="risk" onclick="setJournalView('risk')"><i class="ti ti-shield"></i> Risk Tools</button>
+  </div>
+  <div id="jview_trades">
   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:1rem">
     <div class="chips" id="jAccChips" style="margin-bottom:0;flex:1;min-width:0"></div>
     <button class="addbtn" onclick="toggleTradeForm()" style="white-space:nowrap;flex-shrink:0"><i class="ti ti-plus"></i> Add Trade</button>
@@ -433,7 +453,7 @@ tbody tr:hover td{background:var(--s2)}
       <div><label>Symbol</label><input type="text" id="tj_sym" placeholder="e.g. NQ, ES, GC, EUR/USD"></div>
       <div class="full"><label>Direction</label><div style="display:flex;gap:8px;margin-top:5px"><button type="button" id="jd_long" class="type-btn active" onclick="setJDir('long')">▲ Long</button><button type="button" id="jd_short" class="type-btn" onclick="setJDir('short')">▼ Short</button></div></div>
       <div class="fsection full">🔍 Pre-Trade</div>
-      <div class="full"><label>Setup / Pattern</label><input type="text" id="tj_setup" placeholder="e.g. FVG Fill, BOS, Supply/Demand..."></div>
+      <div class="full"><label>Setup / Pattern</label><input type="text" id="tj_setup" list="pbDatalist" placeholder="e.g. FVG Fill, BOS, Supply/Demand..."><datalist id="pbDatalist"></datalist></div>
       <div class="full"><label>Entry Reason — why exactly now?</label><textarea class="notes-area" style="min-height:60px" id="tj_entry_reason" placeholder="What triggered your entry?"></textarea></div>
       <div><label>Expected Target</label><input type="text" id="tj_target" placeholder="e.g. 50 pts, prev high"></div>
       <div><label>Planned Stop Loss</label><input type="text" id="tj_sl" placeholder="e.g. 15 pts, below swing low"></div>
@@ -463,6 +483,28 @@ tbody tr:hover td{background:var(--s2)}
   </div>
   <div id="tradeList"></div>
   <div id="tradeEmpty" class="empty" style="display:none"><i class="ti ti-notebook"></i>No trades journaled yet.<br><span style="font-size:12px;margin-top:4px;display:block">Click "+ Add Trade" to journal your first trade.</span></div>
+  </div>
+  <!-- Playbooks view -->
+  <div id="jview_playbooks" style="display:none">
+    <button class="addbtn" onclick="togglePlaybookForm()"><i class="ti ti-plus"></i> Add Playbook</button>
+    <div class="fcard" id="playbookForm">
+      <div class="fgrid">
+        <div class="full"><label>Name</label><input type="text" id="pb_name" placeholder="e.g. FVG Fill, Breakout Long..."></div>
+        <div class="full"><label>Description</label><textarea class="notes-area" style="min-height:60px" id="pb_desc" placeholder="Describe the setup rules / criteria..."></textarea></div>
+      </div>
+      <div class="factions"><button class="savebtn" onclick="savePlaybook()">Save</button><button class="cancelbtn" onclick="togglePlaybookForm()">Cancel</button></div>
+    </div>
+    <div id="playbookGrid"></div>
+    <div id="playbookEmpty" class="empty" style="display:none"><i class="ti ti-books"></i>No playbooks yet.<br><span style="font-size:12px;margin-top:4px;display:block">Define your setups to track which strategies actually work.</span></div>
+  </div>
+  <!-- Insights view -->
+  <div id="jview_insights" style="display:none">
+    <div id="insightsContent"></div>
+  </div>
+  <!-- Risk Tools view -->
+  <div id="jview_risk" style="display:none">
+    <div id="riskContent"></div>
+  </div>
 </div>
 
 <!-- TAB: ENTRIES -->
@@ -541,7 +583,7 @@ const CATS={profit:'Profit Withdrawal',fee:'Platform Fee',subscription:'Subscrip
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const FEMOJI={'#3b82f6':'📁','#1baf7a':'📂','#f97316':'🗂️','#8b5cf6':'📋','#ec4899':'📌','#f59e0b':'⭐','#ef4444':'🏆','#14b8a6':'📎','#6b7280':'🗃️'};
 
-let entries=[],accounts=[],folders=[],trades=[],filter='all',editId=null,currentPeriod='1M',currentTab='accounts';
+let entries=[],accounts=[],folders=[],trades=[],playbooks=[],filter='all',editId=null,currentPeriod='1M',currentTab='accounts';
 let detailAccId=null,detailChart=null,cumulativeChart=null,selectedFolderId=null,selectedColor='#3b82f6';
 let _jFilter='all',_jDir='long',_jResult='win',_jFollowed=null,_jDoubts=null,_jMovedStop=null,_jTimed=null;
 let _jFOMO=null,_jRevenge=null,_jImpulse=false,_jCalm=3,_jSession='',_jEditId=null;
@@ -593,9 +635,10 @@ function migrateData(){
   try{const f=localStorage.getItem('af_folders');if(f)folders=JSON.parse(f);}catch(e){}
   try{const n=localStorage.getItem('af_notes');if(n)notes=JSON.parse(n);}catch(e){}
   try{const t=localStorage.getItem('af_trades');if(t)trades=JSON.parse(t);}catch(e){}
+  try{const p=localStorage.getItem('af_playbooks');if(p)playbooks=JSON.parse(p);}catch(e){}
   saveAll();
 }
-function saveAll(){try{localStorage.setItem('af_entries',JSON.stringify(entries));}catch(e){}try{localStorage.setItem('af_accs',JSON.stringify(accounts));}catch(e){}try{localStorage.setItem('af_folders',JSON.stringify(folders));}catch(e){alert('Storage limit reached.');}try{localStorage.setItem('af_trades',JSON.stringify(trades));}catch(e){}}
+function saveAll(){try{localStorage.setItem('af_entries',JSON.stringify(entries));}catch(e){}try{localStorage.setItem('af_accs',JSON.stringify(accounts));}catch(e){}try{localStorage.setItem('af_folders',JSON.stringify(folders));}catch(e){alert('Storage limit reached.');}try{localStorage.setItem('af_trades',JSON.stringify(trades));}catch(e){}try{localStorage.setItem('af_playbooks',JSON.stringify(playbooks));}catch(e){}}
 
 /* ── BALANCE & STATS ── */
 function getBalance(acc){const p=(acc.dailyEntries||[]).reduce((s,e)=>s+e.pnl,0);const py=(acc.payouts||[]).reduce((s,x)=>s+x.amount,0);return(acc.size||0)+p-py;}
@@ -1227,6 +1270,7 @@ function toggleTradeForm(){
     const dp=document.getElementById('tj_date');if(dp)dp.value=todayStr();
     const pnl=document.getElementById('tj_pnl');if(pnl)pnl.value='';
     const sel=document.getElementById('tj_acc');if(sel)sel.innerHTML='<option value="">— No account —</option>'+accounts.map(a=>'<option value="'+a.id+'">'+a.name+'</option>').join('');
+    const dl=document.getElementById('pbDatalist');if(dl)dl.innerHTML=playbooks.map(p=>'<option value="'+p.name.replace(/"/g,'&quot;')+'">').join('');
     setJDir('long');setJResult('win');setJCalm(3);setJImpulse(false);
     ['jf_y','jf_n','jdoubt_y','jdoubt_n','jm_y','jm_n','jtimed_y','jtimed_n','jfomo_y','jfomo_n','jrev_y','jrev_n'].forEach(id=>{const e=document.getElementById(id);if(e)e.className='jyn-btn';});
     document.querySelectorAll('.jsess-btn').forEach(b=>b.classList.remove('active'));
@@ -1306,6 +1350,119 @@ function jDetailHTML(t){
     +'<div class="jsect">🌍 Context</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+fld('Session',t.session?(SESS_LBL[t.session]||t.session):'—')+fld('Day Start',t.dayStart||'—')+'</div>'
     +(t.newsCtx?fld('News / Events',t.newsCtx):'');
+}
+
+/* ── JOURNAL SUB-VIEWS ── */
+function setJournalView(view){
+  ['trades','playbooks','insights','risk'].forEach(v=>{const el=document.getElementById('jview_'+v);if(el)el.style.display=v===view?'block':'none';});
+  document.querySelectorAll('#tabJournal .dtab').forEach(b=>b.classList.toggle('active',b.dataset.jview===view));
+  if(view==='playbooks')renderPlaybooks();else if(view==='insights')renderInsights();else if(view==='risk')renderRiskTools();
+}
+
+/* ── PLAYBOOKS ── */
+function togglePlaybookForm(){const f=document.getElementById('playbookForm');if(!f)return;const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){document.getElementById('pb_name').value='';document.getElementById('pb_desc').value='';setTimeout(()=>{const e=document.getElementById('pb_name');if(e)e.focus();},50);}}
+function savePlaybook(){
+  const name=(document.getElementById('pb_name').value||'').trim();if(!name){alert('Please enter a name.');return;}
+  playbooks.push({id:Date.now(),name,description:(document.getElementById('pb_desc').value||'').trim()});
+  saveAll();togglePlaybookForm();renderPlaybooks();
+}
+function deletePlaybook(id){if(!confirm('Delete this playbook?'))return;playbooks=playbooks.filter(p=>p.id!==id);saveAll();renderPlaybooks();}
+function renderPlaybooks(){
+  const grid=document.getElementById('playbookGrid'),empty=document.getElementById('playbookEmpty');if(!grid)return;
+  if(!playbooks.length){grid.innerHTML='';if(empty)empty.style.display='block';return;}if(empty)empty.style.display='none';
+  grid.innerHTML=playbooks.map(pb=>{
+    const matched=trades.filter(t=>(t.setup||'').trim().toLowerCase()===pb.name.trim().toLowerCase());
+    const wins=matched.filter(t=>t.result==='win').length;
+    const wr=matched.length?Math.round((wins/matched.length)*100):0;
+    const net=matched.reduce((s,t)=>s+(t.pnl||0),0);
+    return '<div class="pb-card"><div class="pb-head"><div><div class="pb-name">'+pb.name+'</div>'+(pb.description?'<div class="pb-desc">'+pb.description+'</div>':'')+'</div><button class="iconbtn" onclick="deletePlaybook('+pb.id+')" style="color:var(--red)"><i class="ti ti-trash"></i></button></div>'
+      +'<div class="pb-stats"><div class="sbox"><div class="sbox-l">Trades</div><div class="sbox-v">'+matched.length+'</div></div><div class="sbox"><div class="sbox-l">Win Rate</div><div class="sbox-v" style="color:'+(matched.length?(wr>=50?'var(--green)':'var(--red)'):'var(--muted)')+'">'+(matched.length?wr+'%':'—')+'</div></div><div class="sbox"><div class="sbox-l">Net P&L</div><div class="sbox-v" style="color:'+(matched.length?(net>=0?'var(--green)':'var(--red)'):'var(--muted)')+'">'+(matched.length?fmtS(net):'—')+'</div></div></div></div>';
+  }).join('');
+}
+
+/* ── INSIGHTS ── */
+const WD_NAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function renderInsights(){
+  const el=document.getElementById('insightsContent');if(!el)return;
+  if(trades.length<3){el.innerHTML='<div class="empty"><i class="ti ti-bulb"></i>Add at least 3 trades to unlock insights.</div>';return;}
+  const wdStats={};
+  trades.forEach(t=>{const d=new Date(t.date+'T00:00:00').getDay();if(!wdStats[d])wdStats[d]={count:0,wins:0,pnl:0};wdStats[d].count++;if(t.result==='win')wdStats[d].wins++;wdStats[d].pnl+=t.pnl||0;});
+  const wdRows=Object.keys(wdStats).sort((a,b)=>a-b).map(d=>{const s=wdStats[d],wr=Math.round((s.wins/s.count)*100);return '<tr><td>'+WD_NAMES[d]+'</td><td class="tar">'+s.count+'</td><td class="tar" style="color:'+(wr>=50?'var(--green)':'var(--red)')+'">'+wr+'%</td><td class="tar" style="color:'+(s.pnl>=0?'var(--green)':'var(--red)')+'">'+fmtS(s.pnl)+'</td></tr>';}).join('');
+  const sessStats={};
+  trades.filter(t=>t.session).forEach(t=>{if(!sessStats[t.session])sessStats[t.session]={count:0,wins:0,pnl:0};sessStats[t.session].count++;if(t.result==='win')sessStats[t.session].wins++;sessStats[t.session].pnl+=t.pnl||0;});
+  const sessRows=Object.keys(sessStats).map(s=>{const st=sessStats[s],wr=Math.round((st.wins/st.count)*100);return '<tr><td>'+(SESS_LBL[s]||s)+'</td><td class="tar">'+st.count+'</td><td class="tar" style="color:'+(wr>=50?'var(--green)':'var(--red)')+'">'+wr+'%</td><td class="tar" style="color:'+(st.pnl>=0?'var(--green)':'var(--red)')+'">'+fmtS(st.pnl)+'</td></tr>';}).join('');
+  const insights=[];
+  const wdArr=Object.entries(wdStats).map(([d,s])=>({d:Number(d),count:s.count,pnl:s.pnl})).filter(x=>x.count>=2);
+  if(wdArr.length>=2){
+    const best=wdArr.slice().sort((a,b)=>b.pnl-a.pnl)[0],worst=wdArr.slice().sort((a,b)=>a.pnl-b.pnl)[0];
+    if(best.d!==worst.d){
+      insights.push({type:'good',text:'Your best day is <strong>'+WD_NAMES[best.d]+'</strong> with '+fmtS(best.pnl)+' net P&L across '+best.count+' trades.'});
+      insights.push({type:'warn',text:'Your worst day is <strong>'+WD_NAMES[worst.d]+'</strong> with '+fmtS(worst.pnl)+' net P&L across '+worst.count+' trades.'});
+    }
+  }
+  const fomoT=trades.filter(t=>t.hadFOMO===true),noFomoT=trades.filter(t=>t.hadFOMO===false);
+  if(fomoT.length>=2&&noFomoT.length>=2){
+    const fomoWR=Math.round((fomoT.filter(t=>t.result==='win').length/fomoT.length)*100),noFomoWR=Math.round((noFomoT.filter(t=>t.result==='win').length/noFomoT.length)*100);
+    if(fomoWR<noFomoWR)insights.push({type:'warn',text:'Trades with FOMO have a <strong>'+fomoWR+'%</strong> win rate vs <strong>'+noFomoWR+'%</strong> without FOMO.'});
+  }
+  const revT=trades.filter(t=>t.revenge===true);
+  if(revT.length>=2){const revWR=Math.round((revT.filter(t=>t.result==='win').length/revT.length)*100);insights.push({type:'warn',text:'You logged <strong>'+revT.length+'</strong> revenge trades with a <strong>'+revWR+'%</strong> win rate.'});}
+  const calmHigh=trades.filter(t=>t.calmRating>=4),calmLow=trades.filter(t=>t.calmRating<=2);
+  if(calmHigh.length>=2&&calmLow.length>=2){
+    const chWR=Math.round((calmHigh.filter(t=>t.result==='win').length/calmHigh.length)*100),clWR=Math.round((calmLow.filter(t=>t.result==='win').length/calmLow.length)*100);
+    if(chWR>clWR)insights.push({type:'good',text:'When calm (4-5/5), your win rate is <strong>'+chWR+'%</strong> vs <strong>'+clWR+'%</strong> when nervous (1-2/5).'});
+  }
+  const followed=trades.filter(t=>t.followedPlan===true),notFollowed=trades.filter(t=>t.followedPlan===false);
+  if(followed.length>=2&&notFollowed.length>=2){
+    const fWR=Math.round((followed.filter(t=>t.result==='win').length/followed.length)*100),nfWR=Math.round((notFollowed.filter(t=>t.result==='win').length/notFollowed.length)*100);
+    insights.push({type:fWR>=nfWR?'good':'warn',text:'When you follow your plan, win rate is <strong>'+fWR+'%</strong> vs <strong>'+nfWR+'%</strong> when you deviate.'});
+  }
+  const sorted=trades.slice().sort((a,b)=>a.date.localeCompare(b.date));
+  const afterLossStreak=[];
+  for(let i=2;i<sorted.length;i++){if(sorted[i-1].result==='loss'&&sorted[i-2].result==='loss')afterLossStreak.push(sorted[i]);}
+  if(afterLossStreak.length>=2){
+    const wr=Math.round((afterLossStreak.filter(t=>t.result==='win').length/afterLossStreak.length)*100);
+    const overallWR=Math.round((trades.filter(t=>t.result==='win').length/trades.length)*100);
+    if(wr<overallWR)insights.push({type:'warn',text:'After 2 losses in a row, your win rate drops to <strong>'+wr+'%</strong> (overall: '+overallWR+'%) — possible tilt risk.'});
+  }
+  el.innerHTML='<div class="stitle"><i class="ti ti-calendar-stats"></i> By Weekday</div>'
+    +'<div class="twrap"><table><thead><tr><th>Day</th><th class="tar">Trades</th><th class="tar">Win Rate</th><th class="tar">Net P&L</th></tr></thead><tbody>'+wdRows+'</tbody></table></div>'
+    +(sessRows?'<div class="stitle" style="margin-top:1.25rem"><i class="ti ti-clock"></i> By Session</div><div class="twrap"><table><thead><tr><th>Session</th><th class="tar">Trades</th><th class="tar">Win Rate</th><th class="tar">Net P&L</th></tr></thead><tbody>'+sessRows+'</tbody></table></div>':'')
+    +'<div class="stitle" style="margin-top:1.25rem"><i class="ti ti-bulb"></i> Insights</div>'
+    +(insights.length?insights.map(i=>'<div class="insight-card '+i.type+'">'+i.text+'</div>').join(''):'<div class="empty"><i class="ti ti-bulb"></i>Not enough data yet for insights.</div>');
+}
+
+/* ── RISK TOOLS ── */
+function renderRiskTools(){
+  const el=document.getElementById('riskContent');if(!el)return;
+  const today=todayStr();
+  const funded=accounts.filter(a=>a.status==='funded'&&a.lossLimit>0);
+  const riskRows=funded.map(a=>{
+    const todayPnl=(a.dailyEntries||[]).filter(e=>e.date===today).reduce((s,e)=>s+e.pnl,0);
+    const used=todayPnl<0?Math.min(100,Math.round((Math.abs(todayPnl)/a.lossLimit)*100)):0;
+    const clr=used>=80?'var(--red)':used>=50?'var(--amber)':'var(--green)';
+    return '<div class="sbox" style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-weight:600;font-size:13px">'+a.name+'</span><span style="font-size:12px;color:'+clr+';font-weight:700">'+used+'% of limit used</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+used+'%;background:'+clr+'"></div></div><div style="font-size:11px;color:var(--muted);margin-top:4px">Today: '+fmtS(todayPnl)+' / Limit: '+fmt(a.lossLimit)+'</div></div>';
+  }).join('');
+  el.innerHTML='<div class="stitle"><i class="ti ti-shield-check"></i> Today\'s Risk Status</div>'
+    +(riskRows||'<div class="empty"><i class="ti ti-shield"></i>No funded accounts with a loss limit set.</div>')
+    +'<div class="stitle" style="margin-top:1.25rem"><i class="ti ti-calculator"></i> Position Size Calculator</div>'
+    +'<div class="ccard"><div class="fgrid">'
+    +'<div><label>Account Balance ($)</label><input type="number" id="rc_balance" placeholder="50000"></div>'
+    +'<div><label>Risk per Trade (%)</label><input type="number" id="rc_risk" placeholder="1" step="0.1"></div>'
+    +'<div><label>Stop Loss Distance (points)</label><input type="number" id="rc_sl" placeholder="20" step="0.01"></div>'
+    +'<div><label>Value per Point ($)</label><input type="number" id="rc_pointval" placeholder="2" step="0.01"></div>'
+    +'</div><button class="savebtn" onclick="calcPositionSize()" style="width:100%;justify-content:center">Calculate</button>'
+    +'<div id="rc_result"></div></div>';
+}
+function calcPositionSize(){
+  const bal=parseFloat(document.getElementById('rc_balance').value)||0;
+  const riskPct=parseFloat(document.getElementById('rc_risk').value)||0;
+  const sl=parseFloat(document.getElementById('rc_sl').value)||0;
+  const pv=parseFloat(document.getElementById('rc_pointval').value)||0;
+  const result=document.getElementById('rc_result');
+  if(!bal||!riskPct||!sl||!pv){result.innerHTML='<div style="margin-top:10px;font-size:12px;color:var(--red)">Please fill in all fields.</div>';return;}
+  const riskAmt=bal*(riskPct/100),size=riskAmt/(sl*pv);
+  result.innerHTML='<div class="risk-result"><div class="sbox-l">Max Position Size</div><div class="risk-result-val">'+size.toFixed(2)+' contracts</div><div style="font-size:12px;color:var(--text2);margin-top:6px">Risking '+fmt(riskAmt)+' ('+riskPct+'% of '+fmt(bal)+')</div></div>';
 }
 
 /* ── INIT ── */
