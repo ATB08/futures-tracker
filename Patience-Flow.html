@@ -9,10 +9,10 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#f8f8f7;--surface:#fff;--s2:#f1f0ec;--border:rgba(0,0,0,.1);--border-s:rgba(0,0,0,.18);--text:#0b0b0b;--text2:#52514e;--muted:#898781;--r:8px;--green:#1baf7a;--red:#ef4444;--blue:#3b82f6;--amber:#f59e0b;--gbg:#eaf3de;--gtx:#3b6d11;--rbg:#fef2f2;--rtx:#b91c1c;--bbg:#eff6ff;--btx:#1d4ed8;--abg:#fef3c7;--atx:#92400e;--obg:#fff7ed;--otx:#c2410c;}
-@media(prefers-color-scheme:dark){:root{--bg:#141413;--surface:#1e1e1c;--s2:#262624;--border:rgba(255,255,255,.1);--border-s:rgba(255,255,255,.18);--text:#f5f5f0;--text2:#c3c2b7;--muted:#898781;--gbg:#173404;--gtx:#97c459;--rbg:#450a0a;--rtx:#fca5a5;--bbg:#1e3a5f;--btx:#93c5fd;--abg:#3d2800;--atx:#fde68a;--obg:#431407;--otx:#fdba74;}}
-html[data-theme="dark"]{--bg:#141413;--surface:#1e1e1c;--s2:#262624;--border:rgba(255,255,255,.1);--border-s:rgba(255,255,255,.18);--text:#f5f5f0;--text2:#c3c2b7;--muted:#898781;--gbg:#173404;--gtx:#97c459;--rbg:#450a0a;--rtx:#fca5a5;--bbg:#1e3a5f;--btx:#93c5fd;--abg:#3d2800;--atx:#fde68a;--obg:#431407;--otx:#fdba74;}
-html[data-theme="light"]{--bg:#f8f8f7;--surface:#fff;--s2:#f1f0ec;--border:rgba(0,0,0,.1);--border-s:rgba(0,0,0,.18);--text:#0b0b0b;--text2:#52514e;--muted:#898781;--gbg:#eaf3de;--gtx:#3b6d11;--rbg:#fef2f2;--rtx:#b91c1c;--bbg:#eff6ff;--btx:#1d4ed8;--abg:#fef3c7;--atx:#92400e;--obg:#fff7ed;--otx:#c2410c;}
+:root{--bg:#f8f8f7;--surface:#fff;--s2:#f1f0ec;--border:rgba(0,0,0,.1);--border-s:rgba(0,0,0,.18);--text:#0b0b0b;--text2:#52514e;--muted:#898781;--r:8px;--green:#1baf7a;--red:#ef4444;--blue:#3b82f6;--amber:#f59e0b;--purple:#8b5cf6;--gbg:#eaf3de;--gtx:#3b6d11;--rbg:#fef2f2;--rtx:#b91c1c;--bbg:#eff6ff;--btx:#1d4ed8;--abg:#fef3c7;--atx:#92400e;--obg:#fff7ed;--otx:#c2410c;--lbg:#ede9fe;--ltx:#6d28d9;}
+@media(prefers-color-scheme:dark){:root{--bg:#141413;--surface:#1e1e1c;--s2:#262624;--border:rgba(255,255,255,.1);--border-s:rgba(255,255,255,.18);--text:#f5f5f0;--text2:#c3c2b7;--muted:#898781;--gbg:#173404;--gtx:#97c459;--rbg:#450a0a;--rtx:#fca5a5;--bbg:#1e3a5f;--btx:#93c5fd;--abg:#3d2800;--atx:#fde68a;--obg:#431407;--otx:#fdba74;--lbg:#2e1065;--ltx:#c4b5fd;}}
+html[data-theme="dark"]{--bg:#141413;--surface:#1e1e1c;--s2:#262624;--border:rgba(255,255,255,.1);--border-s:rgba(255,255,255,.18);--text:#f5f5f0;--text2:#c3c2b7;--muted:#898781;--gbg:#173404;--gtx:#97c459;--rbg:#450a0a;--rtx:#fca5a5;--bbg:#1e3a5f;--btx:#93c5fd;--abg:#3d2800;--atx:#fde68a;--obg:#431407;--otx:#fdba74;--lbg:#2e1065;--ltx:#c4b5fd;}
+html[data-theme="light"]{--bg:#f8f8f7;--surface:#fff;--s2:#f1f0ec;--border:rgba(0,0,0,.1);--border-s:rgba(0,0,0,.18);--text:#0b0b0b;--text2:#52514e;--muted:#898781;--gbg:#eaf3de;--gtx:#3b6d11;--rbg:#fef2f2;--rtx:#b91c1c;--bbg:#eff6ff;--btx:#1d4ed8;--abg:#fef3c7;--atx:#92400e;--obg:#fff7ed;--otx:#c2410c;--lbg:#ede9fe;--ltx:#6d28d9;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
 .app-header{display:flex;align-items:center;gap:10px;padding:11px 1.5rem;border-bottom:.5px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100}
 .app-logo{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;flex-shrink:0}
@@ -56,7 +56,7 @@ td{padding:9px 12px;border-bottom:.5px solid var(--border);color:var(--text)}
 tr:last-child td{border-bottom:none}
 tbody tr:hover td{background:var(--s2)}
 .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500}
-.bg{background:var(--gbg);color:var(--gtx)}.br{background:var(--rbg);color:var(--rtx)}.bb{background:var(--bbg);color:var(--btx)}.ba{background:var(--abg);color:var(--atx)}.bo{background:var(--obg);color:var(--otx)}
+.bg{background:var(--gbg);color:var(--gtx)}.br{background:var(--rbg);color:var(--rtx)}.bb{background:var(--bbg);color:var(--btx)}.ba{background:var(--abg);color:var(--atx)}.bo{background:var(--obg);color:var(--otx)}.bl{background:var(--lbg);color:var(--ltx)}
 .ract{display:flex;gap:2px}
 .stitle{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.05em}
 .divider{height:.5px;background:var(--border);margin:1.5rem 0}
@@ -242,6 +242,7 @@ tbody tr:hover td{background:var(--s2)}
 .tl-dot.tl-funded{background:var(--gbg);border-color:var(--green)}
 .tl-dot.tl-payout{background:var(--gbg);border-color:var(--green)}
 .tl-dot.tl-pending{background:var(--abg);border-color:var(--amber)}
+.tl-dot.tl-live{background:var(--lbg);border-color:var(--purple)}
 .tl-body{flex:1;padding-top:3px}
 .tl-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:1px}
 .tl-sub{font-size:11px;color:var(--muted)}
@@ -659,6 +660,7 @@ function migrateData(){
     if(!acc.groups)acc.groups=[];
     if(acc.livePayoutGoal===undefined)acc.livePayoutGoal=0;
     if(acc.resets===undefined)acc.resets=0;
+    if(acc.liveDate===undefined)acc.liveDate=null;
   });
   try{const g=localStorage.getItem('af_accgroups');if(g)accGroups=JSON.parse(g);}catch(e){}
   try{const f=localStorage.getItem('af_folders');if(f)folders=JSON.parse(f);}catch(e){}
@@ -673,7 +675,7 @@ function saveAll(){try{localStorage.setItem('af_entries',JSON.stringify(entries)
 /* ── BALANCE & STATS ── */
 function getBalance(acc){const p=(acc.dailyEntries||[]).reduce((s,e)=>s+e.pnl,0);const py=(acc.payouts||[]).reduce((s,x)=>s+x.amount,0);return(acc.size||0)+p-py;}
 function getPeriodStats(acc){
-  const lastDate=acc.status==='funded'?acc.lastPayoutDate:null;
+  const lastDate=(acc.status==='funded'||acc.status==='live')?acc.lastPayoutDate:null;
   const rel=lastDate?(acc.dailyEntries||[]).filter(e=>e.date>lastDate):(acc.dailyEntries||[]);
   const dm={};rel.forEach(e=>{dm[e.date]=(dm[e.date]||0)+e.pnl;});
   return{netPnL:rel.reduce((s,e)=>s+e.pnl,0),profitDays:Object.values(dm).filter(v=>v>0).length,lossDays:Object.values(dm).filter(v=>v<0).length,relEntries:rel};
@@ -686,6 +688,7 @@ function getPeriodStats(acc){
    If inconsistent: shows "to fix" section + max new day formula.
 */
 function checkConsistency(acc,relEntries,netPnL){
+  if(acc.status==='live')return null;
   const isFunded=acc.status==='funded';
   const enabled=isFunded?acc.fundedConsistencyEnabled:acc.evalConsistencyEnabled;
   if(!enabled)return null;
@@ -707,7 +710,7 @@ function checkConsistency(acc,relEntries,netPnL){
 
 /* ── CHART DATA ── Eval uses evalLossLimit (static floor), Funded uses lossLimit (trailing) */
 function buildChartData(acc){
-  const size=acc.size||0,isFunded=acc.status==='funded';
+  const size=acc.size||0,isFunded=acc.status==='funded'||acc.status==='live';
   const lossLimit=isFunded?(acc.lossLimit||0):(acc.evalLossLimit!==undefined?acc.evalLossLimit:acc.lossLimit||0);
   const entryMap={};(acc.dailyEntries||[]).forEach(e=>{entryMap[e.date]=(entryMap[e.date]||0)+e.pnl;});
   const payoutMap={};(acc.payouts||[]).forEach(p=>{payoutMap[p.date]=(payoutMap[p.date]||0)+p.amount;});
@@ -777,17 +780,18 @@ function renderDetail(){
   document.querySelectorAll('.dtab').forEach(t=>t.classList.toggle('active',t.dataset.view==='stats'));
   _detailView='stats';
   const acc=accounts.find(a=>a.id===detailAccId);if(!acc){closeDetail();return;}
-  const isFunded=acc.status==='funded',wd=winDaysOf(acc),isPending=!!(acc.payoutPending);
+  const isFunded=acc.status==='funded',isLive=acc.status==='live',isPending=!!(acc.payoutPending);
+  const wd=isLive?0:winDaysOf(acc);
   const bal=getBalance(acc);const{netPnL,profitDays,lossDays,relEntries}=getPeriodStats(acc);
   const con=checkConsistency(acc,relEntries,netPnL);
   const conOk=!con||con.noData||con.ok;
-  const canPayout=isFunded&&!isPending&&(wd===0||profitDays>=wd)&&conOk;
+  const canPayout=(isFunded||isLive)&&!isPending&&(wd===0||profitDays>=wd)&&conOk;
   const balDelta=bal-(acc.size||0);
   const streak=getWinStreak(acc);
 
   document.getElementById('detailName').textContent=acc.name;
   document.getElementById('detailNumber').innerHTML=acc.number?'<i class="ti ti-hash" style="font-size:11px"></i>'+acc.number:'';
-  document.getElementById('detailBadge').innerHTML='<span class="badge '+(isPending?'bo':isFunded?'bg':'ba')+'">'+(isPending?'⏳ Payout Pending':isFunded?'✓ Funded':'◎ Evaluation')+'</span>';
+  document.getElementById('detailBadge').innerHTML='<span class="badge '+(isPending?'bo':isLive?'bl':isFunded?'bg':'ba')+'">'+(isPending?'⏳ Payout Pending':isLive?'★ Live':isFunded?'✓ Funded':'◎ Evaluation')+'</span>';
   document.getElementById('detailPendingNotice').innerHTML=isPending?'<div class="pending-notice" style="margin-bottom:1.25rem"><div class="pending-notice-icon">⏳</div><div class="pending-notice-body"><div class="pending-notice-title">Payout Pending — '+fmt(acc.payoutPending.amount)+'</div><div class="pending-notice-sub">Requested '+fmtDate(acc.payoutPending.requestDate)+' · Trading paused until firm approves</div></div></div>':'';
   document.getElementById('detailBalBox').className='balance-box '+(balDelta>0?'up':balDelta<0?'down':'');
   document.getElementById('detailBalBox').innerHTML='<div><div class="balance-label">Account Balance</div><div class="balance-value" style="color:'+(bal>=(acc.size||0)?'var(--blue)':'var(--red)')+'">'+fmt(bal)+'</div></div><div><div class="balance-change-label">P&L '+(isFunded?'since last payout':'since start')+'</div><div class="balance-change" style="color:'+(netPnL>=0?'var(--green)':'var(--red)')+'">'+fmtS(netPnL)+'</div></div>';
@@ -802,11 +806,14 @@ function renderDetail(){
     document.getElementById('detailConsistency').innerHTML='<div class="con-card '+(ok?'ok':'warn')+'" style="margin-bottom:1rem"><div class="con-label">Consistency Rule (max '+con.threshold+'% per day)</div><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px"><div class="con-status" style="color:'+clr+'">'+(ok?'✓ Consistent':'⚠ Inconsistent')+'</div><div style="font-size:13px;color:'+clr+';font-weight:500">'+con.bestDayPct.toFixed(2)+'% of total profit</div></div>'+(con.bestDayAmount>0?'<div style="font-size:12px;color:var(--text2);margin-bottom:2px">Best day: <strong>'+fmt(con.bestDayAmount)+'</strong>'+(con.bestDay?' on '+fmtDate(con.bestDay):'')+'</div>':'')+fixSection+maxSection+'</div>';
   }else document.getElementById('detailConsistency').innerHTML='';
 
-  if(isFunded){
+  if(isFunded||isLive){
     document.getElementById('detailStats').innerHTML='<div class="stat3"><div class="sbox"><div class="sbox-l">Win Days (this period)</div><div class="sbox-v" style="color:'+(canPayout?'var(--green)':'var(--text')+'">'+(wd===0?'No req.':profitDays+'/'+wd+(canPayout?' ✓':''))+'</div></div><div class="sbox"><div class="sbox-l">Loss Days</div><div class="sbox-v" style="color:'+(lossDays>0?'var(--red)':'var(--muted)')+'">'+lossDays+'</div></div><div class="sbox"><div class="sbox-l">Win Streak 🔥</div><div class="sbox-v" style="color:'+(streak>0?'var(--amber)':'var(--muted)')+'">'+(streak>0?streak+' day'+(streak>1?'s':''):'—')+'</div></div></div>';
-    if(acc.livePayoutGoal>0){
+    if(isFunded&&acc.livePayoutGoal>0){
       const pn=(acc.payouts||[]).length,g=acc.livePayoutGoal,pp=Math.min(100,Math.round(pn/g*100));
-      document.getElementById('detailProgress').innerHTML='<div class="prog-lbl"><span>💰 Payouts toward Live: '+pn+'/'+g+'</span><span>'+(pn>=g?'🎉 Live eligible!':(g-pn)+' to go')+'</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pp+'%;background:'+(pn>=g?'var(--green)':'var(--blue)')+'"></div></div>';
+      document.getElementById('detailProgress').innerHTML='<div class="prog-lbl"><span>💰 Payouts toward Live: '+pn+'/'+g+'</span><span>'+(pn>=g?'🎉 Live eligible!':(g-pn)+' to go')+'</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pp+'%;background:'+(pn>=g?'var(--green)':'var(--blue)')+'"></div></div>'
+        +(pn>=g?'<div style="margin-top:10px;padding:1rem;background:var(--lbg);border:1.5px solid var(--purple);border-radius:12px;text-align:center"><div style="font-size:13px;font-weight:600;color:var(--ltx);margin-bottom:10px">All payouts collected — your firm\'s Live program is unlocked!</div><button class="greenbtn" style="margin:0 auto;background:var(--purple)" onclick="goLive()"><i class="ti ti-rocket"></i> Unlock Live Account ★</button></div>':'');
+    }else if(isLive){
+      document.getElementById('detailProgress').innerHTML='<div style="padding:8px 12px;background:var(--lbg);border:.5px solid var(--purple);border-radius:var(--r);font-size:12px;font-weight:600;color:var(--ltx)">★ Live Account'+(acc.liveDate?' — since '+fmtDate(acc.liveDate):'')+' · no payout requirements</div>';
     }else document.getElementById('detailProgress').innerHTML='';
     document.getElementById('detailPassSection').innerHTML='';
     if(wd>0){const dots=Array.from({length:wd},(_,i)=>'<div class="pd-dot '+(i<profitDays?'ok':'empty-dot')+'">'+(i<profitDays?'✓':'')+'</div>').join('');document.getElementById('detailDots').innerHTML='<div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+wd+' profitable days required</div><div class="pd-dots">'+dots+'</div>';}
@@ -924,6 +931,16 @@ function passToFunded(){
   saveAll();triggerConfetti();renderDetail();
 }
 
+/* ── GO LIVE ── */
+function goLive(){
+  const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
+  const acc=accounts[i];
+  if(!confirm('Unlock Live for "'+acc.name+'"?\n\nThe account moves to the Live stage and restarts from '+fmt(acc.size||0)+'.\nFunded trading history is cleared.'))return;
+  acc.status='live';acc.liveDate=todayStr();acc.startDate=todayStr();
+  acc.dailyEntries=[];acc.payouts=[];acc.lastPayoutDate=null;acc.lastPayoutAmount=0;acc.payoutPending=null;
+  saveAll();triggerConfetti();renderDetail();
+}
+
 /* ── RESET (blown eval) ── */
 function resetEvalAccount(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
@@ -939,12 +956,12 @@ function toggleAccSettings(){
   const f=document.getElementById('accSettingsForm');if(!f)return;
   if(f.style.display==='block'){f.style.display='none';return;}
   const acc=accounts.find(a=>a.id===detailAccId);if(!acc)return;
-  const isFunded=acc.status==='funded';
+  const isFundedLike=acc.status!=='eval';
   const goals=[0,3,4,5,6,8,10];if(acc.livePayoutGoal&&!goals.includes(acc.livePayoutGoal))goals.push(acc.livePayoutGoal);
   f.innerHTML='<div class="fgrid">'
     +'<div><label>Daily Loss Limit — DLL (USD)</label><input type="number" id="as_dll" step="0.01" value="'+(acc.dll||'')+'" placeholder="Optional — orange line on chart"></div>'
-    +'<div><label>'+(isFunded?'Loss Limit — Funded / Trailing (USD)':'Loss Limit — Eval (USD)')+'</label><input type="number" id="as_loss" step="0.01" value="'+((isFunded?acc.lossLimit:acc.evalLossLimit)||'')+'"></div>'
-    +'<div><label>Payouts → Live Program</label><select id="as_liveGoal">'+goals.sort((a,b)=>a-b).map(n=>'<option value="'+n+'"'+((acc.livePayoutGoal||0)===n?' selected':'')+'>'+(n===0?'Off':n+' payouts')+'</option>').join('')+'</select></div>'
+    +'<div><label>'+(isFundedLike?'Loss Limit — Funded / Trailing (USD)':'Loss Limit — Eval (USD)')+'</label><input type="number" id="as_loss" step="0.01" value="'+((isFundedLike?acc.lossLimit:acc.evalLossLimit)||'')+'"></div>'
+    +(acc.status==='live'?'':'<div><label>Payouts → Live Program</label><select id="as_liveGoal">'+goals.sort((a,b)=>a-b).map(n=>'<option value="'+n+'"'+((acc.livePayoutGoal||0)===n?' selected':'')+'>'+(n===0?'Off':n+' payouts')+'</option>').join('')+'</select></div>')
     +'</div><div class="factions"><button class="savebtn" onclick="saveAccSettings()">Save</button><button class="cancelbtn" onclick="toggleAccSettings()">Cancel</button></div>';
   f.style.display='block';
 }
@@ -953,8 +970,8 @@ function saveAccSettings(){
   const acc=accounts[i];
   acc.dll=parseFloat(document.getElementById('as_dll').value)||0;
   const loss=parseFloat(document.getElementById('as_loss').value)||0;
-  if(acc.status==='funded')acc.lossLimit=loss;else acc.evalLossLimit=loss;
-  acc.livePayoutGoal=parseInt(document.getElementById('as_liveGoal').value)||0;
+  if(acc.status==='eval')acc.evalLossLimit=loss;else acc.lossLimit=loss;
+  const lg=document.getElementById('as_liveGoal');if(lg)acc.livePayoutGoal=parseInt(lg.value)||0;
   document.getElementById('accSettingsForm').style.display='none';
   saveAll();renderDetail();
 }
@@ -986,15 +1003,18 @@ function saveAccount(){
   saveAll();renderAccounts();document.getElementById('accForm').style.display='none';
 }
 function deleteAccount(id,e){e.stopPropagation();if(!confirm('Delete this account?'))return;accounts=accounts.filter(a=>a.id!==id);saveAll();renderAccounts();}
-function toggleStatus(id,e){e.stopPropagation();const i=accounts.findIndex(a=>a.id===id);if(i<0)return;accounts[i].status=accounts[i].status==='eval'?'funded':'eval';saveAll();renderAccounts();}
+function toggleStatus(id,e){e.stopPropagation();const i=accounts.findIndex(a=>a.id===id);if(i<0)return;const s=accounts[i].status;accounts[i].status=s==='eval'?'funded':s==='funded'?'live':'eval';if(accounts[i].status==='live'&&!accounts[i].liveDate)accounts[i].liveDate=todayStr();saveAll();renderAccounts();}
 
 /* ── ACCOUNT FILTER / CUSTOM GROUPS ── */
+let groupCreating=false;
 function renderAccFilterBar(){
   const bar=document.getElementById('accFilterBar');if(!bar)return;
   const chip=(v,l)=>'<button class="chip'+(accFilter===v?' active':'')+'" onclick="setAccFilter(\''+v+'\')">'+l+'</button>';
-  let h=chip('all','All')+chip('eval','◎ Evaluation')+chip('funded','✓ Funded');
+  let h=chip('all','All')+chip('eval','◎ Evaluation')+chip('funded','✓ Funded')+chip('live','★ Live');
   h+=accGroups.map(g=>chip('g'+g.id,'🗂 '+g.name)).join('');
-  h+='<button class="chip" onclick="createAccGroup()" title="Create a custom group">+ Group</button>';
+  h+=groupCreating
+    ?'<span style="display:inline-flex;gap:6px;align-items:center"><input type="text" id="newGroupName" placeholder="Group name" style="padding:5px 12px;font-size:12px;border-radius:16px;border:.5px solid var(--blue);background:var(--surface);color:var(--text);width:150px;outline:none" onkeydown="if(event.key===\'Enter\')confirmAccGroup();else if(event.key===\'Escape\'){groupCreating=false;renderAccounts();}"><button class="chip" style="border-color:var(--green);color:var(--gtx)" onclick="confirmAccGroup()">✓</button><button class="chip" onclick="groupCreating=false;renderAccounts()">✕</button></span>'
+    :'<button class="chip" title="Create a custom group" onclick="groupCreating=true;renderAccounts();setTimeout(()=>{const e=document.getElementById(\'newGroupName\');if(e)e.focus();},50)">+ Group</button>';
   if(String(accFilter).startsWith('g')){
     h+='<button class="chip" style="'+(groupManage?'background:var(--gbg);color:var(--gtx);border-color:var(--green)':'')+'" onclick="toggleGroupManage()">'+(groupManage?'✓ Done':'✎ Manage accounts')+'</button>';
     h+='<button class="chip" title="Delete this group" onclick="deleteAccGroup()"><i class="ti ti-trash"></i></button>';
@@ -1002,11 +1022,11 @@ function renderAccFilterBar(){
   bar.innerHTML=h;
 }
 function setAccFilter(v){accFilter=v;groupManage=false;renderAccounts();}
-function createAccGroup(){
-  const name=prompt('Group name (e.g. "Apex 50k" or "Main accounts"):');
-  if(!name||!name.trim())return;
-  const g={id:Date.now(),name:name.trim()};accGroups.push(g);
-  accFilter='g'+g.id;groupManage=true;saveAll();renderAccounts();
+function confirmAccGroup(){
+  const e=document.getElementById('newGroupName');const name=((e&&e.value)||'').trim();
+  if(!name)return;
+  const g={id:Date.now(),name};accGroups.push(g);
+  groupCreating=false;accFilter='g'+g.id;groupManage=true;saveAll();renderAccounts();
 }
 function deleteAccGroup(){
   const gid=Number(String(accFilter).slice(1));const g=accGroups.find(x=>x.id===gid);if(!g)return;
@@ -1030,41 +1050,46 @@ function renderAccounts(){
   if(!accounts.length){grid.innerHTML='';empty.style.display='block';empty.innerHTML='<i class="ti ti-layout-cards"></i>No accounts yet.';if(bar)bar.style.display='none';return;}
   const gid=String(accFilter).startsWith('g')?Number(String(accFilter).slice(1)):null;
   let vis=accounts;
-  if(accFilter==='eval')vis=accounts.filter(a=>a.status!=='funded');
+  if(accFilter==='eval')vis=accounts.filter(a=>a.status==='eval');
   else if(accFilter==='funded')vis=accounts.filter(a=>a.status==='funded');
+  else if(accFilter==='live')vis=accounts.filter(a=>a.status==='live');
   else if(gid!==null)vis=groupManage?accounts:accounts.filter(a=>(a.groups||[]).includes(gid));
   if(!vis.length){grid.innerHTML='';empty.style.display='block';empty.innerHTML='<i class="ti ti-filter"></i>No accounts in this view.';}
   else empty.style.display='none';
-  const funded=accounts.filter(a=>a.status==='funded');
-  if(bar&&funded.length){
-    const totBal=funded.reduce((s,a)=>s+getBalance(a),0);
-    const totPnL=funded.reduce((s,a)=>s+getPeriodStats(a).netPnL,0);
-    const totPay=entries.filter(e=>e.type==='payout').reduce((s,e)=>s+e.amount,0);
+  const pf=vis.filter(a=>a.status==='funded'||a.status==='live');
+  if(bar&&pf.length){
+    const totBal=pf.reduce((s,a)=>s+getBalance(a),0);
+    const totPnL=pf.reduce((s,a)=>s+getPeriodStats(a).netPnL,0);
+    const totPay=(accFilter==='all'||accFilter==='funded')
+      ?entries.filter(e=>e.type==='payout').reduce((s,e)=>s+e.amount,0)
+      :pf.reduce((s,a)=>s+(a.payouts||[]).reduce((x,p)=>x+p.amount,0),0);
+    const g=gid!==null?accGroups.find(x=>x.id===gid):null;
+    const title=accFilter==='live'?'Live Portfolio':accFilter==='funded'?'Funded Portfolio':g?('🗂 '+g.name+' — Portfolio'):'Portfolio (Funded + Live)';
     bar.style.display='block';
-    bar.innerHTML='<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="ti ti-layout-dashboard" style="font-size:13px"></i> Funded Portfolio</div>'
+    bar.innerHTML='<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="ti ti-layout-dashboard" style="font-size:13px"></i> '+title+'</div>'
       +'<div class="krow" style="margin-bottom:0">'
       +'<div class="kpi"><div class="klbl">Total Balance</div><div class="kval b">'+fmt(totBal)+'</div></div>'
       +'<div class="kpi"><div class="klbl">P&L this period</div><div class="kval '+(totPnL>=0?'g':'r')+'">'+fmtS(totPnL)+'</div></div>'
       +'<div class="kpi"><div class="klbl">Total Payouts</div><div class="kval g">'+fmt(totPay)+'</div></div>'
-      +'<div class="kpi"><div class="klbl">Funded Accounts</div><div class="kval">'+funded.length+'</div></div>'
+      +'<div class="kpi"><div class="klbl">Accounts</div><div class="kval">'+pf.length+'</div></div>'
       +'</div>';
   }else if(bar){bar.style.display='none';}
   grid.innerHTML=vis.map(acc=>{
-    const isFunded=acc.status==='funded',bal=getBalance(acc),isPending=!!(acc.payoutPending);
-    const{netPnL,profitDays,relEntries}=getPeriodStats(acc);const wd=winDaysOf(acc);
+    const isFunded=acc.status==='funded',isLive=acc.status==='live',bal=getBalance(acc),isPending=!!(acc.payoutPending);
+    const{netPnL,profitDays,relEntries}=getPeriodStats(acc);const wd=isLive?0:winDaysOf(acc);
     const con=checkConsistency(acc,relEntries,netPnL);const conBadge=con&&!con.noData&&!con.ok?'<span class="badge bo">⚠ Consistency</span>':'';
     const conOk=!con||con.noData||con.ok;
-    const canPayout=isFunded&&!isPending&&(wd===0||profitDays>=wd)&&conOk;const balDelta=bal-(acc.size||0);const winStreak=getWinStreak(acc);
+    const canPayout=(isFunded||isLive)&&!isPending&&(wd===0||profitDays>=wd)&&conOk;const balDelta=bal-(acc.size||0);const winStreak=getWinStreak(acc);
     const target=acc.target||0,pct=!isFunded&&target>0?Math.min(100,Math.max(0,Math.round((netPnL/target)*100))):0;
     const passReady=!isFunded&&target>0&&netPnL>=target&&conOk;
-    const cardClass=isPending?'pending-card':passReady?'pass-ready':canPayout?'funded-ready':'';
+    const cardClass=isPending?'pending-card':passReady?'pass-ready':(canPayout&&!isLive)?'funded-ready':'';
     const inGroup=gid!==null&&(acc.groups||[]).includes(gid);
     const clickFn=groupManage?'toggleAccInGroup('+acc.id+',event)':'openDetail('+acc.id+',event)';
     const manageRow=groupManage?'<div style="font-size:12px;font-weight:600;margin-bottom:6px;color:'+(inGroup?'var(--green)':'var(--muted)')+'">'+(inGroup?'✓ In group — click to remove':'○ Click to add to group')+'</div>':'';
     return '<div class="acccard '+cardClass+'" style="'+(groupManage&&inGroup?'border-color:var(--green);border-width:1.5px':'')+'" onclick="'+clickFn+'">'+manageRow+'<div class="acchead"><div class="acchead-left"><div class="accname">'+acc.name+'</div>'+(acc.number?'<div class="accnumber"><i class="ti ti-hash" style="font-size:11px"></i>'+acc.number+'</div>':'')+'</div><div style="display:flex;gap:3px"><button class="iconbtn" onclick="toggleStatus('+acc.id+',event)"><i class="ti ti-refresh"></i></button><button class="iconbtn" onclick="deleteAccount('+acc.id+',event)"><i class="ti ti-trash"></i></button></div></div>'
-      +'<div class="acc-status-row"><span class="badge '+(isPending?'bo':passReady?'bg':isFunded?'bg':'ba')+'">'+(isPending?'⏳ Pending':passReady?'🎓 Pass Ready':isFunded?'✓ Funded':'◎ Evaluation')+'</span>'+conBadge+'<span style="font-size:11px;color:var(--muted);margin-left:auto">$'+Number(acc.size).toLocaleString('en-US')+'</span></div>'
+      +'<div class="acc-status-row"><span class="badge '+(isPending?'bo':isLive?'bl':passReady?'bg':isFunded?'bg':'ba')+'">'+(isPending?'⏳ Pending':isLive?'★ Live':passReady?'🎓 Pass Ready':isFunded?'✓ Funded':'◎ Evaluation')+'</span>'+conBadge+'<span style="font-size:11px;color:var(--muted);margin-left:auto">$'+Number(acc.size).toLocaleString('en-US')+'</span></div>'
       +'<div class="balance-box '+(balDelta>0?'up':balDelta<0?'down':'')+'"><div><div class="balance-label">Balance</div><div style="font-size:22px;font-weight:700;color:'+(bal>=(acc.size||0)?'var(--blue)':'var(--red)')+'">'+fmt(bal)+'</div></div><div style="text-align:right"><div class="balance-change-label">P&L</div><div style="font-size:14px;font-weight:600;color:'+(netPnL>=0?'var(--green)':'var(--red)')+'">'+fmtS(netPnL)+'</div></div></div>'
-      +(isFunded?'<div style="font-size:12px;color:var(--muted)">'+(isPending?'⏳ Awaiting payout approval':wd===0?'No day req.':profitDays+'/'+wd+' win days')+(canPayout?' <span style="color:var(--green);font-weight:600">✓ Ready</span>':'')+'</div>'
+      +((isFunded||isLive)?'<div style="font-size:12px;color:var(--muted)">'+(isPending?'⏳ Awaiting payout approval':isLive?'★ Live — no payout requirements':wd===0?'No day req.':profitDays+'/'+wd+' win days')+(canPayout&&!isLive?' <span style="color:var(--green);font-weight:600">✓ Ready</span>':'')+'</div>'
         :target>0?'<div><div class="prog-lbl"><span>Progress '+pct+'%</span><span>Target: '+fmt((acc.size||0)+target)+'</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%;background:'+(passReady?'var(--green)':'var(--amber)')+'"></div></div>'+(passReady?'<div style="font-size:11px;color:var(--green);font-weight:600;margin-top:4px;display:flex;align-items:center;gap:4px"><i class="ti ti-badge" style="font-size:13px"></i> Ready to pass to Funded!</div>':'')+'</div>':'')
       +(isFunded&&acc.livePayoutGoal>0?'<div style="font-size:12px;color:var(--muted);margin-top:2px">💰 '+(acc.payouts||[]).length+'/'+acc.livePayoutGoal+' payouts → Live'+((acc.payouts||[]).length>=acc.livePayoutGoal?' <span style="color:var(--green);font-weight:600">✓ Eligible</span>':'')+'</div>':'')
       +(winStreak>=2?'<div class="streak-box" style="margin-top:2px">🔥 '+winStreak+'-day win streak</div>':'')
@@ -1349,11 +1374,12 @@ function renderTimeline(){
   const events=[];
   events.push({key:'start',date:acc.startDate||todayStr(),type:'start',title:'Account Created',sub:acc.status==='funded'?'Started as Funded Account':'Started Evaluation — $'+Number(acc.size).toLocaleString('en-US')});
   if(acc.fundedDate&&acc.fundedDate!==acc.startDate)events.push({key:'funded',date:acc.fundedDate,type:'funded',title:'Converted to Funded',sub:'Evaluation passed — trading live'});
+  if(acc.liveDate)events.push({key:'live',date:acc.liveDate,type:'live',title:'Went Live ★',sub:'Live program unlocked'});
   (acc.payouts||[]).forEach((p,i)=>events.push({key:'p'+p.id,date:p.date,type:'payout',title:'Payout #'+(i+1)+' Received',amount:p.amount}));
   if(acc.payoutPending)events.push({key:'pending',date:acc.payoutPending.requestDate,type:'pending',title:'Payout Pending',sub:'Awaiting firm approval',amount:acc.payoutPending.amount});
   events.sort((a,b)=>b.date.localeCompare(a.date));
-  const icons={start:'📅',funded:'🎓',payout:'💰',pending:'⏳'};
-  const dotCls={start:'tl-start',funded:'tl-funded',payout:'tl-payout',pending:'tl-pending'};
+  const icons={start:'📅',funded:'🎓',payout:'💰',pending:'⏳',live:'🚀'};
+  const dotCls={start:'tl-start',funded:'tl-funded',payout:'tl-payout',pending:'tl-pending',live:'tl-live'};
   const dateHtml=ev=>_tlEdit===ev.key
     ?'<div style="display:flex;gap:6px;align-items:center;margin-top:4px;flex-wrap:wrap"><input type="date" id="tlDateInput" value="'+ev.date+'" style="padding:4px 8px;font-size:12px"><button class="chip" onclick="tlSaveDate(\''+ev.key+'\')">✓ Save</button><button class="chip" onclick="_tlEdit=null;renderTimeline()">✕ Cancel</button></div>'
     :'<div class="tl-sub">'+fmtDate(ev.date)+' <button class="iconbtn" style="font-size:11px;padding:1px 4px" title="Edit date" onclick="tlEditDate(\''+ev.key+'\')"><i class="ti ti-pencil"></i></button></div>';
@@ -1368,6 +1394,7 @@ function tlSaveDate(key){
   const acc=accounts.find(a=>a.id===detailAccId);if(!acc)return;
   if(key==='start')acc.startDate=v;
   else if(key==='funded')acc.fundedDate=v;
+  else if(key==='live')acc.liveDate=v;
   else if(key==='pending'&&acc.payoutPending)acc.payoutPending.requestDate=v;
   else if(key.startsWith('p')){
     const pid=Number(key.slice(1));
