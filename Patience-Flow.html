@@ -475,7 +475,11 @@ tbody tr:hover td{background:var(--s2)}
         <div class="stitle" style="margin-bottom:2px"><i class="ti ti-calendar-week"></i> Notes / News</div>
         <div id="weekLabel" style="font-size:11px;color:var(--muted)"></div>
       </div>
-      <button class="clearbtn" onclick="clearWeeklyNotes()"><i class="ti ti-trash"></i> Clear week</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="addbtn" style="margin-bottom:0" onclick="document.getElementById('reportFile').click()" title="Import a weekly report (e.g. Cowork USD report)"><i class="ti ti-file-import"></i> Import Report</button>
+        <input type="file" id="reportFile" accept=".html,.htm,text/html" style="display:none" onchange="importWeekReport(this)">
+        <button class="clearbtn" onclick="clearWeeklyNotes()"><i class="ti ti-trash"></i> Clear week</button>
+      </div>
     </div>
   </div>
   <div class="week-grid">
@@ -1591,6 +1595,76 @@ function useTemplate(dayKey,id){
 
 let _notesSaveTimer=null;
 function saveNotesNow(){try{localStorage.setItem('af_notes',JSON.stringify(notes));}catch(e){}}
+
+/* ── WEEKLY REPORT IMPORT (e.g. Cowork USD report) ── */
+function parseWeekReport(doc){
+  const dayMap={mo:'mon',di:'tue',mi:'wed','do':'thu',fr:'fri'};
+  const events=[];
+  doc.querySelectorAll('table').forEach(tb=>{
+    const card=tb.closest('.card')||tb.parentElement;
+    const h2=card?card.querySelector('h2'):null;
+    if(h2&&/ausblick|woche danach|next week/i.test(h2.textContent))return;
+    const heads=[...tb.querySelectorAll('th')].map(th=>th.textContent.trim().toLowerCase());
+    if(!heads.some(h=>h.includes('event')))return;
+    tb.querySelectorAll('tbody tr').forEach(tr=>{
+      const td=[...tr.querySelectorAll('td')].map(x=>x.textContent.trim());
+      if(td.length<4)return;
+      const dm=(td[0].match(/\b(Mo|Di|Mi|Do|Fr)\b/i)||[])[1];
+      if(!dm)return;
+      const key=dayMap[dm.toLowerCase()];if(!key)return;
+      const imp=/rot|red/i.test(td[2])?'high':/orange/i.test(td[2])?'medium':/grau|gray/i.test(td[2])?'holiday':'low';
+      let text=td[3];
+      if(td[4])text+=' (F: '+td[4]+(td[5]?' · P: '+td[5]:'')+')';
+      events.push({key,time:td[1],impact:imp,text});
+    });
+  });
+  const lowNote=doc.querySelector('.empty-week .note');
+  if(lowNote){
+    const rx=/\b(Mo|Di|Mi|Do|Fr)\s+(\d{1,2}:\d{2})\s+([^·.]+)/g;let m;
+    while((m=rx.exec(lowNote.textContent))){
+      const key=dayMap[m[1].toLowerCase()];
+      if(key)events.push({key,time:m[2],impact:'low',text:m[3].trim()});
+    }
+  }
+  let summary='';
+  doc.querySelectorAll('.card').forEach(c=>{
+    const h2=c.querySelector('h2');if(!h2)return;
+    if(/wochenüberblick|überblick|overview/i.test(h2.textContent)){
+      summary+=[...c.querySelectorAll('p')].map(p=>p.textContent.trim()).join('\n');
+    }
+  });
+  const verdict=doc.querySelector('.verdict');
+  if(verdict)summary+=(summary?'\n\n':'')+verdict.textContent.trim();
+  return{events,summary};
+}
+async function importWeekReport(input){
+  const file=input.files&&input.files[0];input.value='';if(!file)return;
+  let doc;
+  try{doc=new DOMParser().parseFromString(await file.text(),'text/html');}
+  catch(e){uiAlert('Could not read this file.',{icon:'<i class="ti ti-alert-triangle"></i>',title:'Import failed'});return;}
+  const{events,summary}=parseWeekReport(doc);
+  if(!events.length&&!summary){
+    uiAlert('No events or weekly summary found in this file.\n\nExpected a weekly report like the Cowork USD report.',{icon:'<i class="ti ti-alert-triangle"></i>',title:'Import failed'});
+    return;
+  }
+  const title=((doc.querySelector('title')||{}).textContent||'Report').trim();
+  if(!await uiConfirm('Found '+events.length+' news event'+(events.length!==1?'s':'')+(summary?' + weekly summary':'')+' in:\n"'+title+'"\n\nAdd them to Notes/News?',{icon:'<i class="ti ti-file-import"></i>',title:'Import report',okText:'Import'}))return;
+  if(!notes.news)notes.news={mon:[],tue:[],wed:[],thu:[],fri:[]};
+  const cur=(title.match(/\b(USD|EUR|GBP|JPY|CHF|AUD|CAD|NZD)\b/i)||['','USD'])[1].toUpperCase();
+  let added=0;
+  events.forEach((ev,ix)=>{
+    if(!notes.news[ev.key])notes.news[ev.key]=[];
+    if(notes.news[ev.key].some(x=>x.text===ev.text&&x.time===ev.time))return;
+    notes.news[ev.key].push({id:Date.now()+ix,impact:ev.impact,text:ev.text,time:ev.time,currency:cur});
+    added++;
+  });
+  if(summary&&!(notes.weekGeneral||'').includes(summary.slice(0,60))){
+    notes.weekGeneral=(notes.weekGeneral?notes.weekGeneral+'\n\n':'')+'— Imported: '+title+' —\n'+summary;
+  }
+  saveNotesNow();
+  if(currentTab==='notes')renderNotes();
+  showToast(added+' news event'+(added!==1?'s':'')+' imported ✓');
+}
 function autoSaveNotes(){
   ['mon','tue','wed','thu','fri'].forEach(k=>{const el=document.getElementById('dayNote_'+k);if(el)notes[k]=el.value;});
   const wg=document.getElementById('weekGeneral');if(wg)notes.weekGeneral=wg.value;
