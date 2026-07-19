@@ -458,6 +458,7 @@ tbody tr:hover td{background:var(--s2)}
       </select></div>
       <div><label>Consistency % — Funded</label><input type="number" id="af_conPct" placeholder="e.g. 50.5" min="0.1" max="100" step="0.1"></div>
       <div><label>Payout Buffer — min. balance (USD)</label><input type="number" id="af_buffer" placeholder="Optional — e.g. 52600" step="0.01"></div>
+      <div><label>Profit Split — your share (%)</label><input type="number" id="af_split" placeholder="e.g. 90 — empty = 100" min="1" max="100" step="0.1"></div>
     </div>
     <div class="factions"><button class="savebtn" onclick="saveAccount()">Save</button><button class="cancelbtn" onclick="toggleAccForm()">Cancel</button></div>
   </div>
@@ -719,6 +720,7 @@ function migrateData(){
     if(acc.resets===undefined)acc.resets=0;
     if(acc.liveDate===undefined)acc.liveDate=null;
     if(acc.payoutBuffer===undefined)acc.payoutBuffer=0;
+    if(acc.profitSplit===undefined)acc.profitSplit=100;
   });
   try{const g=localStorage.getItem('af_accgroups');if(g)accGroups=JSON.parse(g);}catch(e){}
   try{const f=localStorage.getItem('af_folders');if(f)folders=JSON.parse(f);}catch(e){}
@@ -926,11 +928,13 @@ function renderDetail(){
     else document.getElementById('detailDots').innerHTML='<div style="font-size:11px;color:var(--muted)">No day requirement</div>';
     if(!isPending){
       document.getElementById('detailPayoutSection').innerHTML='<div class="acc-footer"><span style="font-size:11px;color:var(--muted)">Last payout: '+fmtDate(acc.lastPayoutDate)+'</span><button class="payoutbtn" '+(canPayout?'':'disabled')+' onclick="toggleDetailPayoutForm()">'+(canPayout?'💰 Request Payout':(wd>0&&profitDays<wd)?'⏳ '+(wd-profitDays)+' days needed':!bufferOk?'▽ '+fmt(acc.payoutBuffer-bal)+' below buffer':!conOk?'⚠ Consistency not met':'⏳ Pending')+'</button></div>';
-      document.getElementById('detailPayoutForm').innerHTML='<div class="payout-form" id="dPayoutForm"><div class="payout-form-title"><i class="ti ti-cash"></i> Request Payout</div><div class="payout-form-info">Net P&L since last payout: <strong>'+fmtS(netPnL)+'</strong><br>Balance: <strong>'+fmt(bal)+'</strong><br><span style="opacity:.8">Trading pauses until firm approves.</span></div><label>Payout Amount (USD)</label><input type="number" id="dPayoutAmt" placeholder="Enter amount" step="0.01" value="'+Math.max(0,netPnL).toFixed(2)+'"><div class="payout-form-actions"><button class="payout-confirm-btn" onclick="confirmDetailPayout()">✓ Request</button><button class="payout-cancel-btn" onclick="toggleDetailPayoutForm()">Cancel</button></div></div>';
+      document.getElementById('detailPayoutForm').innerHTML='<div class="payout-form" id="dPayoutForm"><div class="payout-form-title"><i class="ti ti-cash"></i> Request Payout</div><div class="payout-form-info">Net P&L since last payout: <strong>'+fmtS(netPnL)+'</strong><br>Balance: <strong>'+fmt(bal)+'</strong><br><span style="opacity:.8">Trading pauses until firm approves.</span></div><label>Payout Amount (USD)</label><input type="number" id="dPayoutAmt" placeholder="Enter amount" step="0.01" value="'+Math.max(0,netPnL).toFixed(2)+'" oninput="updSplitNote()"><div id="dSplitNote" style="font-size:11px;color:var(--amber);font-weight:600;margin:4px 0 8px"></div><label>Payout Date</label><input type="date" id="dPayoutDate" value="'+todayStr()+'"><div class="payout-form-actions"><button class="payout-confirm-btn" onclick="confirmDetailPayout()">✓ Request</button><button class="payout-cancel-btn" onclick="toggleDetailPayoutForm()">Cancel</button></div></div>';
+      updSplitNote();
       document.getElementById('detailApproveSection').innerHTML='';
     }else{
       document.getElementById('detailPayoutSection').innerHTML='';document.getElementById('detailPayoutForm').innerHTML='';
-      document.getElementById('detailApproveSection').innerHTML='<div style="padding:1.25rem;background:var(--gbg);border:.5px solid var(--green);border-radius:12px;text-align:center"><div style="font-size:32px;margin-bottom:8px">🏦</div><div style="font-size:15px;font-weight:600;color:var(--gtx);margin-bottom:4px">Waiting for Firm Approval</div><div style="font-size:12px;color:var(--gtx);opacity:.8;margin-bottom:16px">Amount: '+fmt(acc.payoutPending.amount)+'</div><button class="greenbtn" style="margin:0 auto" onclick="approvePayout()"><i class="ti ti-check"></i> Payout Approved ✓</button></div>';
+      const _sp=accSplit(acc),_rec=splitAmount(acc.payoutPending.amount,_sp);
+      document.getElementById('detailApproveSection').innerHTML='<div style="padding:1.25rem;background:var(--gbg);border:.5px solid var(--green);border-radius:12px;text-align:center"><div style="font-size:32px;margin-bottom:8px">🏦</div><div style="font-size:15px;font-weight:600;color:var(--gtx);margin-bottom:4px">Waiting for Firm Approval</div><div style="font-size:12px;color:var(--gtx);opacity:.8;margin-bottom:12px">Amount: '+fmt(acc.payoutPending.amount)+(_sp<100?' · You receive: <strong>'+fmt(_rec)+'</strong> ('+_sp+'% split)':'')+'</div><div style="margin-bottom:14px"><div style="font-size:11px;color:var(--gtx);opacity:.8;margin-bottom:4px">Payout Date (when you actually received it)</div><input type="date" id="dApproveDate" value="'+(acc.payoutPending.requestDate||todayStr())+'" style="max-width:180px"></div><button class="greenbtn" style="margin:0 auto" onclick="approvePayout()"><i class="ti ti-check"></i> Payout Approved ✓</button></div>';
     }
   }else{
     // EVAL stage
@@ -1008,19 +1012,34 @@ async function confirmDetailPayout(){
   if(acc.status==='funded'&&acc.payoutBuffer>0&&getBalance(acc)<acc.payoutBuffer){uiAlert('Payout blocked — balance is below the payout buffer.\n\nBalance: '+fmt(getBalance(acc))+'\nBuffer: '+fmt(acc.payoutBuffer)+'\nStill needed: '+fmt(acc.payoutBuffer-getBalance(acc)));return;}
   const payoutAmt=parseFloat(document.getElementById('dPayoutAmt').value)||0;
   if(payoutAmt<=0){uiAlert('Please enter a payout amount.');return;}
-  if(!await uiConfirm('Request payout of '+fmt(payoutAmt)+'?\n\nTrading pauses until the firm approves.',{icon:'💰',title:'Request Payout',okText:'Request'}))return;
-  accounts[i].payoutPending={amount:payoutAmt,requestDate:todayStr()};
+  const pd=(document.getElementById('dPayoutDate')||{}).value||todayStr();
+  const split=accSplit(acc),rec=splitAmount(payoutAmt,split);
+  if(!await uiConfirm('Request payout of '+fmt(payoutAmt)+'?\n'+(split<100?'\nYou will receive '+fmt(rec)+' ('+split+'% split).':'')+'\nTrading pauses until the firm approves.',{icon:'💰',title:'Request Payout',okText:'Request'}))return;
+  accounts[i].payoutPending={amount:payoutAmt,requestDate:pd};
   saveAll();renderDetail();
+}
+function accSplit(acc){return Math.min(100,Math.max(1,Number(acc.profitSplit)||100));}
+function splitAmount(amt,split){return Math.round(amt*split)/100;}
+function updSplitNote(){
+  const acc=accounts.find(a=>a.id===detailAccId);const el=document.getElementById('dSplitNote');
+  if(!acc||!el)return;
+  const amt=parseFloat((document.getElementById('dPayoutAmt')||{}).value)||0;
+  const split=accSplit(acc);
+  el.textContent=split<100?'Profit split '+split+'/'+Math.round((100-split)*10)/10+' — you receive '+fmt(splitAmount(amt,split)):'';
 }
 async function approvePayout(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   const acc=accounts[i];if(!acc.payoutPending)return;
   const{amount}=acc.payoutPending;
-  if(!await uiConfirm('Confirm payout approval of '+fmt(amount)+'?\n\nBalance drops by this amount and trading resumes.',{icon:'🏦',title:'Payout Approved',okText:'Approve'}))return;
+  const split=accSplit(acc),rec=splitAmount(amount,split);
+  const d=(document.getElementById('dApproveDate')||{}).value||todayStr();
+  if(!await uiConfirm('Confirm payout approval of '+fmt(amount)+' on '+fmtDate(d)+'?\n'+(split<100?'\nYou receive '+fmt(rec)+' ('+split+'% split).':'')+'\nBalance drops by '+fmt(amount)+' and trading resumes.',{icon:'🏦',title:'Payout Approved',okText:'Approve'}))return;
   if(!accounts[i].payouts)accounts[i].payouts=[];
-  accounts[i].payouts.push({id:Date.now(),date:todayStr(),amount});
-  accounts[i].lastPayoutDate=todayStr();accounts[i].lastPayoutAmount=amount;accounts[i].payoutPending=null;
-  entries.push({id:Date.now()+1,date:todayStr(),type:'payout',amount,cat:'profit',note:'Payout Approved — '+acc.name});
+  accounts[i].payouts.push({id:Date.now(),date:d,amount});
+  accounts[i].payouts.sort((a,b)=>a.date.localeCompare(b.date));
+  accounts[i].lastPayoutDate=accounts[i].payouts[accounts[i].payouts.length-1].date;
+  accounts[i].lastPayoutAmount=amount;accounts[i].payoutPending=null;
+  entries.push({id:Date.now()+1,date:d,type:'payout',amount:rec,cat:'profit',note:'Payout Approved — '+acc.name+(split<100?' ('+split+'% of '+fmt(amount)+')':'')});
   entries.sort((a,b)=>b.date.localeCompare(a.date));saveAll();triggerConfetti();renderDetail();
 }
 
@@ -1070,6 +1089,7 @@ function toggleAccSettings(){
     +'<div><label>Daily Loss Limit — DLL (USD)</label><input type="number" id="as_dll" step="0.01" value="'+(acc.dll||'')+'" placeholder="Optional — orange line on chart"></div>'
     +'<div><label>'+(isFundedLike?'Loss Limit — Funded / Trailing (USD)':'Loss Limit — Eval (USD)')+'</label><input type="number" id="as_loss" step="0.01" value="'+((isFundedLike?acc.lossLimit:acc.evalLossLimit)||'')+'"></div>'
     +(acc.status==='live'?'':'<div><label>Payout Buffer — min. balance (USD)</label><input type="number" id="as_buffer" step="0.01" value="'+(acc.payoutBuffer||'')+'" placeholder="Optional — payouts only above this"></div>')
+    +'<div><label>Profit Split — your share (%)</label><input type="number" id="as_split" min="1" max="100" step="0.1" value="'+(acc.profitSplit&&acc.profitSplit!==100?acc.profitSplit:'')+'" placeholder="Empty = 100% (full amount)"></div>'
     +(acc.status==='live'?'':'<div><label>Payouts → Live Program</label><select id="as_liveGoal">'+goals.sort((a,b)=>a-b).map(n=>'<option value="'+n+'"'+((acc.livePayoutGoal||0)===n?' selected':'')+'>'+(n===0?'Off':n+' payouts')+'</option>').join('')+'</select></div>')
     +'</div><div class="factions"><button class="savebtn" onclick="saveAccSettings()">Save</button><button class="cancelbtn" onclick="toggleAccSettings()">Cancel</button></div>';
   f.style.display='block';
@@ -1081,6 +1101,7 @@ function saveAccSettings(){
   const loss=parseFloat(document.getElementById('as_loss').value)||0;
   if(acc.status==='eval')acc.evalLossLimit=loss;else acc.lossLimit=loss;
   const bf=document.getElementById('as_buffer');if(bf)acc.payoutBuffer=parseFloat(bf.value)||0;
+  const sp=document.getElementById('as_split');if(sp)acc.profitSplit=Math.min(100,Math.max(1,parseFloat(sp.value)||100));
   const lg=document.getElementById('as_liveGoal');if(lg)acc.livePayoutGoal=parseInt(lg.value)||0;
   document.getElementById('accSettingsForm').style.display='none';
   saveAll();renderDetail();showToast('Settings saved ✓');
@@ -1233,7 +1254,7 @@ function toggleAccView(){accView=accView==='cards'?'list':'cards';localStorage.s
 /* ── ACCOUNTS TAB ── */
 let accFormType='eval';
 function setAccType(type){accFormType=type;document.getElementById('typeEval').classList.toggle('active',type==='eval');document.getElementById('typeFunded').classList.toggle('active',type==='funded');document.querySelectorAll('.af-eval-only').forEach(el=>el.style.display=type==='eval'?'':'none');document.getElementById('af_fundedLabel').textContent=type==='eval'?'✓ Funded Stage (pre-configure)':'✓ Funded Stage Settings';}
-function toggleAccForm(){const f=document.getElementById('accForm');const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){['af_name','af_number','af_target','af_evalLoss','af_evalConPct','af_loss','af_conPct','af_dll','af_buffer'].forEach(id=>document.getElementById(id).value='');document.getElementById('af_start').value=todayStr();document.getElementById('af_size').value='50000';document.getElementById('af_windays').value='5';document.getElementById('af_evalCon').value='0';document.getElementById('af_fundedCon').value='0';document.getElementById('af_liveGoal').value='0';setAccType('eval');}}
+function toggleAccForm(){const f=document.getElementById('accForm');const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){['af_name','af_number','af_target','af_evalLoss','af_evalConPct','af_loss','af_conPct','af_dll','af_buffer','af_split'].forEach(id=>document.getElementById(id).value='');document.getElementById('af_start').value=todayStr();document.getElementById('af_size').value='50000';document.getElementById('af_windays').value='5';document.getElementById('af_evalCon').value='0';document.getElementById('af_fundedCon').value='0';document.getElementById('af_liveGoal').value='0';setAccType('eval');}}
 function saveAccount(){
   const name=document.getElementById('af_name').value.trim();if(!name){uiAlert('Please enter an account name.');return;}
   const size=parseFloat(document.getElementById('af_size').value)||50000;
@@ -1252,6 +1273,7 @@ function saveAccount(){
     fundedDate:accFormType==='funded'?(document.getElementById('af_start').value||todayStr()):null,
     dll:parseFloat(document.getElementById('af_dll').value)||0,
     payoutBuffer:parseFloat(document.getElementById('af_buffer').value)||0,
+    profitSplit:Math.min(100,Math.max(1,parseFloat(document.getElementById('af_split').value)||100)),
     livePayoutGoal:parseInt(document.getElementById('af_liveGoal').value)||0,
     groups:[],resets:0,
     lastPayoutDate:null,lastPayoutAmount:0,dailyEntries:[],payouts:[],payoutPending:null});
