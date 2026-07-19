@@ -419,7 +419,7 @@ tbody tr:hover td{background:var(--s2)}
       <div class="full">
         <label>Account Type</label>
         <div style="display:flex;gap:8px;margin-top:5px">
-          <button type="button" id="typeEval" class="type-btn active" onclick="setAccType('eval')">◎ Evaluation</button>
+          <button type="button" id="typeEval" class="type-btn active" onclick="setAccType('eval')"><i class="ti ti-target"></i> Evaluation</button>
           <button type="button" id="typeFunded" class="type-btn" onclick="setAccType('funded')">✓ Already Funded</button>
         </div>
       </div>
@@ -438,7 +438,7 @@ tbody tr:hover td{background:var(--s2)}
         <option value="5">5 payouts</option><option value="6">6 payouts</option><option value="8">8 payouts</option><option value="10">10 payouts</option>
       </select></div>
       <!-- Eval-only fields -->
-      <div class="fsection af-eval-only">◎ Evaluation Stage</div>
+      <div class="fsection af-eval-only"><i class="ti ti-target"></i> Evaluation Stage</div>
       <div class="af-eval-only"><label>Profit Target (USD)</label><input type="number" id="af_target" placeholder="e.g. 4000" step="0.01"></div>
       <div class="af-eval-only"><label>Loss Limit — Eval (USD)</label><input type="number" id="af_evalLoss" placeholder="e.g. 2000" step="0.01"></div>
       <div class="af-eval-only"><label>Consistency Rule — Eval</label><select id="af_evalCon">
@@ -446,7 +446,7 @@ tbody tr:hover td{background:var(--s2)}
       </select></div>
       <div class="af-eval-only"><label>Consistency % — Eval</label><input type="number" id="af_evalConPct" placeholder="e.g. 30" min="0.1" max="100" step="0.1"></div>
       <!-- Funded fields (always shown, label changes) -->
-      <div class="fsection" id="af_fundedLabel">✓ Funded Stage (pre-configure)</div>
+      <div class="fsection" id="af_fundedLabel"><i class="ti ti-circle-check"></i> Funded Stage (pre-configure)</div>
       <div><label>Loss Limit — Funded / Trailing (USD)</label><input type="number" id="af_loss" placeholder="e.g. 3000" step="0.01"></div>
       <div><label>Required Win Days</label><select id="af_windays">
         <option value="0">None</option><option value="1">1 day</option><option value="2">2 days</option>
@@ -530,7 +530,7 @@ tbody tr:hover td{background:var(--s2)}
       <div class="full"><label>Doubts / wanted to exit early?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jdoubt_y" onclick="setJField('doubts',true)">✓ Yes</button><button type="button" class="jyn-btn" id="jdoubt_n" onclick="setJField('doubts',false)">✗ No</button></div></div>
       <div class="full"><label>Moved your stop?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jm_y" onclick="setJField('movedStop',true)">✓ Yes</button><button type="button" class="jyn-btn" id="jm_n" onclick="setJField('movedStop',false)">✗ No</button></div></div>
       <div class="full" id="jMSRWrap" style="display:none"><label>Reason — stop moved</label><input type="text" id="tj_move_reason" placeholder="Why did you move the stop?"></div>
-      <div class="fsection full">📊 Post-Trade</div>
+      <div class="fsection full"><i class="ti ti-chart-bar"></i> Post-Trade</div>
       <div class="full"><label>Result</label><div style="display:flex;gap:8px;margin-top:5px"><button type="button" id="jr_win" class="type-btn active" onclick="setJResult('win')">✓ Win</button><button type="button" id="jr_loss" class="type-btn" onclick="setJResult('loss')">✗ Loss</button><button type="button" id="jr_be" class="type-btn" onclick="setJResult('be')">○ Break Even</button></div></div>
       <div class="full"><label>P&amp;L (USD)</label><input type="number" id="tj_pnl" placeholder="+250 or −150" step="0.01"></div>
       <div class="full"><label>Was the entry well-timed?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jtimed_y" onclick="setJField('timed',true)">✓ Yes</button><button type="button" class="jyn-btn" id="jtimed_n" onclick="setJField('timed',false)">✗ No</button></div></div>
@@ -598,16 +598,17 @@ tbody tr:hover td{background:var(--s2)}
 
 <!-- TAB: TAX -->
 <div id="tabTax" class="page" style="display:none">
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem">
-    <div class="chips" id="taxYearChips" style="margin-bottom:0"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:.75rem">
+    <div class="chips" id="taxModeChips" style="margin-bottom:0"></div>
     <button class="addbtn" onclick="exportTaxCSV()" style="margin-bottom:0"><i class="ti ti-download"></i> Export CSV</button>
   </div>
+  <div id="taxRangeControls" style="margin-bottom:1.25rem"></div>
   <div class="krow" id="taxKpiRow"></div>
   <div class="stitle"><i class="ti ti-category"></i> Deductible Expense Categories</div>
   <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Click to toggle whether a category counts as a tax-deductible expense.</div>
   <div id="taxCatSettings" style="margin-bottom:1.25rem"></div>
   <div class="stitle"><i class="ti ti-list"></i> Expense Breakdown</div>
-  <div class="twrap"><table><thead><tr><th>Category</th><th class="tar">Count</th><th class="tar">Amount</th><th>Deductible</th></tr></thead><tbody id="taxCatBody"></tbody></table><div id="taxCatEmpty" class="empty" style="display:none"><i class="ti ti-receipt"></i>No expenses this year.</div></div>
+  <div class="twrap"><table><thead><tr><th>Category</th><th class="tar">Count</th><th class="tar">Amount</th><th>Deductible</th></tr></thead><tbody id="taxCatBody"></tbody></table><div id="taxCatEmpty" class="empty" style="display:none"><i class="ti ti-receipt"></i>No expenses in this period.</div></div>
 </div>
 
 <!-- TAB: ANALYTICS -->
@@ -667,6 +668,7 @@ const FEMOJI={'#3b82f6':'📁','#1baf7a':'📂','#f97316':'🗂️','#8b5cf6':'�
 let entries=[],accounts=[],folders=[],trades=[],playbooks=[],filter='all',editId=null,currentPeriod='ALL',currentTab='dashboard';
 let accGroups=[],accFilter='all',groupManage=false,_tlEdit=null;
 let taxConfig={deductibleCats:{fee:true,subscription:true,reset:true,news:true,hardware:true,other:false}},currentTaxYear=null;
+let taxMode='year',taxMonth=null,taxFrom='',taxTo='';
 let detailAccId=null,detailChart=null,cumulativeChart=null,selectedFolderId=null,selectedColor='#3b82f6';
 let _jFilter='all',_jDir='long',_jResult='win',_jFollowed=null,_jDoubts=null,_jMovedStop=null,_jTimed=null;
 let _jFOMO=null,_jRevenge=null,_jImpulse=false,_jCalm=3,_jSession='',_jEditId=null;
@@ -754,7 +756,7 @@ function uiDialog(msg,opts){
   });
 }
 function _uiModalDone(v){const ov=document.getElementById('uiModal');if(ov)ov.classList.remove('open');const r=_modalRes;_modalRes=null;if(r)r(v);}
-function uiAlert(msg,opts){return uiDialog(msg,Object.assign({confirm:false,icon:'ℹ️'},opts||{}));}
+function uiAlert(msg,opts){return uiDialog(msg,Object.assign({confirm:false,icon:'<i class="ti ti-info-circle"></i>'},opts||{}));}
 function uiConfirm(msg,opts){return uiDialog(msg,Object.assign({confirm:true},opts||{}));}
 document.addEventListener('keydown',e=>{const ov=document.getElementById('uiModal');if(!ov||!ov.classList.contains('open'))return;if(e.key==='Escape')_uiModalDone(false);else if(e.key==='Enter')_uiModalDone(true);});
 
@@ -771,8 +773,8 @@ async function importData(input){
   const file=input.files&&input.files[0];input.value='';if(!file)return;
   let data=null;
   try{const parsed=JSON.parse(await file.text());if(parsed&&parsed.data&&typeof parsed.data==='object')data=parsed.data;}catch(e){}
-  if(!data||!Object.keys(data).some(k=>k.startsWith('af_'))){uiAlert('This file is not a valid Patience-Flow backup.',{icon:'⚠️',title:'Import failed'});return;}
-  if(!await uiConfirm('This replaces ALL current data here with the data from the backup file.\n\nContinue?',{icon:'📥',title:'Import backup',okText:'Import',danger:true}))return;
+  if(!data||!Object.keys(data).some(k=>k.startsWith('af_'))){uiAlert('This file is not a valid Patience-Flow backup.',{icon:'<i class="ti ti-alert-triangle"></i>',title:'Import failed'});return;}
+  if(!await uiConfirm('This replaces ALL current data here with the data from the backup file.\n\nContinue?',{icon:'<i class="ti ti-database-import"></i>',title:'Import backup',okText:'Import',danger:true}))return;
   for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&k.startsWith('af_'))localStorage.removeItem(k);}
   Object.keys(data).forEach(k=>{if(k.startsWith('af_'))localStorage.setItem(k,data[k]);});
   location.reload();
@@ -782,7 +784,12 @@ async function importData(input){
 function getBalance(acc){const p=(acc.dailyEntries||[]).reduce((s,e)=>s+e.pnl,0);const py=(acc.payouts||[]).reduce((s,x)=>s+x.amount,0);return(acc.size||0)+p-py;}
 function getPeriodStats(acc){
   const lastDate=(acc.status==='funded'||acc.status==='live')?acc.lastPayoutDate:null;
-  const rel=lastDate?(acc.dailyEntries||[]).filter(e=>e.date>lastDate):(acc.dailyEntries||[]);
+  let rel;
+  if(lastDate){
+    const pids=(acc.payouts||[]).filter(p=>p.date===lastDate).map(p=>p.id);
+    const cut=pids.length?Math.max(...pids):null;
+    rel=(acc.dailyEntries||[]).filter(e=>e.date>lastDate||(e.date===lastDate&&cut!==null&&e.id>cut));
+  }else rel=(acc.dailyEntries||[]);
   const dm={};rel.forEach(e=>{dm[e.date]=(dm[e.date]||0)+e.pnl;});
   return{netPnL:rel.reduce((s,e)=>s+e.pnl,0),profitDays:Object.values(dm).filter(v=>v>0).length,lossDays:Object.values(dm).filter(v=>v<0).length,relEntries:rel};
 }
@@ -899,8 +906,8 @@ function renderDetail(){
 
   document.getElementById('detailName').textContent=acc.name;
   document.getElementById('detailNumber').innerHTML=acc.number?'<i class="ti ti-hash" style="font-size:11px"></i>'+acc.number:'';
-  document.getElementById('detailBadge').innerHTML='<span class="badge '+(isPending?'bo':isLive?'bl':isFunded?'bg':'ba')+'">'+(isPending?'⏳ Payout Pending':isLive?'★ Live':isFunded?'✓ Funded':'◎ Evaluation')+'</span>'+(isFunded&&acc.payoutBuffer>0?' <span class="badge '+(bufferOk?'bg':'bo')+'">'+(bufferOk?'▲ Over Buffer':'▽ Below Buffer')+'</span>':'');
-  document.getElementById('detailPendingNotice').innerHTML=isPending?'<div class="pending-notice" style="margin-bottom:1.25rem"><div class="pending-notice-icon">⏳</div><div class="pending-notice-body"><div class="pending-notice-title">Payout Pending — '+fmt(acc.payoutPending.amount)+'</div><div class="pending-notice-sub">Requested '+fmtDate(acc.payoutPending.requestDate)+' · Trading paused until firm approves</div></div></div>':'';
+  document.getElementById('detailBadge').innerHTML='<span class="badge '+(isPending?'bo':isLive?'bl':isFunded?'bg':'ba')+'">'+(isPending?'<i class="ti ti-hourglass"></i> Payout Pending':isLive?'<i class="ti ti-star-filled"></i> Live':isFunded?'<i class="ti ti-circle-check"></i> Funded':'<i class="ti ti-target"></i> Evaluation')+'</span>'+(isFunded&&acc.payoutBuffer>0?' <span class="badge '+(bufferOk?'bg':'bo')+'">'+(bufferOk?'<i class="ti ti-trending-up"></i> Over Buffer':'<i class="ti ti-trending-down"></i> Below Buffer')+'</span>':'');
+  document.getElementById('detailPendingNotice').innerHTML=isPending?'<div class="pending-notice" style="margin-bottom:1.25rem"><div class="pending-notice-icon"><i class="ti ti-hourglass"></i></div><div class="pending-notice-body"><div class="pending-notice-title">Payout Pending — '+fmt(acc.payoutPending.amount)+'</div><div class="pending-notice-sub">Requested '+fmtDate(acc.payoutPending.requestDate)+' · Trading paused until firm approves</div></div></div>':'';
   document.getElementById('detailBalBox').className='balance-box '+(balDelta>0?'up':balDelta<0?'down':'');
   document.getElementById('detailBalBox').innerHTML='<div><div class="balance-label">Account Balance</div><div class="balance-value" style="color:'+(bal>=(acc.size||0)?'var(--blue)':'var(--red)')+'">'+fmt(bal)+(isFunded&&acc.payoutBuffer>0?' <span style="font-size:14px;color:var(--muted);font-weight:500">/ '+fmt(acc.payoutBuffer)+'</span>':'')+'</div></div><div><div class="balance-change-label">P&L '+(isFunded?'since last payout':'since start')+'</div><div class="balance-change" style="color:'+(netPnL>=0?'var(--green)':'var(--red)')+'">'+fmtS(netPnL)+'</div></div>';
 
@@ -909,42 +916,42 @@ function renderDetail(){
   // Consistency display
   if(con&&!con.noData){
     const ok=con.ok,clr=ok?'var(--green)':'var(--red)';
-    const fixSection=!ok?'<div style="margin-top:10px;padding:10px 12px;background:rgba(0,0,0,.18);border-radius:8px;border-left:3px solid var(--amber)"><div style="font-size:12px;font-weight:600;color:var(--amber);margin-bottom:6px">△ To fix inconsistency:</div><div style="font-size:12px;margin-bottom:4px">Need <strong>'+fmt(con.needFromOtherDays)+'</strong> more from <em>other</em> days to reach '+con.threshold+'%</div><div style="font-size:11px;color:var(--text2);opacity:.8">Formula: '+fmt(con.bestDayAmount)+' ÷ '+con.threshold+'% = '+fmt(con.requiredTotal)+' required total</div></div>':'';
-    const maxSection='<div style="margin-top:8px;padding:10px 12px;background:rgba(0,0,0,.15);border-radius:8px"><div style="font-size:12px;font-weight:600;margin-bottom:5px">📊 Max single day (if adding more trades):</div><div style="font-size:15px;font-weight:700;color:var(--amber);margin-bottom:4px">'+fmt(con.maxNewDay)+' before violating '+con.threshold+'% rule</div><div style="font-size:11px;color:var(--text2);opacity:.8">Formula: '+fmt(con.totalProfit)+' × '+con.threshold+'% ÷ (100% – '+con.threshold+'%) = '+fmt(con.maxNewDay)+'</div></div>';
-    document.getElementById('detailConsistency').innerHTML='<div class="con-card '+(ok?'ok':'warn')+'" style="margin-bottom:1rem"><div class="con-label">Consistency Rule (max '+con.threshold+'% per day)</div><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px"><div class="con-status" style="color:'+clr+'">'+(ok?'✓ Consistent':'⚠ Inconsistent')+'</div><div style="font-size:13px;color:'+clr+';font-weight:500">'+con.bestDayPct.toFixed(2)+'% of total profit</div></div>'+(con.bestDayAmount>0?'<div style="font-size:12px;color:var(--text2);margin-bottom:2px">Best day: <strong>'+fmt(con.bestDayAmount)+'</strong>'+(con.bestDay?' on '+fmtDate(con.bestDay):'')+'</div>':'')+fixSection+maxSection+'</div>';
+    const fixSection=!ok?'<div style="margin-top:10px;padding:10px 12px;background:rgba(0,0,0,.18);border-radius:8px;border-left:3px solid var(--amber)"><div style="font-size:12px;font-weight:600;color:var(--amber);margin-bottom:6px"><i class="ti ti-alert-triangle"></i> To fix inconsistency:</div><div style="font-size:12px;margin-bottom:4px">Need <strong>'+fmt(con.needFromOtherDays)+'</strong> more from <em>other</em> days to reach '+con.threshold+'%</div><div style="font-size:11px;color:var(--text2);opacity:.8">Formula: '+fmt(con.bestDayAmount)+' ÷ '+con.threshold+'% = '+fmt(con.requiredTotal)+' required total</div></div>':'';
+    const maxSection='<div style="margin-top:8px;padding:10px 12px;background:rgba(0,0,0,.15);border-radius:8px"><div style="font-size:12px;font-weight:600;margin-bottom:5px"><i class="ti ti-chart-bar"></i> Max single day (if adding more trades):</div><div style="font-size:15px;font-weight:700;color:var(--amber);margin-bottom:4px">'+fmt(con.maxNewDay)+' before violating '+con.threshold+'% rule</div><div style="font-size:11px;color:var(--text2);opacity:.8">Formula: '+fmt(con.totalProfit)+' × '+con.threshold+'% ÷ (100% – '+con.threshold+'%) = '+fmt(con.maxNewDay)+'</div></div>';
+    document.getElementById('detailConsistency').innerHTML='<div class="con-card '+(ok?'ok':'warn')+'" style="margin-bottom:1rem"><div class="con-label">Consistency Rule (max '+con.threshold+'% per day)</div><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px"><div class="con-status" style="color:'+clr+'">'+(ok?'✓ Consistent':'<i class="ti ti-alert-triangle"></i> Inconsistent')+'</div><div style="font-size:13px;color:'+clr+';font-weight:500">'+con.bestDayPct.toFixed(2)+'% of total profit</div></div>'+(con.bestDayAmount>0?'<div style="font-size:12px;color:var(--text2);margin-bottom:2px">Best day: <strong>'+fmt(con.bestDayAmount)+'</strong>'+(con.bestDay?' on '+fmtDate(con.bestDay):'')+'</div>':'')+fixSection+maxSection+'</div>';
   }else document.getElementById('detailConsistency').innerHTML='';
 
   if(isFunded||isLive){
-    document.getElementById('detailStats').innerHTML='<div class="stat3"><div class="sbox"><div class="sbox-l">Win Days (this period)</div><div class="sbox-v" style="color:'+(canPayout?'var(--green)':'var(--text')+'">'+(wd===0?'No req.':profitDays+'/'+wd+(canPayout?' ✓':''))+'</div></div><div class="sbox"><div class="sbox-l">Loss Days</div><div class="sbox-v" style="color:'+(lossDays>0?'var(--red)':'var(--muted)')+'">'+lossDays+'</div></div><div class="sbox"><div class="sbox-l">Win Streak 🔥</div><div class="sbox-v" style="color:'+(streak>0?'var(--amber)':'var(--muted)')+'">'+(streak>0?streak+' day'+(streak>1?'s':''):'—')+'</div></div></div>';
+    document.getElementById('detailStats').innerHTML='<div class="stat3"><div class="sbox"><div class="sbox-l">Win Days (this period)</div><div class="sbox-v" style="color:'+(canPayout?'var(--green)':'var(--text')+'">'+(wd===0?'No req.':profitDays+'/'+wd+(canPayout?' ✓':''))+'</div></div><div class="sbox"><div class="sbox-l">Loss Days</div><div class="sbox-v" style="color:'+(lossDays>0?'var(--red)':'var(--muted)')+'">'+lossDays+'</div></div><div class="sbox"><div class="sbox-l">Win Streak <i class="ti ti-flame"></i></div><div class="sbox-v" style="color:'+(streak>0?'var(--amber)':'var(--muted)')+'">'+(streak>0?streak+' day'+(streak>1?'s':''):'—')+'</div></div></div>';
     if(isFunded&&acc.livePayoutGoal>0){
       const pn=(acc.payouts||[]).length,g=acc.livePayoutGoal,pp=Math.min(100,Math.round(pn/g*100));
-      document.getElementById('detailProgress').innerHTML='<div class="prog-lbl"><span>💰 Payouts toward Live: '+pn+'/'+g+'</span><span>'+(pn>=g?'🎉 Live eligible!':(g-pn)+' to go')+'</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pp+'%;background:'+(pn>=g?'var(--green)':'var(--blue)')+'"></div></div>'
-        +(pn>=g?'<div style="margin-top:10px;padding:1rem;background:var(--lbg);border:1.5px solid var(--purple);border-radius:12px;text-align:center"><div style="font-size:13px;font-weight:600;color:var(--ltx);margin-bottom:10px">All payouts collected — your firm\'s Live program is unlocked!</div><button class="greenbtn" style="margin:0 auto;background:var(--purple)" onclick="goLive()"><i class="ti ti-rocket"></i> Unlock Live Account ★</button></div>':'');
+      document.getElementById('detailProgress').innerHTML='<div class="prog-lbl"><span><i class="ti ti-cash"></i> Payouts toward Live: '+pn+'/'+g+'</span><span>'+(pn>=g?'<i class="ti ti-confetti"></i> Live eligible!':(g-pn)+' to go')+'</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pp+'%;background:'+(pn>=g?'var(--green)':'var(--blue)')+'"></div></div>'
+        +(pn>=g?'<div style="margin-top:10px;padding:1rem;background:var(--lbg);border:1.5px solid var(--purple);border-radius:12px;text-align:center"><div style="font-size:13px;font-weight:600;color:var(--ltx);margin-bottom:10px">All payouts collected — your firm\'s Live program is unlocked!</div><button class="greenbtn" style="margin:0 auto;background:var(--purple)" onclick="goLive()"><i class="ti ti-rocket"></i> Unlock Live Account</button></div>':'');
     }else if(isLive){
-      document.getElementById('detailProgress').innerHTML='<div style="padding:8px 12px;background:var(--lbg);border:.5px solid var(--purple);border-radius:var(--r);font-size:12px;font-weight:600;color:var(--ltx)">★ Live Account'+(acc.liveDate?' — since '+fmtDate(acc.liveDate):'')+' · no payout requirements</div>';
+      document.getElementById('detailProgress').innerHTML='<div style="padding:8px 12px;background:var(--lbg);border:.5px solid var(--purple);border-radius:var(--r);font-size:12px;font-weight:600;color:var(--ltx)"><i class="ti ti-star-filled"></i> Live Account'+(acc.liveDate?' — since '+fmtDate(acc.liveDate):'')+' · no payout requirements</div>';
     }else document.getElementById('detailProgress').innerHTML='';
     document.getElementById('detailPassSection').innerHTML='';
     if(wd>0){const dots=Array.from({length:wd},(_,i)=>'<div class="pd-dot '+(i<profitDays?'ok':'empty-dot')+'">'+(i<profitDays?'✓':'')+'</div>').join('');document.getElementById('detailDots').innerHTML='<div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+wd+' profitable days required</div><div class="pd-dots">'+dots+'</div>';}
     else document.getElementById('detailDots').innerHTML='<div style="font-size:11px;color:var(--muted)">No day requirement</div>';
     if(!isPending){
-      document.getElementById('detailPayoutSection').innerHTML='<div class="acc-footer"><span style="font-size:11px;color:var(--muted)">Last payout: '+fmtDate(acc.lastPayoutDate)+'</span><button class="payoutbtn" '+(canPayout?'':'disabled')+' onclick="toggleDetailPayoutForm()">'+(canPayout?'💰 Request Payout':(wd>0&&profitDays<wd)?'⏳ '+(wd-profitDays)+' days needed':!bufferOk?'▽ '+fmt(acc.payoutBuffer-bal)+' below buffer':!conOk?'⚠ Consistency not met':'⏳ Pending')+'</button></div>';
+      document.getElementById('detailPayoutSection').innerHTML='<div class="acc-footer"><span style="font-size:11px;color:var(--muted)">Last payout: '+fmtDate(acc.lastPayoutDate)+'</span><button class="payoutbtn" '+(canPayout?'':'disabled')+' onclick="toggleDetailPayoutForm()">'+(canPayout?'<i class="ti ti-cash"></i> Request Payout':(wd>0&&profitDays<wd)?'<i class="ti ti-hourglass"></i> '+(wd-profitDays)+' days needed':!bufferOk?'<i class="ti ti-trending-down"></i> '+fmt(acc.payoutBuffer-bal)+' below buffer':!conOk?'<i class="ti ti-alert-triangle"></i> Consistency not met':'<i class="ti ti-hourglass"></i> Pending')+'</button></div>';
       document.getElementById('detailPayoutForm').innerHTML='<div class="payout-form" id="dPayoutForm"><div class="payout-form-title"><i class="ti ti-cash"></i> Request Payout</div><div class="payout-form-info">Net P&L since last payout: <strong>'+fmtS(netPnL)+'</strong><br>Balance: <strong>'+fmt(bal)+'</strong><br><span style="opacity:.8">Trading pauses until firm approves.</span></div><label>Payout Amount (USD)</label><input type="number" id="dPayoutAmt" placeholder="Enter amount" step="0.01" value="'+Math.max(0,netPnL).toFixed(2)+'" oninput="updSplitNote()"><div id="dSplitNote" style="font-size:11px;color:var(--amber);font-weight:600;margin:4px 0 8px"></div><label>Payout Date</label><input type="date" id="dPayoutDate" value="'+todayStr()+'"><div class="payout-form-actions"><button class="payout-confirm-btn" onclick="confirmDetailPayout()">✓ Request</button><button class="payout-cancel-btn" onclick="toggleDetailPayoutForm()">Cancel</button></div></div>';
       updSplitNote();
       document.getElementById('detailApproveSection').innerHTML='';
     }else{
       document.getElementById('detailPayoutSection').innerHTML='';document.getElementById('detailPayoutForm').innerHTML='';
       const _sp=accSplit(acc),_rec=splitAmount(acc.payoutPending.amount,_sp);
-      document.getElementById('detailApproveSection').innerHTML='<div style="padding:1.25rem;background:var(--gbg);border:.5px solid var(--green);border-radius:12px;text-align:center"><div style="font-size:32px;margin-bottom:8px">🏦</div><div style="font-size:15px;font-weight:600;color:var(--gtx);margin-bottom:4px">Waiting for Firm Approval</div><div style="font-size:12px;color:var(--gtx);opacity:.8;margin-bottom:12px">Amount: '+fmt(acc.payoutPending.amount)+(_sp<100?' · You receive: <strong>'+fmt(_rec)+'</strong> ('+_sp+'% split)':'')+'</div><div style="margin-bottom:14px"><div style="font-size:11px;color:var(--gtx);opacity:.8;margin-bottom:4px">Payout Date (when you actually received it)</div><input type="date" id="dApproveDate" value="'+(acc.payoutPending.requestDate||todayStr())+'" style="max-width:180px"></div><button class="greenbtn" style="margin:0 auto" onclick="approvePayout()"><i class="ti ti-check"></i> Payout Approved ✓</button></div>';
+      document.getElementById('detailApproveSection').innerHTML='<div style="padding:1.25rem;background:var(--gbg);border:.5px solid var(--green);border-radius:12px;text-align:center"><div style="font-size:32px;margin-bottom:8px"><i class="ti ti-building-bank"></i></div><div style="font-size:15px;font-weight:600;color:var(--gtx);margin-bottom:4px">Waiting for Firm Approval</div><div style="font-size:12px;color:var(--gtx);opacity:.8;margin-bottom:12px">Amount: '+fmt(acc.payoutPending.amount)+(_sp<100?' · You receive: <strong>'+fmt(_rec)+'</strong> ('+_sp+'% split)':'')+'</div><div style="margin-bottom:14px"><div style="font-size:11px;color:var(--gtx);opacity:.8;margin-bottom:4px">Payout Date (when you actually received it)</div><input type="date" id="dApproveDate" value="'+(acc.payoutPending.requestDate||todayStr())+'" style="max-width:180px"></div><button class="greenbtn" style="margin:0 auto" onclick="approvePayout()"><i class="ti ti-check"></i> Payout Approved ✓</button></div>';
     }
   }else{
     // EVAL stage
     const target=acc.target||0,pct=target>0?Math.min(100,Math.max(0,Math.round((netPnL/target)*100))):0,missing=Math.max(0,target-netPnL);
     const pctColor=pct>=100?'var(--green)':pct>=60?'var(--amber)':'var(--blue)';
-    document.getElementById('detailStats').innerHTML='<div class="stat3"><div class="sbox"><div class="sbox-l">Current P&L</div><div class="sbox-v" style="color:'+(netPnL>=0?'var(--green)':'var(--red)')+'">'+fmtS(netPnL)+'</div></div><div class="sbox"><div class="sbox-l">Still Needed</div><div class="sbox-v" style="color:'+(missing>0?'var(--red)':'var(--green)')+'">'+( missing>0?'- '+fmt(missing):'✓ Done')+'</div></div><div class="sbox"><div class="sbox-l">Days</div><div class="sbox-v">'+profitDays+'✓ '+lossDays+'✗</div></div></div>'+(streak>0?'<div class="streak-card">🔥 Win Streak: <strong>'+streak+' day'+(streak>1?'s':'')+'</strong> in a row</div>':'');
+    document.getElementById('detailStats').innerHTML='<div class="stat3"><div class="sbox"><div class="sbox-l">Current P&L</div><div class="sbox-v" style="color:'+(netPnL>=0?'var(--green)':'var(--red)')+'">'+fmtS(netPnL)+'</div></div><div class="sbox"><div class="sbox-l">Still Needed</div><div class="sbox-v" style="color:'+(missing>0?'var(--red)':'var(--green)')+'">'+( missing>0?'- '+fmt(missing):'✓ Done')+'</div></div><div class="sbox"><div class="sbox-l">Days</div><div class="sbox-v">'+profitDays+'✓ '+lossDays+'✗</div></div></div>'+(streak>0?'<div class="streak-card"><i class="ti ti-flame"></i> Win Streak: <strong>'+streak+' day'+(streak>1?'s':'')+'</strong> in a row</div>':'');
     document.getElementById('detailProgress').innerHTML=target>0?'<div class="prog-lbl"><span>Progress '+pct+'%</span><span>Target: '+fmt((acc.size||0)+target)+'</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%;background:'+pctColor+'"></div></div>':'';
     document.getElementById('detailDots').innerHTML='';
     const blown=(acc.evalLossLimit||0)>0&&bal<=(acc.size||0)-acc.evalLossLimit;
-    document.getElementById('detailPayoutSection').innerHTML=(blown?'<div class="pending-notice" style="border-color:var(--red);background:var(--rbg);margin-bottom:.75rem"><div class="pending-notice-icon">💥</div><div class="pending-notice-body"><div class="pending-notice-title" style="color:var(--rtx)">Account Blown</div><div class="pending-notice-sub" style="color:var(--rtx)">Loss limit reached — reset the account to try again</div></div></div>':'')
+    document.getElementById('detailPayoutSection').innerHTML=(blown?'<div class="pending-notice" style="border-color:var(--red);background:var(--rbg);margin-bottom:.75rem"><div class="pending-notice-icon"><i class="ti ti-alert-octagon"></i></div><div class="pending-notice-body"><div class="pending-notice-title" style="color:var(--rtx)">Account Blown</div><div class="pending-notice-sub" style="color:var(--rtx)">Loss limit reached — reset the account to try again</div></div></div>':'')
       +'<div class="acc-footer"><span style="font-size:11px;color:var(--muted)">Resets so far: '+(acc.resets||0)+'</span><button class="payoutbtn" style="'+(blown?'border-color:var(--red);background:var(--rbg);color:var(--rtx)':'')+'" onclick="resetEvalAccount()"><i class="ti ti-restore"></i> Reset Account</button></div>';
     document.getElementById('detailPayoutForm').innerHTML='';document.getElementById('detailApproveSection').innerHTML='';
 
@@ -952,7 +959,7 @@ function renderDetail(){
     const targetHit=target>0&&netPnL>=target;
     const canPass=targetHit&&conOk;
     if(target>0){
-      document.getElementById('detailPassSection').innerHTML='<div style="margin-top:1.25rem;padding:1.25rem;background:'+(canPass?'var(--gbg)':'var(--s2)')+';border:'+(canPass?'1.5px solid var(--green)':'.5px solid var(--border)')+';border-radius:14px;text-align:center">'+(canPass?'<div style="font-size:36px;margin-bottom:10px">🎓</div><div style="font-size:16px;font-weight:700;color:var(--gtx);margin-bottom:4px">Profit Target Reached!</div><div style="font-size:12px;color:var(--gtx);opacity:.8;margin-bottom:18px">All conditions satisfied — ready to convert to Funded</div><button class="greenbtn" style="margin:0 auto" onclick="passToFunded()"><i class="ti ti-badge"></i> Convert to Funded Account ✓</button>':'<div style="font-size:13px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px"><i class="ti ti-lock" style="font-size:16px"></i>'+(targetHit?'Consistency rule not yet satisfied — see rule card above':'Still '+fmt(missing)+' away from target')+'</div>')+'</div>';
+      document.getElementById('detailPassSection').innerHTML='<div style="margin-top:1.25rem;padding:1.25rem;background:'+(canPass?'var(--gbg)':'var(--s2)')+';border:'+(canPass?'1.5px solid var(--green)':'.5px solid var(--border)')+';border-radius:14px;text-align:center">'+(canPass?'<div style="font-size:36px;margin-bottom:10px"><i class="ti ti-school"></i></div><div style="font-size:16px;font-weight:700;color:var(--gtx);margin-bottom:4px">Profit Target Reached!</div><div style="font-size:12px;color:var(--gtx);opacity:.8;margin-bottom:18px">All conditions satisfied — ready to convert to Funded</div><button class="greenbtn" style="margin:0 auto" onclick="passToFunded()"><i class="ti ti-badge"></i> Convert to Funded Account ✓</button>':'<div style="font-size:13px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px"><i class="ti ti-lock" style="font-size:16px"></i>'+(targetHit?'Consistency rule not yet satisfied — see rule card above':'Still '+fmt(missing)+' away from target')+'</div>')+'</div>';
     }else{
       document.getElementById('detailPassSection').innerHTML='';
     }
@@ -1014,7 +1021,7 @@ async function confirmDetailPayout(){
   if(payoutAmt<=0){uiAlert('Please enter a payout amount.');return;}
   const pd=(document.getElementById('dPayoutDate')||{}).value||todayStr();
   const split=accSplit(acc),rec=splitAmount(payoutAmt,split);
-  if(!await uiConfirm('Request payout of '+fmt(payoutAmt)+'?\n'+(split<100?'\nYou will receive '+fmt(rec)+' ('+split+'% split).':'')+'\nTrading pauses until the firm approves.',{icon:'💰',title:'Request Payout',okText:'Request'}))return;
+  if(!await uiConfirm('Request payout of '+fmt(payoutAmt)+'?\n'+(split<100?'\nYou will receive '+fmt(rec)+' ('+split+'% split).':'')+'\nTrading pauses until the firm approves.',{icon:'<i class="ti ti-cash"></i>',title:'Request Payout',okText:'Request'}))return;
   accounts[i].payoutPending={amount:payoutAmt,requestDate:pd};
   saveAll();renderDetail();
 }
@@ -1033,7 +1040,7 @@ async function approvePayout(){
   const{amount}=acc.payoutPending;
   const split=accSplit(acc),rec=splitAmount(amount,split);
   const d=(document.getElementById('dApproveDate')||{}).value||todayStr();
-  if(!await uiConfirm('Confirm payout approval of '+fmt(amount)+' on '+fmtDate(d)+'?\n'+(split<100?'\nYou receive '+fmt(rec)+' ('+split+'% split).':'')+'\nBalance drops by '+fmt(amount)+' and trading resumes.',{icon:'🏦',title:'Payout Approved',okText:'Approve'}))return;
+  if(!await uiConfirm('Confirm payout approval of '+fmt(amount)+' on '+fmtDate(d)+'?\n'+(split<100?'\nYou receive '+fmt(rec)+' ('+split+'% split).':'')+'\nBalance drops by '+fmt(amount)+' and trading resumes.',{icon:'<i class="ti ti-building-bank"></i>',title:'Payout Approved',okText:'Approve'}))return;
   if(!accounts[i].payouts)accounts[i].payouts=[];
   accounts[i].payouts.push({id:Date.now(),date:d,amount});
   accounts[i].payouts.sort((a,b)=>a.date.localeCompare(b.date));
@@ -1047,7 +1054,7 @@ async function approvePayout(){
 async function passToFunded(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   const acc=accounts[i];
-  if(!await uiConfirm('Convert "'+acc.name+'" to Funded?\n\nThe account restarts from '+fmt(acc.size)+' with funded stage rules.\n\nEval trading history is cleared.',{icon:'🎓',title:'Convert to Funded',okText:'Convert'}))return;
+  if(!await uiConfirm('Convert "'+acc.name+'" to Funded?\n\nThe account restarts from '+fmt(acc.size)+' with funded stage rules.\n\nEval trading history is cleared.',{icon:'<i class="ti ti-school"></i>',title:'Convert to Funded',okText:'Convert'}))return;
   accounts[i].status='funded';
   accounts[i].startDate=todayStr();
   accounts[i].fundedDate=todayStr();
@@ -1062,7 +1069,7 @@ async function passToFunded(){
 async function goLive(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   const acc=accounts[i];
-  if(!await uiConfirm('Unlock Live for "'+acc.name+'"?\n\nThe account moves to the Live stage and restarts from '+fmt(acc.size||0)+'.\nFunded trading history is cleared.',{icon:'🚀',title:'Unlock Live',okText:'Go Live'}))return;
+  if(!await uiConfirm('Unlock Live for "'+acc.name+'"?\n\nThe account moves to the Live stage and restarts from '+fmt(acc.size||0)+'.\nFunded trading history is cleared.',{icon:'<i class="ti ti-rocket"></i>',title:'Unlock Live',okText:'Go Live'}))return;
   acc.status='live';acc.liveDate=todayStr();acc.startDate=todayStr();
   acc.dailyEntries=[];acc.payouts=[];acc.lastPayoutDate=null;acc.lastPayoutAmount=0;acc.payoutPending=null;
   saveAll();triggerConfetti();renderDetail();
@@ -1072,7 +1079,7 @@ async function goLive(){
 async function resetEvalAccount(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   const acc=accounts[i];
-  if(!await uiConfirm('Reset "'+acc.name+'"?\n\nAll trading days are cleared and the balance returns to '+fmt(acc.size||0)+'.\nThis will be reset #'+((acc.resets||0)+1)+'.',{icon:'↺',title:'Reset Account',okText:'Reset',danger:true}))return;
+  if(!await uiConfirm('Reset "'+acc.name+'"?\n\nAll trading days are cleared and the balance returns to '+fmt(acc.size||0)+'.\nThis will be reset #'+((acc.resets||0)+1)+'.',{icon:'<i class="ti ti-restore"></i>',title:'Reset Account',okText:'Reset',danger:true}))return;
   acc.dailyEntries=[];acc.payouts=[];acc.payoutPending=null;acc.lastPayoutDate=null;acc.lastPayoutAmount=0;
   acc.startDate=todayStr();acc.resets=(acc.resets||0)+1;
   saveAll();renderDetail();
@@ -1158,23 +1165,23 @@ function renderDashboard(){
   document.getElementById('dashReady').innerHTML=accounts.length?accounts.map(acc=>{
     const r=accReadyState(acc);
     let status,clr;
-    if(r.isPending){status='⏳ Payout pending — awaiting approval';clr='var(--amber)';}
-    else if(r.isLive){status='★ Live — payout anytime';clr='var(--purple)';}
+    if(r.isPending){status='<i class="ti ti-hourglass"></i> Payout pending — awaiting approval';clr='var(--amber)';}
+    else if(r.isLive){status='<i class="ti ti-star-filled"></i> Live — payout anytime';clr='var(--purple)';}
     else if(r.isFunded){
       if(r.canPayout){status='✓ Ready to request payout';clr='var(--green)';}
       else{const parts=[];
         if(r.wd>0&&r.profitDays<r.wd)parts.push((r.wd-r.profitDays)+' win day'+(r.wd-r.profitDays>1?'s':'')+' needed');
         if(!r.bufferOk)parts.push(fmt(acc.payoutBuffer-r.bal)+' below buffer');
         if(!r.conOk)parts.push('consistency not met');
-        status='⏳ '+parts.join(' · ');clr='var(--muted)';}
+        status='<i class="ti ti-hourglass"></i> '+parts.join(' · ');clr='var(--muted)';}
     }else{
       const target=acc.target||0,pct=target>0?Math.min(100,Math.max(0,Math.round((r.netPnL/target)*100))):0;
-      status=r.passReady?'🎓 Ready to pass to Funded!':target>0?pct+'% to target — '+fmt(Math.max(0,target-r.netPnL))+' left':'◎ Evaluation';
+      status=r.passReady?'<i class="ti ti-school"></i> Ready to pass to Funded!':target>0?pct+'% to target — '+fmt(Math.max(0,target-r.netPnL))+' left':'<i class="ti ti-target"></i> Evaluation';
       clr=r.passReady?'var(--green)':'var(--blue)';
     }
     return '<div class="dash-ready-row" onclick="openDetail('+acc.id+',event)">'
       +'<span style="font-weight:600;font-size:13px">'+acc.name+'</span>'
-      +'<span class="badge '+(r.isPending?'bo':r.isLive?'bl':r.isFunded?'bg':'ba')+'">'+(r.isPending?'⏳':r.isLive?'★ Live':r.isFunded?'✓ Funded':'◎ Eval')+'</span>'
+      +'<span class="badge '+(r.isPending?'bo':r.isLive?'bl':r.isFunded?'bg':'ba')+'">'+(r.isPending?'<i class="ti ti-hourglass"></i>':r.isLive?'<i class="ti ti-star-filled"></i> Live':r.isFunded?'<i class="ti ti-circle-check"></i> Funded':'<i class="ti ti-target"></i> Eval')+'</span>'
       +'<span style="flex:1"></span>'
       +'<span style="font-size:12px;font-weight:600;color:'+clr+'">'+status+'</span>'
       +'<span style="font-size:12px;color:var(--text2);font-weight:600">'+fmt(r.bal)+'</span>'
@@ -1206,8 +1213,8 @@ function renderDashboard(){
 function renderDashHeatChips(){
   const bar=document.getElementById('dashHeatChips');if(!bar)return;
   const chip=(v,l)=>'<button class="chip'+(dashHeatFilter===v?' active':'')+'" onclick="dashHeatFilter=\''+v+'\';renderDashHeatChips();renderDashHeatmap()">'+l+'</button>';
-  let h=chip('eval','◎ Evaluation')+chip('funded','✓ Funded')+chip('live','★ Live');
-  h+=accGroups.map(g=>chip('g'+g.id,'🗂 '+g.name)).join('');
+  let h=chip('eval','<i class="ti ti-target"></i> Evaluation')+chip('funded','<i class="ti ti-circle-check"></i> Funded')+chip('live','<i class="ti ti-star-filled"></i> Live');
+  h+=accGroups.map(g=>chip('g'+g.id,'<i class="ti ti-folder"></i> '+g.name)).join('');
   bar.innerHTML=h;
 }
 function renderDashHeatmap(){
@@ -1253,7 +1260,7 @@ function toggleAccView(){accView=accView==='cards'?'list':'cards';localStorage.s
 
 /* ── ACCOUNTS TAB ── */
 let accFormType='eval';
-function setAccType(type){accFormType=type;document.getElementById('typeEval').classList.toggle('active',type==='eval');document.getElementById('typeFunded').classList.toggle('active',type==='funded');document.querySelectorAll('.af-eval-only').forEach(el=>el.style.display=type==='eval'?'':'none');document.getElementById('af_fundedLabel').textContent=type==='eval'?'✓ Funded Stage (pre-configure)':'✓ Funded Stage Settings';}
+function setAccType(type){accFormType=type;document.getElementById('typeEval').classList.toggle('active',type==='eval');document.getElementById('typeFunded').classList.toggle('active',type==='funded');document.querySelectorAll('.af-eval-only').forEach(el=>el.style.display=type==='eval'?'':'none');document.getElementById('af_fundedLabel').textContent=type==='eval'?'<i class="ti ti-circle-check"></i> Funded Stage (pre-configure)':'<i class="ti ti-circle-check"></i> Funded Stage Settings';}
 function toggleAccForm(){const f=document.getElementById('accForm');const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){['af_name','af_number','af_target','af_evalLoss','af_evalConPct','af_loss','af_conPct','af_dll','af_buffer','af_split'].forEach(id=>document.getElementById(id).value='');document.getElementById('af_start').value=todayStr();document.getElementById('af_size').value='50000';document.getElementById('af_windays').value='5';document.getElementById('af_evalCon').value='0';document.getElementById('af_fundedCon').value='0';document.getElementById('af_liveGoal').value='0';setAccType('eval');}}
 function saveAccount(){
   const name=document.getElementById('af_name').value.trim();if(!name){uiAlert('Please enter an account name.');return;}
@@ -1279,7 +1286,7 @@ function saveAccount(){
     lastPayoutDate:null,lastPayoutAmount:0,dailyEntries:[],payouts:[],payoutPending:null});
   saveAll();renderAccounts();document.getElementById('accForm').style.display='none';showToast('Account created ✓');
 }
-async function deleteAccount(id,e){e.stopPropagation();if(!await uiConfirm('Delete this account?\n\nAll its trading days and settings are removed.',{icon:'🗑️',title:'Delete account',okText:'Delete',danger:true}))return;accounts=accounts.filter(a=>a.id!==id);saveAll();renderAccounts();}
+async function deleteAccount(id,e){e.stopPropagation();if(!await uiConfirm('Delete this account?\n\nAll its trading days and settings are removed.',{icon:'<i class="ti ti-trash"></i>',title:'Delete account',okText:'Delete',danger:true}))return;accounts=accounts.filter(a=>a.id!==id);saveAll();renderAccounts();}
 function toggleStatus(id,e){e.stopPropagation();const i=accounts.findIndex(a=>a.id===id);if(i<0)return;const s=accounts[i].status;accounts[i].status=s==='eval'?'funded':s==='funded'?'live':'eval';if(accounts[i].status==='live'&&!accounts[i].liveDate)accounts[i].liveDate=todayStr();saveAll();renderAccounts();}
 
 /* ── ACCOUNT FILTER / CUSTOM GROUPS ── */
@@ -1287,8 +1294,8 @@ let groupCreating=false;
 function renderAccFilterBar(){
   const bar=document.getElementById('accFilterBar');if(!bar)return;
   const chip=(v,l)=>'<button class="chip'+(accFilter===v?' active':'')+'" onclick="setAccFilter(\''+v+'\')">'+l+'</button>';
-  let h=chip('all','All')+chip('eval','◎ Evaluation')+chip('funded','✓ Funded')+chip('live','★ Live');
-  h+=accGroups.map(g=>chip('g'+g.id,'🗂 '+g.name)).join('');
+  let h=chip('all','All')+chip('eval','<i class="ti ti-target"></i> Evaluation')+chip('funded','<i class="ti ti-circle-check"></i> Funded')+chip('live','<i class="ti ti-star-filled"></i> Live');
+  h+=accGroups.map(g=>chip('g'+g.id,'<i class="ti ti-folder"></i> '+g.name)).join('');
   h+=groupCreating
     ?'<span style="display:inline-flex;gap:6px;align-items:center"><input type="text" id="newGroupName" placeholder="Group name" style="padding:5px 12px;font-size:12px;border-radius:16px;border:.5px solid var(--blue);background:var(--surface);color:var(--text);width:150px;outline:none" onkeydown="if(event.key===\'Enter\')confirmAccGroup();else if(event.key===\'Escape\'){groupCreating=false;renderAccounts();}"><button class="chip" style="border-color:var(--green);color:var(--gtx)" onclick="confirmAccGroup()">✓</button><button class="chip" onclick="groupCreating=false;renderAccounts()">✕</button></span>'
     :'<button class="chip" title="Create a custom group" onclick="groupCreating=true;renderAccounts();setTimeout(()=>{const e=document.getElementById(\'newGroupName\');if(e)e.focus();},50)">+ Group</button>';
@@ -1349,7 +1356,7 @@ function renderAccounts(){
       ?entries.filter(e=>e.type==='payout').reduce((s,e)=>s+e.amount,0)
       :pf.reduce((s,a)=>s+(a.payouts||[]).reduce((x,p)=>x+p.amount,0),0);
     const g=gid!==null?accGroups.find(x=>x.id===gid):null;
-    const title=accFilter==='live'?'Live Portfolio':accFilter==='funded'?'Funded Portfolio':g?('🗂 '+g.name+' — Portfolio'):'Portfolio (Funded + Live)';
+    const title=accFilter==='live'?'Live Portfolio':accFilter==='funded'?'Funded Portfolio':g?('<i class="ti ti-folder"></i> '+g.name+' — Portfolio'):'Portfolio (Funded + Live)';
     bar.style.display='block';
     bar.innerHTML='<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="ti ti-layout-dashboard" style="font-size:13px"></i> '+title+'</div>'
       +'<div class="krow" style="margin-bottom:0">'
@@ -1362,11 +1369,11 @@ function renderAccounts(){
   if(accView==='list'&&!groupManage){
     grid.innerHTML=vis.map(acc=>{
       const r=accReadyState(acc);
-      const stTxt=r.isPending?'⏳ Pending':r.isLive?'★ Live':r.isFunded?(r.canPayout?'✓ Payout ready':(r.wd>0?r.profitDays+'/'+r.wd+' days':'—')):r.passReady?'🎓 Pass ready':((acc.target||0)>0?Math.min(100,Math.max(0,Math.round((r.netPnL/acc.target)*100)))+'% to target':'◎ Eval');
+      const stTxt=r.isPending?'<i class="ti ti-hourglass"></i> Pending':r.isLive?'<i class="ti ti-star-filled"></i> Live':r.isFunded?(r.canPayout?'✓ Payout ready':(r.wd>0?r.profitDays+'/'+r.wd+' days':'—')):r.passReady?'<i class="ti ti-school"></i> Pass ready':((acc.target||0)>0?Math.min(100,Math.max(0,Math.round((r.netPnL/acc.target)*100)))+'% to target':'<i class="ti ti-target"></i> Eval');
       return '<div class="acc-row" onclick="openDetail('+acc.id+',event)">'
         +'<span style="font-weight:600;font-size:13px">'+acc.name+'</span>'
         +(acc.number?'<span style="font-size:11px;color:var(--muted)">#'+acc.number+'</span>':'')
-        +'<span class="badge '+(r.isPending?'bo':r.isLive?'bl':r.isFunded?'bg':'ba')+'">'+(r.isPending?'⏳':r.isLive?'★ Live':r.isFunded?'✓ Funded':'◎ Eval')+'</span>'
+        +'<span class="badge '+(r.isPending?'bo':r.isLive?'bl':r.isFunded?'bg':'ba')+'">'+(r.isPending?'<i class="ti ti-hourglass"></i>':r.isLive?'<i class="ti ti-star-filled"></i> Live':r.isFunded?'<i class="ti ti-circle-check"></i> Funded':'<i class="ti ti-target"></i> Eval')+'</span>'
         +'<span style="flex:1"></span>'
         +'<span style="font-size:12px;color:var(--text2)">'+stTxt+'</span>'
         +'<span style="font-weight:700;font-size:13px;color:'+(r.bal>=(acc.size||0)?'var(--blue)':'var(--red)')+'">'+fmt(r.bal)+'</span>'
@@ -1379,10 +1386,10 @@ function renderAccounts(){
   grid.innerHTML=vis.map(acc=>{
     const isFunded=acc.status==='funded',isLive=acc.status==='live',bal=getBalance(acc),isPending=!!(acc.payoutPending);
     const{netPnL,profitDays,relEntries}=getPeriodStats(acc);const wd=isLive?0:winDaysOf(acc);
-    const con=checkConsistency(acc,relEntries,netPnL);const conBadge=con&&!con.noData&&!con.ok?'<span class="badge bo">⚠ Consistency</span>':'';
+    const con=checkConsistency(acc,relEntries,netPnL);const conBadge=con&&!con.noData&&!con.ok?'<span class="badge bo"><i class="ti ti-alert-triangle"></i> Consistency</span>':'';
     const conOk=!con||con.noData||con.ok;
     const bufferOk=!isFunded||!(acc.payoutBuffer>0)||bal>=acc.payoutBuffer;
-    const bufBadge=isFunded&&acc.payoutBuffer>0?'<span class="badge '+(bufferOk?'bg':'bo')+'">'+(bufferOk?'▲ Over Buffer':'▽ Below Buffer')+'</span>':'';
+    const bufBadge=isFunded&&acc.payoutBuffer>0?'<span class="badge '+(bufferOk?'bg':'bo')+'">'+(bufferOk?'<i class="ti ti-trending-up"></i> Over Buffer':'<i class="ti ti-trending-down"></i> Below Buffer')+'</span>':'';
     const canPayout=(isFunded||isLive)&&!isPending&&(wd===0||profitDays>=wd)&&conOk&&bufferOk;const balDelta=bal-(acc.size||0);const winStreak=getWinStreak(acc);
     const target=acc.target||0,pct=!isFunded&&target>0?Math.min(100,Math.max(0,Math.round((netPnL/target)*100))):0;
     const passReady=!isFunded&&target>0&&netPnL>=target&&conOk;
@@ -1391,13 +1398,13 @@ function renderAccounts(){
     const clickFn=groupManage?'toggleAccInGroup('+acc.id+',event)':'openDetail('+acc.id+',event)';
     const manageRow=groupManage?'<div style="font-size:12px;font-weight:600;margin-bottom:6px;color:'+(inGroup?'var(--green)':'var(--muted)')+'">'+(inGroup?'✓ In group — click to remove':'○ Click to add to group')+'</div>':'';
     return '<div class="acccard '+cardClass+'" style="'+(groupManage&&inGroup?'border-color:var(--green);border-width:1.5px':'')+'" onclick="'+clickFn+'">'+manageRow+'<div class="acchead"><div class="acchead-left"><div class="accname">'+acc.name+'</div>'+(acc.number?'<div class="accnumber"><i class="ti ti-hash" style="font-size:11px"></i>'+acc.number+'</div>':'')+'</div><div style="display:flex;gap:3px"><button class="iconbtn" onclick="toggleStatus('+acc.id+',event)"><i class="ti ti-refresh"></i></button><button class="iconbtn" onclick="deleteAccount('+acc.id+',event)"><i class="ti ti-trash"></i></button></div></div>'
-      +'<div class="acc-status-row"><span class="badge '+(isPending?'bo':isLive?'bl':passReady?'bg':isFunded?'bg':'ba')+'">'+(isPending?'⏳ Pending':isLive?'★ Live':passReady?'🎓 Pass Ready':isFunded?'✓ Funded':'◎ Evaluation')+'</span>'+bufBadge+conBadge+'<span style="font-size:11px;color:var(--muted);margin-left:auto">$'+Number(acc.size).toLocaleString('en-US')+'</span></div>'
+      +'<div class="acc-status-row"><span class="badge '+(isPending?'bo':isLive?'bl':passReady?'bg':isFunded?'bg':'ba')+'">'+(isPending?'<i class="ti ti-hourglass"></i> Pending':isLive?'<i class="ti ti-star-filled"></i> Live':passReady?'<i class="ti ti-school"></i> Pass Ready':isFunded?'<i class="ti ti-circle-check"></i> Funded':'<i class="ti ti-target"></i> Evaluation')+'</span>'+bufBadge+conBadge+'<span style="font-size:11px;color:var(--muted);margin-left:auto">$'+Number(acc.size).toLocaleString('en-US')+'</span></div>'
       +'<div class="balance-box '+(balDelta>0?'up':balDelta<0?'down':'')+'"><div><div class="balance-label">Balance</div><div style="font-size:22px;font-weight:700;color:'+(bal>=(acc.size||0)?'var(--blue)':'var(--red)')+'">'+fmt(bal)+'</div></div><div style="text-align:right"><div class="balance-change-label">P&L</div><div style="font-size:14px;font-weight:600;color:'+(netPnL>=0?'var(--green)':'var(--red)')+'">'+fmtS(netPnL)+'</div></div></div>'
       +sparkline(acc)
-      +((isFunded||isLive)?'<div style="font-size:12px;color:var(--muted)">'+(isPending?'⏳ Awaiting payout approval':isLive?'★ Live — no payout requirements':wd===0?'No day req.':profitDays+'/'+wd+' win days')+(canPayout&&!isLive?' <span style="color:var(--green);font-weight:600">✓ Ready</span>':'')+'</div>'
+      +((isFunded||isLive)?'<div style="font-size:12px;color:var(--muted)">'+(isPending?'<i class="ti ti-hourglass"></i> Awaiting payout approval':isLive?'<i class="ti ti-star-filled"></i> Live — no payout requirements':wd===0?'No day req.':profitDays+'/'+wd+' win days')+(canPayout&&!isLive?' <span style="color:var(--green);font-weight:600">✓ Ready</span>':'')+'</div>'
         :target>0?'<div><div class="prog-lbl"><span>Progress '+pct+'%</span><span>Target: '+fmt((acc.size||0)+target)+'</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%;background:'+(passReady?'var(--green)':'var(--amber)')+'"></div></div>'+(passReady?'<div style="font-size:11px;color:var(--green);font-weight:600;margin-top:4px;display:flex;align-items:center;gap:4px"><i class="ti ti-badge" style="font-size:13px"></i> Ready to pass to Funded!</div>':'')+'</div>':'')
-      +(isFunded&&acc.livePayoutGoal>0?'<div style="font-size:12px;color:var(--muted);margin-top:2px">💰 '+(acc.payouts||[]).length+'/'+acc.livePayoutGoal+' payouts → Live'+((acc.payouts||[]).length>=acc.livePayoutGoal?' <span style="color:var(--green);font-weight:600">✓ Eligible</span>':'')+'</div>':'')
-      +(winStreak>=2?'<div class="streak-box" style="margin-top:2px">🔥 '+winStreak+'-day win streak</div>':'')
+      +(isFunded&&acc.livePayoutGoal>0?'<div style="font-size:12px;color:var(--muted);margin-top:2px"><i class="ti ti-cash"></i> '+(acc.payouts||[]).length+'/'+acc.livePayoutGoal+' payouts → Live'+((acc.payouts||[]).length>=acc.livePayoutGoal?' <span style="color:var(--green);font-weight:600">✓ Eligible</span>':'')+'</div>':'')
+      +(winStreak>=2?'<div class="streak-box" style="margin-top:2px"><i class="ti ti-flame"></i> '+winStreak+'-day win streak</div>':'')
       +'<div class="card-hint"><i class="ti ti-chart-line" style="font-size:12px"></i> Click for chart & details</div></div>';
   }).join('');
 }
@@ -1405,7 +1412,7 @@ function renderAccounts(){
 /* ── ENTRIES ── */
 function toggleEntryForm(){const f=document.getElementById('entryForm');const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){document.getElementById('fd').value=todayStr();['fa','fn'].forEach(id=>document.getElementById(id).value='');document.getElementById('ft').value='payout';document.getElementById('fc').value='profit';editId=null;}}
 function saveEntry(){const date=document.getElementById('fd').value,type=document.getElementById('ft').value,amount=parseFloat(document.getElementById('fa').value)||0,cat=document.getElementById('fc').value,note=document.getElementById('fn').value;if(!date||!amount){uiAlert('Please enter date and amount.');return;}if(editId!==null){const i=entries.findIndex(e=>e.id===editId);if(i>-1)entries[i]={...entries[i],date,type,amount,cat,note};editId=null;}else entries.push({id:Date.now(),date,type,amount,cat,note});entries.sort((a,b)=>b.date.localeCompare(a.date));saveAll();renderEntries();document.getElementById('entryForm').style.display='none';showToast('Entry saved ✓');}
-async function deleteEntry(id){if(!await uiConfirm('Delete this entry?',{icon:'🗑️',title:'Delete entry',okText:'Delete',danger:true}))return;entries=entries.filter(e=>e.id!==id);saveAll();renderEntries();}
+async function deleteEntry(id){if(!await uiConfirm('Delete this entry?',{icon:'<i class="ti ti-trash"></i>',title:'Delete entry',okText:'Delete',danger:true}))return;entries=entries.filter(e=>e.id!==id);saveAll();renderEntries();}
 function editEntry(id){const e=entries.find(x=>x.id===id);if(!e)return;editId=id;document.getElementById('fd').value=e.date;document.getElementById('ft').value=e.type;document.getElementById('fa').value=e.amount;document.getElementById('fc').value=e.cat;document.getElementById('fn').value=e.note||'';document.getElementById('entryForm').style.display='block';}
 function setFilter(f,btn){filter=f;document.querySelectorAll('#tabEntries .chip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');renderEntries();}
 function renderEntries(){
@@ -1459,7 +1466,7 @@ function renderAnalytics(){
 function selectColor(color,el){selectedColor=color;document.querySelectorAll('.color-opt').forEach(e=>e.classList.remove('selected'));el.classList.add('selected');}
 function toggleFolderForm(){const f=document.getElementById('folderForm');const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){document.getElementById('ff_name').value='';selectedColor='#3b82f6';document.querySelectorAll('.color-opt').forEach((e,i)=>e.classList.toggle('selected',i===0));}}
 function saveFolder(){const name=document.getElementById('ff_name').value.trim();if(!name){uiAlert('Please enter a folder name.');return;}folders.push({id:Date.now(),name,color:selectedColor,certificates:[]});saveAll();document.getElementById('folderForm').style.display='none';renderAchievements();}
-async function deleteFolder(){if(!selectedFolderId)return;if(!await uiConfirm('Delete this folder and all its certificates?',{icon:'🗑️',title:'Delete folder',okText:'Delete',danger:true}))return;folders=folders.filter(f=>f.id!==selectedFolderId);selectedFolderId=null;saveAll();closeFolder();}
+async function deleteFolder(){if(!selectedFolderId)return;if(!await uiConfirm('Delete this folder and all its certificates?',{icon:'<i class="ti ti-trash"></i>',title:'Delete folder',okText:'Delete',danger:true}))return;folders=folders.filter(f=>f.id!==selectedFolderId);selectedFolderId=null;saveAll();closeFolder();}
 function openFolder(id){selectedFolderId=id;document.getElementById('achFolderView').style.display='none';document.getElementById('achDetailView').style.display='block';renderFolderDetail();}
 function closeFolder(){selectedFolderId=null;document.getElementById('achDetailView').style.display='none';document.getElementById('achFolderView').style.display='block';renderAchievements();}
 function renderAchievements(){
@@ -1488,7 +1495,7 @@ async function uploadCertificate(event){
   folder.certificates.push({id:Date.now(),name,date:todayStr(),imageData});
   saveAll();renderFolderDetail();event.target.value='';
 }
-async function deleteCert(certId){if(!await uiConfirm('Delete this certificate?',{icon:'🗑️',title:'Delete certificate',okText:'Delete',danger:true}))return;const folder=folders.find(f=>f.id===selectedFolderId);if(!folder)return;folder.certificates=(folder.certificates||[]).filter(c=>c.id!==certId);saveAll();renderFolderDetail();}
+async function deleteCert(certId){if(!await uiConfirm('Delete this certificate?',{icon:'<i class="ti ti-trash"></i>',title:'Delete certificate',okText:'Delete',danger:true}))return;const folder=folders.find(f=>f.id===selectedFolderId);if(!folder)return;folder.certificates=(folder.certificates||[]).filter(c=>c.id!==certId);saveAll();renderFolderDetail();}
 function openLightbox(certId){const folder=folders.find(f=>f.id===selectedFolderId);if(!folder)return;const cert=folder.certificates.find(c=>c.id===Number(certId)||c.id===certId);if(!cert||!cert.imageData)return;document.getElementById('lightboxImg').src=cert.imageData;document.getElementById('lightbox').classList.add('open');}
 function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.getElementById('lightboxImg').src='';}
 
@@ -1591,7 +1598,7 @@ function autoSaveNotes(){
   clearTimeout(_notesSaveTimer);_notesSaveTimer=setTimeout(saveNotesNow,600);
 }
 async function clearWeeklyNotes(){
-  if(!await uiConfirm("Clear all notes and news for this week?",{icon:"🧹",title:"Clear week",okText:"Clear",danger:true}))return;
+  if(!await uiConfirm("Clear all notes and news for this week?",{icon:'<i class="ti ti-eraser"></i>',title:"Clear week",okText:"Clear",danger:true}))return;
   ['mon','tue','wed','thu','fri'].forEach(k=>{notes[k]='';if(!notes.news)notes.news={};notes.news[k]=[];const el=document.getElementById('dayNote_'+k);if(el)el.value='';});
   notes.weekGeneral='';const wg=document.getElementById('weekGeneral');if(wg)wg.value='';
   saveNotesNow();renderNotes();
@@ -1683,7 +1690,7 @@ function renderTimeline(){
   (acc.payouts||[]).forEach((p,i)=>events.push({key:'p'+p.id,date:p.date,type:'payout',title:'Payout #'+(i+1)+' Received',amount:p.amount}));
   if(acc.payoutPending)events.push({key:'pending',date:acc.payoutPending.requestDate,type:'pending',title:'Payout Pending',sub:'Awaiting firm approval',amount:acc.payoutPending.amount});
   events.sort((a,b)=>b.date.localeCompare(a.date));
-  const icons={start:'📅',funded:'🎓',payout:'💰',pending:'⏳',live:'🚀'};
+  const icons={start:'<i class="ti ti-calendar"></i>',funded:'<i class="ti ti-school"></i>',payout:'<i class="ti ti-cash"></i>',pending:'<i class="ti ti-hourglass"></i>',live:'<i class="ti ti-rocket"></i>'};
   const dotCls={start:'tl-start',funded:'tl-funded',payout:'tl-payout',pending:'tl-pending',live:'tl-live'};
   const dateHtml=ev=>_tlEdit===ev.key
     ?'<div style="display:flex;gap:6px;align-items:center;margin-top:4px;flex-wrap:wrap"><input type="date" id="tlDateInput" value="'+ev.date+'" style="padding:4px 8px;font-size:12px"><button class="chip" onclick="tlSaveDate(\''+ev.key+'\')">✓ Save</button><button class="chip" onclick="_tlEdit=null;renderTimeline()">✕ Cancel</button></div>'
@@ -1767,7 +1774,7 @@ function saveTrade(){
   trades.sort((a,b)=>b.date.localeCompare(a.date));
   saveAll();toggleTradeForm();renderJournal();showToast('Trade saved ✓');
 }
-async function deleteTrade(id){if(!await uiConfirm('Delete this trade?',{icon:'🗑️',title:'Delete trade',okText:'Delete',danger:true}))return;trades=trades.filter(t=>t.id!==id);saveAll();renderTradeList();}
+async function deleteTrade(id){if(!await uiConfirm('Delete this trade?',{icon:'<i class="ti ti-trash"></i>',title:'Delete trade',okText:'Delete',danger:true}))return;trades=trades.filter(t=>t.id!==id);saveAll();renderTradeList();}
 function toggleJCard(id){const e=document.getElementById('jc_'+id);if(e)e.classList.toggle('open');}
 function renderJournal(){
   const chips=document.getElementById('jAccChips');
@@ -1813,7 +1820,7 @@ function jDetailHTML(t){
     +'<div class="jsect">⚡ During</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">'+fld('Followed Plan',yn(t.followedPlan))+fld('Doubts',yn(t.hadDoubts))+fld('Stop Moved',yn(t.movedStop))+'</div>'
     +(t.moveReason?fld('Stop Reason',t.moveReason):'')
-    +'<div class="jsect">📊 Post-Trade</div>'
+    +'<div class="jsect"><i class="ti ti-chart-bar"></i> Post-Trade</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+fld('Entry Timed',yn(t.entryTimed))+fld('Earlier/Later',t.exit||'—')+'</div>'
     +(t.whatDiff?fld('What to Change',t.whatDiff):'')
     +'<div class="jsect">🧠 Psychology</div>'
@@ -1840,7 +1847,7 @@ function savePlaybook(){
   playbooks.push({id:Date.now(),name,description:(document.getElementById('pb_desc').value||'').trim()});
   saveAll();togglePlaybookForm();renderPlaybooks();
 }
-async function deletePlaybook(id){if(!await uiConfirm('Delete this playbook?',{icon:'🗑️',title:'Delete playbook',okText:'Delete',danger:true}))return;playbooks=playbooks.filter(p=>p.id!==id);saveAll();renderPlaybooks();}
+async function deletePlaybook(id){if(!await uiConfirm('Delete this playbook?',{icon:'<i class="ti ti-trash"></i>',title:'Delete playbook',okText:'Delete',danger:true}))return;playbooks=playbooks.filter(p=>p.id!==id);saveAll();renderPlaybooks();}
 function renderPlaybooks(){
   const grid=document.getElementById('playbookGrid'),empty=document.getElementById('playbookEmpty');if(!grid)return;
   if(!playbooks.length){grid.innerHTML='';if(empty)empty.style.display='block';return;}if(empty)empty.style.display='none';
@@ -1943,13 +1950,35 @@ function calcPositionSize(){
 const TAX_EXP_CATS=['fee','subscription','reset','news','hardware','other'];
 function getTaxYears(){const years=new Set(entries.map(e=>e.date.slice(0,4)));years.add(String(new Date().getFullYear()));return[...years].sort((a,b)=>b.localeCompare(a));}
 function setTaxYear(y){currentTaxYear=y;renderTax();}
+function setTaxMode(m){taxMode=m;renderTax();}
+function taxFilteredEntries(){
+  if(taxMode==='all')return entries.slice();
+  if(taxMode==='month')return entries.filter(e=>e.date.slice(0,7)===taxMonth);
+  if(taxMode==='range')return(taxFrom&&taxTo)?entries.filter(e=>e.date>=taxFrom&&e.date<=taxTo):[];
+  return entries.filter(e=>e.date.slice(0,4)===currentTaxYear);
+}
+function taxRangeLabel(){
+  if(taxMode==='all')return 'all-time';
+  if(taxMode==='month')return taxMonth;
+  if(taxMode==='range')return taxFrom+'_to_'+taxTo;
+  return currentTaxYear;
+}
 function toggleTaxCat(cat){taxConfig.deductibleCats[cat]=!taxConfig.deductibleCats[cat];saveAll();renderTax();}
 function renderTax(){
   const years=getTaxYears();
   if(!currentTaxYear||!years.includes(currentTaxYear))currentTaxYear=years[0];
-  const yc=document.getElementById('taxYearChips');
-  if(yc)yc.innerHTML=years.map(y=>'<button class="chip'+(y===currentTaxYear?' active':'')+'" onclick="setTaxYear(\''+y+'\')">'+y+'</button>').join('');
-  const yearEntries=entries.filter(e=>e.date.slice(0,4)===currentTaxYear);
+  if(!taxMonth)taxMonth=todayStr().slice(0,7);
+  const mc=document.getElementById('taxModeChips');
+  const mchip=(v,l)=>'<button class="chip'+(taxMode===v?' active':'')+'" onclick="setTaxMode(\''+v+'\')">'+l+'</button>';
+  if(mc)mc.innerHTML=mchip('year','Year')+mchip('month','Month')+mchip('range','Custom Range')+mchip('all','All Time');
+  const rc=document.getElementById('taxRangeControls');
+  if(rc){
+    if(taxMode==='year')rc.innerHTML='<div class="chips" style="margin-bottom:0">'+years.map(y=>'<button class="chip'+(y===currentTaxYear?' active':'')+'" onclick="setTaxYear(\''+y+'\')">'+y+'</button>').join('')+'</div>';
+    else if(taxMode==='month')rc.innerHTML='<input type="month" value="'+taxMonth+'" onchange="taxMonth=this.value;renderTax()" style="padding:7px 12px;font-size:13px;border-radius:8px;border:.5px solid var(--border-s);background:var(--surface);color:var(--text)">';
+    else if(taxMode==='range')rc.innerHTML='<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted)"><span>From</span><input type="date" value="'+taxFrom+'" onchange="taxFrom=this.value;renderTax()" style="padding:7px 12px;font-size:13px;border-radius:8px;border:.5px solid var(--border-s);background:var(--surface);color:var(--text)"><span>to</span><input type="date" value="'+taxTo+'" onchange="taxTo=this.value;renderTax()" style="padding:7px 12px;font-size:13px;border-radius:8px;border:.5px solid var(--border-s);background:var(--surface);color:var(--text)">'+((!taxFrom||!taxTo)?'<span style="color:var(--amber)">Pick both dates</span>':'')+'</div>';
+    else rc.innerHTML='';
+  }
+  const yearEntries=taxFilteredEntries();
   const payouts=yearEntries.filter(e=>e.type==='payout'),expenses=yearEntries.filter(e=>e.type==='expense');
   const totalPayouts=payouts.reduce((s,e)=>s+e.amount,0);
   const deductible=expenses.filter(e=>taxConfig.deductibleCats[e.cat]);
@@ -1980,8 +2009,8 @@ function renderTax(){
   }
 }
 function exportTaxCSV(){
-  const yearEntries=entries.filter(e=>e.date.slice(0,4)===currentTaxYear).sort((a,b)=>a.date.localeCompare(b.date));
-  if(!yearEntries.length){uiAlert('No entries for '+currentTaxYear+'.');return;}
+  const yearEntries=taxFilteredEntries().sort((a,b)=>a.date.localeCompare(b.date));
+  if(!yearEntries.length){uiAlert('No entries in the selected period.');return;}
   let csv='Date,Type,Category,Note,Amount,Deductible\n';
   yearEntries.forEach(e=>{
     const deductible=e.type==='expense'?(taxConfig.deductibleCats[e.cat]?'Yes':'No'):'—';
@@ -1990,7 +2019,7 @@ function exportTaxCSV(){
   });
   const blob=new Blob([csv],{type:'text/csv'});
   const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download='tax-report-'+currentTaxYear+'.csv';document.body.appendChild(a);a.click();a.remove();
+  const a=document.createElement('a');a.href=url;a.download='tax-report-'+taxRangeLabel()+'.csv';document.body.appendChild(a);a.click();a.remove();
   URL.revokeObjectURL(url);
 }
 
