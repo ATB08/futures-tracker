@@ -243,6 +243,20 @@ tbody tr:hover td{background:var(--s2)}
 .tl-dot.tl-payout{background:var(--gbg);border-color:var(--green)}
 .tl-dot.tl-pending{background:var(--abg);border-color:var(--amber)}
 .tl-dot.tl-live{background:var(--lbg);border-color:var(--purple)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);z-index:10000;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal-card{background:var(--surface);border:.5px solid var(--border-s);border-radius:14px;padding:1.4rem 1.5rem;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:modalIn .16s ease}
+@keyframes modalIn{0%{transform:scale(.94);opacity:0}100%{transform:scale(1);opacity:1}}
+.modal-icon{font-size:28px;margin-bottom:10px;line-height:1}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:6px}
+.modal-msg{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:18px;white-space:pre-line}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.modal-btn{padding:8px 18px;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;border:.5px solid var(--border-s);background:transparent;color:var(--text)}
+.modal-btn:hover{background:var(--s2)}
+.modal-btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.modal-btn.primary:hover{background:#2563eb}
+.modal-btn.danger{background:var(--red);border-color:var(--red);color:#fff}
+.modal-btn.danger:hover{background:#dc2626}
 .tl-body{flex:1;padding-top:3px}
 .tl-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:1px}
 .tl-sub{font-size:11px;color:var(--muted)}
@@ -311,6 +325,9 @@ tbody tr:hover td{background:var(--s2)}
     <button class="ntab" data-view="analytics" onclick="showTab('analytics',this)"><i class="ti ti-chart-bar"></i> Analytics</button>
     <button class="ntab" data-view="achievements" onclick="showTab('achievements',this)"><i class="ti ti-trophy"></i> Records</button>
   </div>
+  <button class="theme-btn" onclick="exportData()" title="Export data (backup file)"><i class="ti ti-database-export"></i></button>
+  <button class="theme-btn" onclick="document.getElementById('importFile').click()" title="Import data (from backup file)"><i class="ti ti-database-import"></i></button>
+  <input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="importData(this)">
   <button class="theme-btn" onclick="showTab('tax',null)" title="Tax"><i class="ti ti-receipt-tax"></i></button>
   <button class="theme-btn" onclick="toggleTheme()"><i class="ti ti-moon" id="themeIcon"></i></button>
 </div>
@@ -555,7 +572,7 @@ tbody tr:hover td{background:var(--s2)}
 
 <!-- TAB: ANALYTICS -->
 <div id="tabAnalytics" class="page" style="display:none">
-  <div class="chips" id="periodChips"><button class="pchip active" onclick="setPeriod('1M',this)">1 Month</button><button class="pchip" onclick="setPeriod('3M',this)">3 Months</button><button class="pchip" onclick="setPeriod('6M',this)">6 Months</button><button class="pchip" onclick="setPeriod('1J',this)">1 Year</button><button class="pchip" onclick="setPeriod('ALL',this)">All Time</button></div>
+  <div class="chips" id="periodChips"><button class="pchip active" onclick="setPeriod('ALL',this)">All Time</button><button class="pchip" onclick="setPeriod('1M',this)">1 Month</button><button class="pchip" onclick="setPeriod('3M',this)">3 Months</button><button class="pchip" onclick="setPeriod('6M',this)">6 Months</button><button class="pchip" onclick="setPeriod('1J',this)">1 Year</button></div>
   <div class="krow" id="chartKpi"></div>
   <div class="ccard"><div class="ctitle"><span id="chartTitle">–</span><span style="font-size:11px;color:var(--muted)">Green = Payouts · Red = Expenses</span></div><div class="barchart" id="barChart"><div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;color:var(--muted);font-size:13px">No data yet</div></div><div class="clegend"><div class="cli"><div class="cldot" style="background:var(--green)"></div>Payouts</div><div class="cli"><div class="cldot" style="background:var(--red)"></div>Expenses</div></div></div>
   <div class="stitle"><i class="ti ti-trending-up"></i> Cumulative Earnings</div>
@@ -607,7 +624,7 @@ const CATS={profit:'Profit Withdrawal',fee:'Platform Fee',subscription:'Subscrip
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const FEMOJI={'#3b82f6':'📁','#1baf7a':'📂','#f97316':'🗂️','#8b5cf6':'📋','#ec4899':'📌','#f59e0b':'⭐','#ef4444':'🏆','#14b8a6':'📎','#6b7280':'🗃️'};
 
-let entries=[],accounts=[],folders=[],trades=[],playbooks=[],filter='all',editId=null,currentPeriod='1M',currentTab='accounts';
+let entries=[],accounts=[],folders=[],trades=[],playbooks=[],filter='all',editId=null,currentPeriod='ALL',currentTab='accounts';
 let accGroups=[],accFilter='all',groupManage=false,_tlEdit=null;
 let taxConfig={deductibleCats:{fee:true,subscription:true,reset:true,news:true,hardware:true,other:false}},currentTaxYear=null;
 let detailAccId=null,detailChart=null,cumulativeChart=null,selectedFolderId=null,selectedColor='#3b82f6';
@@ -672,7 +689,53 @@ function migrateData(){
   try{const tc=localStorage.getItem('af_taxconfig');if(tc)taxConfig=Object.assign(taxConfig,JSON.parse(tc));}catch(e){}
   saveAll();
 }
-function saveAll(){try{localStorage.setItem('af_entries',JSON.stringify(entries));}catch(e){}try{localStorage.setItem('af_accs',JSON.stringify(accounts));}catch(e){}try{localStorage.setItem('af_folders',JSON.stringify(folders));}catch(e){alert('Storage limit reached.');}try{localStorage.setItem('af_trades',JSON.stringify(trades));}catch(e){}try{localStorage.setItem('af_playbooks',JSON.stringify(playbooks));}catch(e){}try{localStorage.setItem('af_taxconfig',JSON.stringify(taxConfig));}catch(e){}try{localStorage.setItem('af_accgroups',JSON.stringify(accGroups));}catch(e){}}
+function saveAll(){try{localStorage.setItem('af_entries',JSON.stringify(entries));}catch(e){}try{localStorage.setItem('af_accs',JSON.stringify(accounts));}catch(e){}try{localStorage.setItem('af_folders',JSON.stringify(folders));}catch(e){uiAlert('Storage limit reached.');}try{localStorage.setItem('af_trades',JSON.stringify(trades));}catch(e){}try{localStorage.setItem('af_playbooks',JSON.stringify(playbooks));}catch(e){}try{localStorage.setItem('af_taxconfig',JSON.stringify(taxConfig));}catch(e){}try{localStorage.setItem('af_accgroups',JSON.stringify(accGroups));}catch(e){}}
+
+/* ── CUSTOM DIALOGS (replaces native alert/confirm) ── */
+let _modalRes=null;
+function uiDialog(msg,opts){
+  opts=opts||{};
+  return new Promise(res=>{
+    _modalRes=res;
+    let ov=document.getElementById('uiModal');
+    if(!ov){ov=document.createElement('div');ov.id='uiModal';ov.className='modal-overlay';document.body.appendChild(ov);}
+    const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    ov.innerHTML='<div class="modal-card">'
+      +(opts.icon?'<div class="modal-icon">'+opts.icon+'</div>':'')
+      +(opts.title?'<div class="modal-title">'+esc(opts.title)+'</div>':'')
+      +'<div class="modal-msg">'+esc(msg)+'</div>'
+      +'<div class="modal-actions">'
+      +(opts.confirm?'<button class="modal-btn" onclick="_uiModalDone(false)">Cancel</button>':'')
+      +'<button class="modal-btn '+(opts.danger?'danger':'primary')+'" onclick="_uiModalDone(true)">'+esc(opts.okText||'OK')+'</button>'
+      +'</div></div>';
+    ov.classList.add('open');
+    ov.onclick=e=>{if(e.target===ov&&opts.confirm)_uiModalDone(false);};
+  });
+}
+function _uiModalDone(v){const ov=document.getElementById('uiModal');if(ov)ov.classList.remove('open');const r=_modalRes;_modalRes=null;if(r)r(v);}
+function uiAlert(msg,opts){return uiDialog(msg,Object.assign({confirm:false,icon:'ℹ️'},opts||{}));}
+function uiConfirm(msg,opts){return uiDialog(msg,Object.assign({confirm:true},opts||{}));}
+document.addEventListener('keydown',e=>{const ov=document.getElementById('uiModal');if(!ov||!ov.classList.contains('open'))return;if(e.key==='Escape')_uiModalDone(false);else if(e.key==='Enter')_uiModalDone(true);});
+
+/* ── EXPORT / IMPORT (backup file — e.g. browser → desktop app) ── */
+function exportData(){
+  const data={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('af_'))data[k]=localStorage.getItem(k);}
+  const blob=new Blob([JSON.stringify({app:'patience-flow',exported:new Date().toISOString(),data},null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='patience-flow-backup-'+todayStr()+'.json';document.body.appendChild(a);a.click();a.remove();
+  URL.revokeObjectURL(url);
+  uiAlert('Backup file downloaded ✓\n\nOpen Patience Flow anywhere else (e.g. the desktop app) and use the import button to load it.',{icon:'💾',title:'Data exported'});
+}
+async function importData(input){
+  const file=input.files&&input.files[0];input.value='';if(!file)return;
+  let data=null;
+  try{const parsed=JSON.parse(await file.text());if(parsed&&parsed.data&&typeof parsed.data==='object')data=parsed.data;}catch(e){}
+  if(!data||!Object.keys(data).some(k=>k.startsWith('af_'))){uiAlert('This file is not a valid Patience-Flow backup.',{icon:'⚠️',title:'Import failed'});return;}
+  if(!await uiConfirm('This replaces ALL current data here with the data from the backup file.\n\nContinue?',{icon:'📥',title:'Import backup',okText:'Import',danger:true}))return;
+  for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&k.startsWith('af_'))localStorage.removeItem(k);}
+  Object.keys(data).forEach(k=>{if(k.startsWith('af_'))localStorage.setItem(k,data[k]);});
+  location.reload();
+}
 
 /* ── BALANCE & STATS ── */
 function getBalance(acc){const p=(acc.dailyEntries||[]).reduce((s,e)=>s+e.pnl,0);const py=(acc.payouts||[]).reduce((s,x)=>s+x.amount,0);return(acc.size||0)+p-py;}
@@ -889,7 +952,7 @@ function renderDetailChart(acc){
 function toggleDetailDayForm(){const el=document.getElementById('detailDayForm');if(!el)return;const o=el.style.display==='block';el.style.display=o?'none':'block';if(!o)setTimeout(()=>{const p=document.getElementById('dd_pnl');if(p)p.focus();},50);}
 function addDetailDay(){
   const date=document.getElementById('dd_date').value,pnl=parseFloat(document.getElementById('dd_pnl').value);
-  if(!date){alert('Please enter a date.');return;}if(isNaN(pnl)||pnl===0){alert('Please enter a P&L value.');return;}
+  if(!date){uiAlert('Please enter a date.');return;}if(isNaN(pnl)||pnl===0){uiAlert('Please enter a P&L value.');return;}
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   if(!accounts[i].dailyEntries)accounts[i].dailyEntries=[];
   accounts[i].dailyEntries.push({id:Date.now(),date,pnl});accounts[i].dailyEntries.sort((a,b)=>a.date.localeCompare(b.date));
@@ -897,24 +960,24 @@ function addDetailDay(){
 }
 function removeDetailDay(dayId){const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;accounts[i].dailyEntries=(accounts[i].dailyEntries||[]).filter(e=>e.id!==dayId);saveAll();renderDetail();}
 function toggleDetailPayoutForm(){const f=document.getElementById('dPayoutForm');if(!f)return;f.style.display=f.style.display==='block'?'none':'block';}
-function confirmDetailPayout(){
+async function confirmDetailPayout(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   const acc=accounts[i],wd=winDaysOf(acc);const{profitDays,relEntries,netPnL}=getPeriodStats(acc);
-  if(wd>0&&profitDays<wd){alert('You need at least '+wd+' profitable days!');return;}
+  if(wd>0&&profitDays<wd){uiAlert('You need at least '+wd+' profitable days!');return;}
   const con=checkConsistency(acc,relEntries,netPnL);
-  if(con&&!con.noData&&!con.ok){alert('Payout blocked — consistency rule not satisfied.\n\nBest day ('+con.bestDayPct+'%) exceeds the '+con.threshold+'% limit.\nBalance it out with more profitable days first.');return;}
-  if(acc.status==='funded'&&acc.payoutBuffer>0&&getBalance(acc)<acc.payoutBuffer){alert('Payout blocked — balance is below the payout buffer.\n\nBalance: '+fmt(getBalance(acc))+'\nBuffer: '+fmt(acc.payoutBuffer)+'\nStill needed: '+fmt(acc.payoutBuffer-getBalance(acc)));return;}
+  if(con&&!con.noData&&!con.ok){uiAlert('Payout blocked — consistency rule not satisfied.\n\nBest day ('+con.bestDayPct+'%) exceeds the '+con.threshold+'% limit.\nBalance it out with more profitable days first.');return;}
+  if(acc.status==='funded'&&acc.payoutBuffer>0&&getBalance(acc)<acc.payoutBuffer){uiAlert('Payout blocked — balance is below the payout buffer.\n\nBalance: '+fmt(getBalance(acc))+'\nBuffer: '+fmt(acc.payoutBuffer)+'\nStill needed: '+fmt(acc.payoutBuffer-getBalance(acc)));return;}
   const payoutAmt=parseFloat(document.getElementById('dPayoutAmt').value)||0;
-  if(payoutAmt<=0){alert('Please enter a payout amount.');return;}
-  if(!confirm('Request payout of '+fmt(payoutAmt)+'?\n\nTrading pauses until the firm approves.'))return;
+  if(payoutAmt<=0){uiAlert('Please enter a payout amount.');return;}
+  if(!await uiConfirm('Request payout of '+fmt(payoutAmt)+'?\n\nTrading pauses until the firm approves.',{icon:'💰',title:'Request Payout',okText:'Request'}))return;
   accounts[i].payoutPending={amount:payoutAmt,requestDate:todayStr()};
   saveAll();renderDetail();
 }
-function approvePayout(){
+async function approvePayout(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   const acc=accounts[i];if(!acc.payoutPending)return;
   const{amount}=acc.payoutPending;
-  if(!confirm('Confirm payout approval of '+fmt(amount)+'?\n\nBalance drops by this amount and trading resumes.'))return;
+  if(!await uiConfirm('Confirm payout approval of '+fmt(amount)+'?\n\nBalance drops by this amount and trading resumes.',{icon:'🏦',title:'Payout Approved',okText:'Approve'}))return;
   if(!accounts[i].payouts)accounts[i].payouts=[];
   accounts[i].payouts.push({id:Date.now(),date:todayStr(),amount});
   accounts[i].lastPayoutDate=todayStr();accounts[i].lastPayoutAmount=amount;accounts[i].payoutPending=null;
@@ -923,10 +986,10 @@ function approvePayout(){
 }
 
 /* ── PASS TO FUNDED ── */
-function passToFunded(){
+async function passToFunded(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   const acc=accounts[i];
-  if(!confirm('Convert "'+acc.name+'" to Funded?\n\nThe account restarts from '+fmt(acc.size)+' with funded stage rules.\n\nEval trading history is cleared.'))return;
+  if(!await uiConfirm('Convert "'+acc.name+'" to Funded?\n\nThe account restarts from '+fmt(acc.size)+' with funded stage rules.\n\nEval trading history is cleared.',{icon:'🎓',title:'Convert to Funded',okText:'Convert'}))return;
   accounts[i].status='funded';
   accounts[i].startDate=todayStr();
   accounts[i].fundedDate=todayStr();
@@ -938,20 +1001,20 @@ function passToFunded(){
 }
 
 /* ── GO LIVE ── */
-function goLive(){
+async function goLive(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   const acc=accounts[i];
-  if(!confirm('Unlock Live for "'+acc.name+'"?\n\nThe account moves to the Live stage and restarts from '+fmt(acc.size||0)+'.\nFunded trading history is cleared.'))return;
+  if(!await uiConfirm('Unlock Live for "'+acc.name+'"?\n\nThe account moves to the Live stage and restarts from '+fmt(acc.size||0)+'.\nFunded trading history is cleared.',{icon:'🚀',title:'Unlock Live',okText:'Go Live'}))return;
   acc.status='live';acc.liveDate=todayStr();acc.startDate=todayStr();
   acc.dailyEntries=[];acc.payouts=[];acc.lastPayoutDate=null;acc.lastPayoutAmount=0;acc.payoutPending=null;
   saveAll();triggerConfetti();renderDetail();
 }
 
 /* ── RESET (blown eval) ── */
-function resetEvalAccount(){
+async function resetEvalAccount(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   const acc=accounts[i];
-  if(!confirm('Reset "'+acc.name+'"?\n\nAll trading days are cleared and the balance returns to '+fmt(acc.size||0)+'.\nThis will be reset #'+((acc.resets||0)+1)+'.'))return;
+  if(!await uiConfirm('Reset "'+acc.name+'"?\n\nAll trading days are cleared and the balance returns to '+fmt(acc.size||0)+'.\nThis will be reset #'+((acc.resets||0)+1)+'.',{icon:'↺',title:'Reset Account',okText:'Reset',danger:true}))return;
   acc.dailyEntries=[];acc.payouts=[];acc.payoutPending=null;acc.lastPayoutDate=null;acc.lastPayoutAmount=0;
   acc.startDate=todayStr();acc.resets=(acc.resets||0)+1;
   saveAll();renderDetail();
@@ -989,7 +1052,7 @@ let accFormType='eval';
 function setAccType(type){accFormType=type;document.getElementById('typeEval').classList.toggle('active',type==='eval');document.getElementById('typeFunded').classList.toggle('active',type==='funded');document.querySelectorAll('.af-eval-only').forEach(el=>el.style.display=type==='eval'?'':'none');document.getElementById('af_fundedLabel').textContent=type==='eval'?'✓ Funded Stage (pre-configure)':'✓ Funded Stage Settings';}
 function toggleAccForm(){const f=document.getElementById('accForm');const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){['af_name','af_number','af_target','af_evalLoss','af_evalConPct','af_loss','af_conPct','af_dll','af_buffer'].forEach(id=>document.getElementById(id).value='');document.getElementById('af_start').value=todayStr();document.getElementById('af_size').value='50000';document.getElementById('af_windays').value='5';document.getElementById('af_evalCon').value='0';document.getElementById('af_fundedCon').value='0';document.getElementById('af_liveGoal').value='0';setAccType('eval');}}
 function saveAccount(){
-  const name=document.getElementById('af_name').value.trim();if(!name){alert('Please enter an account name.');return;}
+  const name=document.getElementById('af_name').value.trim();if(!name){uiAlert('Please enter an account name.');return;}
   const size=parseFloat(document.getElementById('af_size').value)||50000;
   accounts.push({id:Date.now(),name,
     number:document.getElementById('af_number').value.trim(),size,
@@ -1011,7 +1074,7 @@ function saveAccount(){
     lastPayoutDate:null,lastPayoutAmount:0,dailyEntries:[],payouts:[],payoutPending:null});
   saveAll();renderAccounts();document.getElementById('accForm').style.display='none';
 }
-function deleteAccount(id,e){e.stopPropagation();if(!confirm('Delete this account?'))return;accounts=accounts.filter(a=>a.id!==id);saveAll();renderAccounts();}
+async function deleteAccount(id,e){e.stopPropagation();if(!await uiConfirm('Delete this account?\n\nAll its trading days and settings are removed.',{icon:'🗑️',title:'Delete account',okText:'Delete',danger:true}))return;accounts=accounts.filter(a=>a.id!==id);saveAll();renderAccounts();}
 function toggleStatus(id,e){e.stopPropagation();const i=accounts.findIndex(a=>a.id===id);if(i<0)return;const s=accounts[i].status;accounts[i].status=s==='eval'?'funded':s==='funded'?'live':'eval';if(accounts[i].status==='live'&&!accounts[i].liveDate)accounts[i].liveDate=todayStr();saveAll();renderAccounts();}
 
 /* ── ACCOUNT FILTER / CUSTOM GROUPS ── */
@@ -1037,9 +1100,9 @@ function confirmAccGroup(){
   const g={id:Date.now(),name};accGroups.push(g);
   groupCreating=false;accFilter='g'+g.id;groupManage=true;saveAll();renderAccounts();
 }
-function deleteAccGroup(){
+async function deleteAccGroup(){
   const gid=Number(String(accFilter).slice(1));const g=accGroups.find(x=>x.id===gid);if(!g)return;
-  if(!confirm('Delete group "'+g.name+'"?\n\nThe accounts themselves are not deleted.'))return;
+  if(!await uiConfirm('Delete group "'+g.name+'"?\n\nThe accounts themselves are not deleted.'))return;
   accGroups=accGroups.filter(x=>x.id!==gid);
   accounts.forEach(a=>{a.groups=(a.groups||[]).filter(x=>x!==gid);});
   accFilter='all';groupManage=false;saveAll();renderAccounts();
@@ -1110,8 +1173,8 @@ function renderAccounts(){
 
 /* ── ENTRIES ── */
 function toggleEntryForm(){const f=document.getElementById('entryForm');const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){document.getElementById('fd').value=todayStr();['fa','fn'].forEach(id=>document.getElementById(id).value='');document.getElementById('ft').value='payout';document.getElementById('fc').value='profit';editId=null;}}
-function saveEntry(){const date=document.getElementById('fd').value,type=document.getElementById('ft').value,amount=parseFloat(document.getElementById('fa').value)||0,cat=document.getElementById('fc').value,note=document.getElementById('fn').value;if(!date||!amount){alert('Please enter date and amount.');return;}if(editId!==null){const i=entries.findIndex(e=>e.id===editId);if(i>-1)entries[i]={...entries[i],date,type,amount,cat,note};editId=null;}else entries.push({id:Date.now(),date,type,amount,cat,note});entries.sort((a,b)=>b.date.localeCompare(a.date));saveAll();renderEntries();document.getElementById('entryForm').style.display='none';}
-function deleteEntry(id){if(!confirm('Delete?'))return;entries=entries.filter(e=>e.id!==id);saveAll();renderEntries();}
+function saveEntry(){const date=document.getElementById('fd').value,type=document.getElementById('ft').value,amount=parseFloat(document.getElementById('fa').value)||0,cat=document.getElementById('fc').value,note=document.getElementById('fn').value;if(!date||!amount){uiAlert('Please enter date and amount.');return;}if(editId!==null){const i=entries.findIndex(e=>e.id===editId);if(i>-1)entries[i]={...entries[i],date,type,amount,cat,note};editId=null;}else entries.push({id:Date.now(),date,type,amount,cat,note});entries.sort((a,b)=>b.date.localeCompare(a.date));saveAll();renderEntries();document.getElementById('entryForm').style.display='none';}
+async function deleteEntry(id){if(!await uiConfirm('Delete this entry?',{icon:'🗑️',title:'Delete entry',okText:'Delete',danger:true}))return;entries=entries.filter(e=>e.id!==id);saveAll();renderEntries();}
 function editEntry(id){const e=entries.find(x=>x.id===id);if(!e)return;editId=id;document.getElementById('fd').value=e.date;document.getElementById('ft').value=e.type;document.getElementById('fa').value=e.amount;document.getElementById('fc').value=e.cat;document.getElementById('fn').value=e.note||'';document.getElementById('entryForm').style.display='block';}
 function setFilter(f,btn){filter=f;document.querySelectorAll('#tabEntries .chip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');renderEntries();}
 function renderEntries(){
@@ -1164,8 +1227,8 @@ function renderAnalytics(){
 /* ── ACHIEVEMENTS / RECORDS ── */
 function selectColor(color,el){selectedColor=color;document.querySelectorAll('.color-opt').forEach(e=>e.classList.remove('selected'));el.classList.add('selected');}
 function toggleFolderForm(){const f=document.getElementById('folderForm');const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){document.getElementById('ff_name').value='';selectedColor='#3b82f6';document.querySelectorAll('.color-opt').forEach((e,i)=>e.classList.toggle('selected',i===0));}}
-function saveFolder(){const name=document.getElementById('ff_name').value.trim();if(!name){alert('Please enter a folder name.');return;}folders.push({id:Date.now(),name,color:selectedColor,certificates:[]});saveAll();document.getElementById('folderForm').style.display='none';renderAchievements();}
-function deleteFolder(){if(!selectedFolderId)return;if(!confirm('Delete this folder and all its certificates?'))return;folders=folders.filter(f=>f.id!==selectedFolderId);selectedFolderId=null;saveAll();closeFolder();}
+function saveFolder(){const name=document.getElementById('ff_name').value.trim();if(!name){uiAlert('Please enter a folder name.');return;}folders.push({id:Date.now(),name,color:selectedColor,certificates:[]});saveAll();document.getElementById('folderForm').style.display='none';renderAchievements();}
+async function deleteFolder(){if(!selectedFolderId)return;if(!await uiConfirm('Delete this folder and all its certificates?',{icon:'🗑️',title:'Delete folder',okText:'Delete',danger:true}))return;folders=folders.filter(f=>f.id!==selectedFolderId);selectedFolderId=null;saveAll();closeFolder();}
 function openFolder(id){selectedFolderId=id;document.getElementById('achFolderView').style.display='none';document.getElementById('achDetailView').style.display='block';renderFolderDetail();}
 function closeFolder(){selectedFolderId=null;document.getElementById('achDetailView').style.display='none';document.getElementById('achFolderView').style.display='block';renderAchievements();}
 function renderAchievements(){
@@ -1194,7 +1257,7 @@ async function uploadCertificate(event){
   folder.certificates.push({id:Date.now(),name,date:todayStr(),imageData});
   saveAll();renderFolderDetail();event.target.value='';
 }
-function deleteCert(certId){if(!confirm('Delete this certificate?'))return;const folder=folders.find(f=>f.id===selectedFolderId);if(!folder)return;folder.certificates=(folder.certificates||[]).filter(c=>c.id!==certId);saveAll();renderFolderDetail();}
+async function deleteCert(certId){if(!await uiConfirm('Delete this certificate?',{icon:'🗑️',title:'Delete certificate',okText:'Delete',danger:true}))return;const folder=folders.find(f=>f.id===selectedFolderId);if(!folder)return;folder.certificates=(folder.certificates||[]).filter(c=>c.id!==certId);saveAll();renderFolderDetail();}
 function openLightbox(certId){const folder=folders.find(f=>f.id===selectedFolderId);if(!folder)return;const cert=folder.certificates.find(c=>c.id===Number(certId)||c.id===certId);if(!cert||!cert.imageData)return;document.getElementById('lightboxImg').src=cert.imageData;document.getElementById('lightbox').classList.add('open');}
 function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.getElementById('lightboxImg').src='';}
 
@@ -1270,7 +1333,7 @@ function removeNewsItem(dayKey,id){notes.news[dayKey]=(notes.news[dayKey]||[]).f
 function saveNewsTemplate(dayKey){
   const text=(document.getElementById('ne_'+dayKey)||{}).value||'';
   const cur=(document.getElementById('nc_'+dayKey)||{}).value||'';
-  if(!text.trim()){alert('Enter an event name first.');return;}
+  if(!text.trim()){uiAlert('Enter an event name first.');return;}
   if(!notes.newsTemplates)notes.newsTemplates=[];
   notes.newsTemplates.push({id:Date.now(),impact:_newsImpact[dayKey]||'high',text:text.trim(),currency:cur.trim()});
   saveNotesNow();renderNewsList(dayKey);const f=document.getElementById('nf_'+dayKey);if(f)f.style.display='block';
@@ -1296,8 +1359,8 @@ function autoSaveNotes(){
   const gn=document.getElementById('generalNotes');if(gn)notes.general=gn.value;
   clearTimeout(_notesSaveTimer);_notesSaveTimer=setTimeout(saveNotesNow,600);
 }
-function clearWeeklyNotes(){
-  if(!confirm("Clear all notes and news for this week?"))return;
+async function clearWeeklyNotes(){
+  if(!await uiConfirm("Clear all notes and news for this week?",{icon:"🧹",title:"Clear week",okText:"Clear",danger:true}))return;
   ['mon','tue','wed','thu','fri'].forEach(k=>{notes[k]='';if(!notes.news)notes.news={};notes.news[k]=[];const el=document.getElementById('dayNote_'+k);if(el)el.value='';});
   notes.weekGeneral='';const wg=document.getElementById('weekGeneral');if(wg)wg.value='';
   saveNotesNow();renderNotes();
@@ -1401,7 +1464,7 @@ function renderTimeline(){
 }
 function tlEditDate(key){_tlEdit=key;renderTimeline();}
 function tlSaveDate(key){
-  const v=(document.getElementById('tlDateInput')||{}).value;if(!v){alert('Please pick a date.');return;}
+  const v=(document.getElementById('tlDateInput')||{}).value;if(!v){uiAlert('Please pick a date.');return;}
   const acc=accounts.find(a=>a.id===detailAccId);if(!acc)return;
   if(key==='start')acc.startDate=v;
   else if(key==='funded')acc.fundedDate=v;
@@ -1460,7 +1523,7 @@ function toggleTradeForm(){
 }
 function saveTrade(){
   const date=(document.getElementById('tj_date')||{}).value,sym=((document.getElementById('tj_sym')||{}).value||'').trim();
-  if(!date||!sym){alert('Please enter date and symbol.');return;}
+  if(!date||!sym){uiAlert('Please enter date and symbol.');return;}
   const g=id=>(document.getElementById(id)||{}).value||'';
   const trade={id:_jEditId||Date.now(),date,accountId:g('tj_acc')||null,symbol:sym,direction:_jDir,
     setup:g('tj_setup').trim(),entryReason:g('tj_entry_reason').trim(),target:g('tj_target').trim(),
@@ -1473,7 +1536,7 @@ function saveTrade(){
   trades.sort((a,b)=>b.date.localeCompare(a.date));
   saveAll();toggleTradeForm();renderJournal();
 }
-function deleteTrade(id){if(!confirm('Delete this trade?'))return;trades=trades.filter(t=>t.id!==id);saveAll();renderTradeList();}
+async function deleteTrade(id){if(!await uiConfirm('Delete this trade?',{icon:'🗑️',title:'Delete trade',okText:'Delete',danger:true}))return;trades=trades.filter(t=>t.id!==id);saveAll();renderTradeList();}
 function toggleJCard(id){const e=document.getElementById('jc_'+id);if(e)e.classList.toggle('open');}
 function renderJournal(){
   const chips=document.getElementById('jAccChips');
@@ -1542,11 +1605,11 @@ function setJournalView(view){
 /* ── PLAYBOOKS ── */
 function togglePlaybookForm(){const f=document.getElementById('playbookForm');if(!f)return;const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){document.getElementById('pb_name').value='';document.getElementById('pb_desc').value='';setTimeout(()=>{const e=document.getElementById('pb_name');if(e)e.focus();},50);}}
 function savePlaybook(){
-  const name=(document.getElementById('pb_name').value||'').trim();if(!name){alert('Please enter a name.');return;}
+  const name=(document.getElementById('pb_name').value||'').trim();if(!name){uiAlert('Please enter a name.');return;}
   playbooks.push({id:Date.now(),name,description:(document.getElementById('pb_desc').value||'').trim()});
   saveAll();togglePlaybookForm();renderPlaybooks();
 }
-function deletePlaybook(id){if(!confirm('Delete this playbook?'))return;playbooks=playbooks.filter(p=>p.id!==id);saveAll();renderPlaybooks();}
+async function deletePlaybook(id){if(!await uiConfirm('Delete this playbook?',{icon:'🗑️',title:'Delete playbook',okText:'Delete',danger:true}))return;playbooks=playbooks.filter(p=>p.id!==id);saveAll();renderPlaybooks();}
 function renderPlaybooks(){
   const grid=document.getElementById('playbookGrid'),empty=document.getElementById('playbookEmpty');if(!grid)return;
   if(!playbooks.length){grid.innerHTML='';if(empty)empty.style.display='block';return;}if(empty)empty.style.display='none';
@@ -1687,7 +1750,7 @@ function renderTax(){
 }
 function exportTaxCSV(){
   const yearEntries=entries.filter(e=>e.date.slice(0,4)===currentTaxYear).sort((a,b)=>a.date.localeCompare(b.date));
-  if(!yearEntries.length){alert('No entries for '+currentTaxYear+'.');return;}
+  if(!yearEntries.length){uiAlert('No entries for '+currentTaxYear+'.');return;}
   let csv='Date,Type,Category,Note,Amount,Deductible\n';
   yearEntries.forEach(e=>{
     const deductible=e.type==='expense'?(taxConfig.deductibleCats[e.cat]?'Yes':'No'):'—';
