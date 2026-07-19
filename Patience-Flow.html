@@ -257,6 +257,23 @@ tbody tr:hover td{background:var(--s2)}
 .modal-btn.primary:hover{background:#2563eb}
 .modal-btn.danger{background:var(--red);border-color:var(--red);color:#fff}
 .modal-btn.danger:hover{background:#dc2626}
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:10001;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:var(--surface);border:.5px solid var(--border-s);border-left:3px solid var(--green);border-radius:10px;padding:10px 16px;font-size:13px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.25);display:flex;gap:8px;align-items:center;animation:toastIn .2s ease}
+@keyframes toastIn{0%{transform:translateX(24px);opacity:0}100%{transform:none;opacity:1}}
+.heat-wrap{max-width:560px;background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);padding:1rem}
+.heat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.heat-title{font-size:13px;font-weight:600}
+.heat-nav{background:none;border:.5px solid var(--border-s);border-radius:6px;color:var(--text2);cursor:pointer;padding:2px 9px;font-size:13px}
+.heat-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.heat-dow{font-size:9px;color:var(--muted);text-align:center;text-transform:uppercase;letter-spacing:.04em;padding-bottom:2px}
+.heat-cell{aspect-ratio:1.15;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--text2);background:var(--s2);cursor:default;min-height:34px}
+.heat-cell.off{background:transparent}
+.heat-cell .hp{font-size:8.5px;font-weight:700;margin-top:1px}
+.acc-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border:.5px solid var(--border);border-radius:10px;cursor:pointer;flex-wrap:wrap}
+.acc-row:hover{border-color:var(--border-s)}
+.accgrid.list-mode{display:flex;flex-direction:column;gap:8px}
+.dash-ready-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border:.5px solid var(--border);border-radius:10px;cursor:pointer;flex-wrap:wrap;margin-bottom:8px}
+.dash-ready-row:hover{border-color:var(--border-s)}
 .tl-body{flex:1;padding-top:3px}
 .tl-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:1px}
 .tl-sub{font-size:11px;color:var(--muted)}
@@ -318,7 +335,8 @@ tbody tr:hover td{background:var(--s2)}
     </div>Patience
   </div>
   <div class="navtabs">
-    <button class="ntab active" data-view="accounts" onclick="showTab('accounts',this)"><i class="ti ti-layout-cards"></i> Accounts</button>
+    <button class="ntab active" data-view="dashboard" onclick="showTab('dashboard',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
+    <button class="ntab" data-view="accounts" onclick="showTab('accounts',this)"><i class="ti ti-layout-cards"></i> Accounts</button>
     <button class="ntab" data-view="notes" onclick="showTab('notes',this)"><i class="ti ti-notes"></i> Notes/News</button>
     <button class="ntab" data-view="journal" onclick="showTab('journal',this)"><i class="ti ti-notebook"></i> Journal</button>
     <button class="ntab" data-view="entries" onclick="showTab('entries',this)"><i class="ti ti-list-details"></i> Entries</button>
@@ -370,10 +388,31 @@ tbody tr:hover td{background:var(--s2)}
   </div>
 </div></div>
 
+<!-- TAB: DASHBOARD -->
+<div id="tabDashboard" class="page">
+  <div id="dashKpis" style="margin-bottom:1.5rem"></div>
+  <div class="stitle"><i class="ti ti-cash"></i> Payout Readiness</div>
+  <div id="dashReady" style="margin-bottom:1.75rem"></div>
+  <div class="stitle"><i class="ti ti-calendar-stats"></i> P&L Heatmap</div>
+  <div class="chips" id="dashHeatChips" style="margin-bottom:.75rem"></div>
+  <div id="dashHeatmap" style="margin-bottom:1.75rem"></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.25rem">
+    <div><div class="stitle"><i class="ti ti-notebook"></i> Recent Trades</div><div id="dashTrades"></div></div>
+    <div><div class="stitle"><i class="ti ti-notes"></i> This Week</div><div id="dashNotes"></div></div>
+  </div>
+</div>
+
 <!-- TAB: ACCOUNTS -->
-<div id="tabAccounts" class="page">
+<div id="tabAccounts" class="page" style="display:none">
   <div class="chips" id="accFilterBar" style="margin-bottom:.75rem"></div>
-  <button class="addbtn" onclick="toggleAccForm()"><i class="ti ti-plus"></i> Add Account</button>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;flex-wrap:wrap">
+    <button class="addbtn" style="margin-bottom:0" onclick="toggleAccForm()"><i class="ti ti-plus"></i> Add Account</button>
+    <span style="flex:1"></span>
+    <select id="accSortSel" onchange="setAccSort(this.value)" style="padding:6px 10px;font-size:12px;border-radius:8px;border:.5px solid var(--border-s);background:var(--surface);color:var(--text);cursor:pointer">
+      <option value="created">Newest first</option><option value="name">Name</option><option value="balance">Balance</option><option value="pnl">P&L</option><option value="ready">Payout-ready first</option>
+    </select>
+    <button class="iconbtn" id="accViewBtn" onclick="toggleAccView()" title="Toggle compact view" style="border:.5px solid var(--border-s);border-radius:8px;padding:6px 9px"><i class="ti ti-list"></i></button>
+  </div>
   <div class="fcard" id="accForm">
     <div class="fgrid">
       <!-- Account type toggle -->
@@ -624,7 +663,7 @@ const CATS={profit:'Profit Withdrawal',fee:'Platform Fee',subscription:'Subscrip
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const FEMOJI={'#3b82f6':'📁','#1baf7a':'📂','#f97316':'🗂️','#8b5cf6':'📋','#ec4899':'📌','#f59e0b':'⭐','#ef4444':'🏆','#14b8a6':'📎','#6b7280':'🗃️'};
 
-let entries=[],accounts=[],folders=[],trades=[],playbooks=[],filter='all',editId=null,currentPeriod='ALL',currentTab='accounts';
+let entries=[],accounts=[],folders=[],trades=[],playbooks=[],filter='all',editId=null,currentPeriod='ALL',currentTab='dashboard';
 let accGroups=[],accFilter='all',groupManage=false,_tlEdit=null;
 let taxConfig={deductibleCats:{fee:true,subscription:true,reset:true,news:true,hardware:true,other:false}},currentTaxYear=null;
 let detailAccId=null,detailChart=null,cumulativeChart=null,selectedFolderId=null,selectedColor='#3b82f6';
@@ -724,7 +763,7 @@ function exportData(){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download='patience-flow-backup-'+todayStr()+'.json';document.body.appendChild(a);a.click();a.remove();
   URL.revokeObjectURL(url);
-  uiAlert('Backup file downloaded ✓\n\nOpen Patience Flow anywhere else (e.g. the desktop app) and use the import button to load it.',{icon:'💾',title:'Data exported'});
+  showToast('Backup downloaded ✓ — import it in the app to transfer your data');
 }
 async function importData(input){
   const file=input.files&&input.files[0];input.value='';if(!file)return;
@@ -830,14 +869,14 @@ function triggerConfetti(){
 /* ── TAB SWITCHING ── */
 function showTab(tab,btn){
   currentTab=tab;document.getElementById('accountDetail').style.display='none';
-  ['Accounts','Notes','Journal','Entries','Tax','Analytics','Achievements'].forEach(t=>document.getElementById('tab'+t).style.display=t.toLowerCase()===tab?'block':'none');
+  ['Dashboard','Accounts','Notes','Journal','Entries','Tax','Analytics','Achievements'].forEach(t=>document.getElementById('tab'+t).style.display=t.toLowerCase()===tab?'block':'none');
   document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));if(btn)btn.classList.add('active');
-  if(tab==='entries')renderEntries();else if(tab==='tax')renderTax();else if(tab==='analytics')renderAnalytics();else if(tab==='achievements')renderAchievements();else if(tab==='notes')renderNotes();else if(tab==='journal')renderJournal();else renderAccounts();
+  if(tab==='entries')renderEntries();else if(tab==='tax')renderTax();else if(tab==='analytics')renderAnalytics();else if(tab==='achievements')renderAchievements();else if(tab==='notes')renderNotes();else if(tab==='journal')renderJournal();else if(tab==='dashboard')renderDashboard();else renderAccounts();
 }
 
 /* ── ACCOUNT DETAIL ── */
-function openDetail(id,ev){if(ev)ev.stopPropagation();detailAccId=id;_detailView='stats';_tlEdit=null;const _sf=document.getElementById('accSettingsForm');if(_sf)_sf.style.display='none';calYear=new Date().getFullYear();calMonth=new Date().getMonth();['tabAccounts','tabNotes','tabJournal','tabEntries','tabTax','tabAnalytics','tabAchievements'].forEach(t=>document.getElementById(t).style.display='none');document.getElementById('accountDetail').style.display='block';renderDetail();}
-function closeDetail(){_detailView='stats';document.getElementById('accountDetail').style.display='none';['tabAccounts','tabNotes','tabJournal','tabEntries','tabTax','tabAnalytics','tabAchievements'].forEach(el=>{const e=document.getElementById(el);if(e)e.style.display='none';});document.getElementById('tabAccounts').style.display='block';document.querySelectorAll('.ntab').forEach(t=>t.classList.toggle('active',t.dataset.view==='accounts'));if(detailChart){detailChart.destroy();detailChart=null;}renderAccounts();}
+function openDetail(id,ev){if(ev)ev.stopPropagation();detailAccId=id;_detailView='stats';_tlEdit=null;const _sf=document.getElementById('accSettingsForm');if(_sf)_sf.style.display='none';calYear=new Date().getFullYear();calMonth=new Date().getMonth();['tabDashboard','tabAccounts','tabNotes','tabJournal','tabEntries','tabTax','tabAnalytics','tabAchievements'].forEach(t=>document.getElementById(t).style.display='none');document.getElementById('accountDetail').style.display='block';renderDetail();}
+function closeDetail(){_detailView='stats';document.getElementById('accountDetail').style.display='none';['tabDashboard','tabAccounts','tabNotes','tabJournal','tabEntries','tabTax','tabAnalytics','tabAchievements'].forEach(el=>{const e=document.getElementById(el);if(e)e.style.display='none';});document.getElementById('tabAccounts').style.display='block';document.querySelectorAll('.ntab').forEach(t=>t.classList.toggle('active',t.dataset.view==='accounts'));if(detailChart){detailChart.destroy();detailChart=null;}renderAccounts();}
 
 function renderDetail(){
   // Reset tab to stats view
@@ -956,7 +995,7 @@ function addDetailDay(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   if(!accounts[i].dailyEntries)accounts[i].dailyEntries=[];
   accounts[i].dailyEntries.push({id:Date.now(),date,pnl});accounts[i].dailyEntries.sort((a,b)=>a.date.localeCompare(b.date));
-  saveAll();renderDetail();
+  saveAll();renderDetail();showToast('Trading day saved ✓');
 }
 function removeDetailDay(dayId){const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;accounts[i].dailyEntries=(accounts[i].dailyEntries||[]).filter(e=>e.id!==dayId);saveAll();renderDetail();}
 function toggleDetailPayoutForm(){const f=document.getElementById('dPayoutForm');if(!f)return;f.style.display=f.style.display==='block'?'none':'block';}
@@ -1044,8 +1083,152 @@ function saveAccSettings(){
   const bf=document.getElementById('as_buffer');if(bf)acc.payoutBuffer=parseFloat(bf.value)||0;
   const lg=document.getElementById('as_liveGoal');if(lg)acc.livePayoutGoal=parseInt(lg.value)||0;
   document.getElementById('accSettingsForm').style.display='none';
-  saveAll();renderDetail();
+  saveAll();renderDetail();showToast('Settings saved ✓');
 }
+
+/* ── TOASTS ── */
+function showToast(msg){
+  let w=document.getElementById('toastWrap');
+  if(!w){w=document.createElement('div');w.id='toastWrap';w.className='toast-wrap';document.body.appendChild(w);}
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  w.appendChild(t);
+  setTimeout(()=>{t.style.transition='opacity .3s';t.style.opacity='0';setTimeout(()=>t.remove(),350);},2600);
+}
+
+/* ── READINESS (shared by cards, sort, dashboard) ── */
+function accReadyState(acc){
+  const isFunded=acc.status==='funded',isLive=acc.status==='live',isPending=!!(acc.payoutPending);
+  const bal=getBalance(acc);
+  const{netPnL,profitDays,relEntries}=getPeriodStats(acc);
+  const wd=isLive?0:winDaysOf(acc);
+  const con=checkConsistency(acc,relEntries,netPnL);
+  const conOk=!con||con.noData||con.ok;
+  const bufferOk=!isFunded||!(acc.payoutBuffer>0)||bal>=acc.payoutBuffer;
+  const canPayout=(isFunded||isLive)&&!isPending&&(wd===0||profitDays>=wd)&&conOk&&bufferOk;
+  const passReady=!isFunded&&!isLive&&(acc.target||0)>0&&netPnL>=acc.target&&conOk;
+  return{isFunded,isLive,isPending,bal,netPnL,profitDays,wd,conOk,bufferOk,canPayout,passReady};
+}
+
+/* ── SPARKLINE ── */
+function sparkline(acc){
+  const{balData}=buildChartData(acc);
+  if(balData.length<3)return'';
+  const min=Math.min(...balData),max=Math.max(...balData),rng=(max-min)||1;
+  const pts=balData.map((v,i)=>((i/(balData.length-1))*100).toFixed(2)+','+(28-((v-min)/rng)*24+2).toFixed(2)).join(' ');
+  const clr=balData[balData.length-1]>=balData[0]?'#1baf7a':'#ef4444';
+  return '<svg viewBox="0 0 100 32" preserveAspectRatio="none" style="width:100%;height:32px;display:block;margin:2px 0 4px"><polyline points="'+pts+'" fill="none" stroke="'+clr+'" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+}
+
+/* ── DASHBOARD ── */
+let dashHeatFilter='funded',heatY=new Date().getFullYear(),heatM=new Date().getMonth();
+function renderDashboard(){
+  const pf=accounts.filter(a=>a.status==='funded'||a.status==='live');
+  const totBal=pf.reduce((s,a)=>s+getBalance(a),0);
+  const totPnL=pf.reduce((s,a)=>s+getPeriodStats(a).netPnL,0);
+  const totPay=entries.filter(e=>e.type==='payout').reduce((s,e)=>s+e.amount,0);
+  const nEval=accounts.filter(a=>a.status==='eval').length,nFun=accounts.filter(a=>a.status==='funded').length,nLive=accounts.filter(a=>a.status==='live').length;
+  document.getElementById('dashKpis').innerHTML='<div class="krow" style="margin-bottom:0">'
+    +'<div class="kpi"><div class="klbl">Total Balance (Funded + Live)</div><div class="kval b">'+fmt(totBal)+'</div></div>'
+    +'<div class="kpi"><div class="klbl">P&L this period</div><div class="kval '+(totPnL>=0?'g':'r')+'">'+fmtS(totPnL)+'</div></div>'
+    +'<div class="kpi"><div class="klbl">Total Payouts</div><div class="kval g">'+fmt(totPay)+'</div></div>'
+    +'<div class="kpi"><div class="klbl">Accounts</div><div class="kval">'+nEval+' Eval · '+nFun+' Funded · '+nLive+' Live</div></div>'
+    +'</div>';
+  // Payout readiness
+  document.getElementById('dashReady').innerHTML=accounts.length?accounts.map(acc=>{
+    const r=accReadyState(acc);
+    let status,clr;
+    if(r.isPending){status='⏳ Payout pending — awaiting approval';clr='var(--amber)';}
+    else if(r.isLive){status='★ Live — payout anytime';clr='var(--purple)';}
+    else if(r.isFunded){
+      if(r.canPayout){status='✓ Ready to request payout';clr='var(--green)';}
+      else{const parts=[];
+        if(r.wd>0&&r.profitDays<r.wd)parts.push((r.wd-r.profitDays)+' win day'+(r.wd-r.profitDays>1?'s':'')+' needed');
+        if(!r.bufferOk)parts.push(fmt(acc.payoutBuffer-r.bal)+' below buffer');
+        if(!r.conOk)parts.push('consistency not met');
+        status='⏳ '+parts.join(' · ');clr='var(--muted)';}
+    }else{
+      const target=acc.target||0,pct=target>0?Math.min(100,Math.max(0,Math.round((r.netPnL/target)*100))):0;
+      status=r.passReady?'🎓 Ready to pass to Funded!':target>0?pct+'% to target — '+fmt(Math.max(0,target-r.netPnL))+' left':'◎ Evaluation';
+      clr=r.passReady?'var(--green)':'var(--blue)';
+    }
+    return '<div class="dash-ready-row" onclick="openDetail('+acc.id+',event)">'
+      +'<span style="font-weight:600;font-size:13px">'+acc.name+'</span>'
+      +'<span class="badge '+(r.isPending?'bo':r.isLive?'bl':r.isFunded?'bg':'ba')+'">'+(r.isPending?'⏳':r.isLive?'★ Live':r.isFunded?'✓ Funded':'◎ Eval')+'</span>'
+      +'<span style="flex:1"></span>'
+      +'<span style="font-size:12px;font-weight:600;color:'+clr+'">'+status+'</span>'
+      +'<span style="font-size:12px;color:var(--text2);font-weight:600">'+fmt(r.bal)+'</span>'
+      +'</div>';
+  }).join(''):'<div class="empty" style="padding:1.25rem"><i class="ti ti-layout-cards"></i>No accounts yet — create one in the Accounts tab.</div>';
+  renderDashHeatChips();renderDashHeatmap();
+  // Recent trades
+  const rec=trades.slice(0,5);
+  document.getElementById('dashTrades').innerHTML=rec.length?rec.map(t=>{
+    const am=accounts.find(a=>String(a.id)===String(t.accountId));
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:.5px solid var(--border);border-radius:10px;margin-bottom:6px">'
+      +'<span style="font-size:12px;color:var(--muted);min-width:52px">'+fmtShort(t.date)+'</span>'
+      +'<span style="font-weight:600;font-size:13px">'+t.symbol+'</span>'
+      +'<span class="badge '+(t.direction==='long'?'bg':'br')+'">'+(t.direction==='long'?'▲ Long':'▼ Short')+'</span>'
+      +'<span style="flex:1"></span>'
+      +'<span class="badge '+(t.result==='win'?'bg':t.result==='loss'?'br':'ba')+'">'+t.result.toUpperCase()+'</span>'
+      +(t.pnl?'<span style="font-size:12px;font-weight:600;color:'+(t.pnl>=0?'var(--green)':'var(--red)')+'">'+fmtS(t.pnl)+'</span>':'')
+      +'</div>';
+  }).join(''):'<div class="empty" style="padding:1.25rem"><i class="ti ti-notebook"></i>No trades logged yet.</div>';
+  // Notes peek
+  const dow=['sun','mon','tue','wed','thu','fri','sat'][new Date().getDay()];
+  const todayNote=(notes[dow]||'').trim(),weekNote=(notes.weekGeneral||'').trim();
+  const ex=s=>s.length>180?s.slice(0,180)+'…':s;
+  document.getElementById('dashNotes').innerHTML=(todayNote||weekNote)
+    ?(todayNote?'<div style="padding:10px 14px;background:var(--surface);border:.5px solid var(--border);border-radius:10px;margin-bottom:6px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:4px">Today</div><div style="font-size:13px;white-space:pre-line">'+ex(todayNote)+'</div></div>':'')
+      +(weekNote?'<div style="padding:10px 14px;background:var(--surface);border:.5px solid var(--border);border-radius:10px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:4px">Week General</div><div style="font-size:13px;white-space:pre-line">'+ex(weekNote)+'</div></div>':'')
+    :'<div class="empty" style="padding:1.25rem"><i class="ti ti-notes"></i>No notes this week yet.</div>';
+}
+function renderDashHeatChips(){
+  const bar=document.getElementById('dashHeatChips');if(!bar)return;
+  const chip=(v,l)=>'<button class="chip'+(dashHeatFilter===v?' active':'')+'" onclick="dashHeatFilter=\''+v+'\';renderDashHeatChips();renderDashHeatmap()">'+l+'</button>';
+  let h=chip('eval','◎ Evaluation')+chip('funded','✓ Funded')+chip('live','★ Live');
+  h+=accGroups.map(g=>chip('g'+g.id,'🗂 '+g.name)).join('');
+  bar.innerHTML=h;
+}
+function renderDashHeatmap(){
+  const el=document.getElementById('dashHeatmap');if(!el)return;
+  let accs;
+  if(dashHeatFilter==='eval')accs=accounts.filter(a=>a.status==='eval');
+  else if(dashHeatFilter==='funded')accs=accounts.filter(a=>a.status==='funded');
+  else if(dashHeatFilter==='live')accs=accounts.filter(a=>a.status==='live');
+  else{const gid=Number(String(dashHeatFilter).slice(1));accs=accounts.filter(a=>(a.groups||[]).includes(gid));}
+  const dm={};accs.forEach(a=>(a.dailyEntries||[]).forEach(e=>{dm[e.date]=(dm[e.date]||0)+e.pnl;}));
+  const days=new Date(heatY,heatM+1,0).getDate();
+  const startDow=(new Date(heatY,heatM,1).getDay()+6)%7;
+  const monthVals=[];for(let d=1;d<=days;d++){const k=heatY+'-'+String(heatM+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');if(dm[k])monthVals.push(Math.abs(dm[k]));}
+  const mx=Math.max(...monthVals,1);
+  let cells='';
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d=>cells+='<div class="heat-dow">'+d+'</div>');
+  for(let i=0;i<startDow;i++)cells+='<div class="heat-cell off"></div>';
+  let monTot=0;
+  for(let d=1;d<=days;d++){
+    const k=heatY+'-'+String(heatM+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const v=dm[k];monTot+=v||0;
+    let style='',pl='';
+    if(v!==undefined&&v!==0){
+      const a=(0.25+0.65*(Math.abs(v)/mx)).toFixed(2);
+      style='background:rgba('+(v>0?'27,175,122':'239,68,68')+','+a+');color:#fff';
+      pl='<span class="hp">'+(v>0?'+':'−')+(Math.abs(v)>=1000?(Math.abs(v)/1000).toFixed(1)+'k':Math.round(Math.abs(v)))+'</span>';
+    }
+    cells+='<div class="heat-cell" style="'+style+'" title="'+fmtDate(k)+': '+fmtS(v||0)+'"><span>'+d+'</span>'+pl+'</div>';
+  }
+  el.innerHTML='<div class="heat-wrap"><div class="heat-head">'
+    +'<button class="heat-nav" onclick="heatM--;if(heatM<0){heatM=11;heatY--;}renderDashHeatmap()">‹</button>'
+    +'<div class="heat-title">'+MONTHS[heatM]+' '+heatY+' <span style="color:'+(monTot>=0?'var(--green)':'var(--red)')+';font-size:12px;margin-left:6px">'+fmtS(monTot)+'</span></div>'
+    +'<button class="heat-nav" onclick="heatM++;if(heatM>11){heatM=0;heatY++;}renderDashHeatmap()">›</button>'
+    +'</div><div class="heat-grid">'+cells+'</div>'
+    +(accs.length?'':'<div style="font-size:11px;color:var(--muted);margin-top:8px;text-align:center">No accounts in this view</div>')
+    +'</div>';
+}
+
+/* ── ACCOUNT SORT & VIEW ── */
+let accSort=localStorage.getItem('af_accsort')||'created',accView=localStorage.getItem('af_accview')||'cards';
+function setAccSort(v){accSort=v;localStorage.setItem('af_accsort',v);renderAccounts();}
+function toggleAccView(){accView=accView==='cards'?'list':'cards';localStorage.setItem('af_accview',accView);renderAccounts();}
 
 /* ── ACCOUNTS TAB ── */
 let accFormType='eval';
@@ -1072,7 +1255,7 @@ function saveAccount(){
     livePayoutGoal:parseInt(document.getElementById('af_liveGoal').value)||0,
     groups:[],resets:0,
     lastPayoutDate:null,lastPayoutAmount:0,dailyEntries:[],payouts:[],payoutPending:null});
-  saveAll();renderAccounts();document.getElementById('accForm').style.display='none';
+  saveAll();renderAccounts();document.getElementById('accForm').style.display='none';showToast('Account created ✓');
 }
 async function deleteAccount(id,e){e.stopPropagation();if(!await uiConfirm('Delete this account?\n\nAll its trading days and settings are removed.',{icon:'🗑️',title:'Delete account',okText:'Delete',danger:true}))return;accounts=accounts.filter(a=>a.id!==id);saveAll();renderAccounts();}
 function toggleStatus(id,e){e.stopPropagation();const i=accounts.findIndex(a=>a.id===id);if(i<0)return;const s=accounts[i].status;accounts[i].status=s==='eval'?'funded':s==='funded'?'live':'eval';if(accounts[i].status==='live'&&!accounts[i].liveDate)accounts[i].liveDate=todayStr();saveAll();renderAccounts();}
@@ -1098,7 +1281,7 @@ function confirmAccGroup(){
   const e=document.getElementById('newGroupName');const name=((e&&e.value)||'').trim();
   if(!name)return;
   const g={id:Date.now(),name};accGroups.push(g);
-  groupCreating=false;accFilter='g'+g.id;groupManage=true;saveAll();renderAccounts();
+  groupCreating=false;accFilter='g'+g.id;groupManage=true;saveAll();renderAccounts();showToast('Group created ✓ — click accounts to add them');
 }
 async function deleteAccGroup(){
   const gid=Number(String(accFilter).slice(1));const g=accGroups.find(x=>x.id===gid);if(!g)return;
@@ -1128,6 +1311,14 @@ function renderAccounts(){
   else if(gid!==null)vis=groupManage?accounts:accounts.filter(a=>(a.groups||[]).includes(gid));
   if(!vis.length){grid.innerHTML='';empty.style.display='block';empty.innerHTML='<i class="ti ti-filter"></i>No accounts in this view.';}
   else empty.style.display='none';
+  vis=[...vis];
+  if(accSort==='name')vis.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(accSort==='balance')vis.sort((a,b)=>getBalance(b)-getBalance(a));
+  else if(accSort==='pnl')vis.sort((a,b)=>getPeriodStats(b).netPnL-getPeriodStats(a).netPnL);
+  else if(accSort==='ready')vis.sort((a,b)=>{const s=x=>{const r=accReadyState(x);return r.canPayout||r.passReady?2:r.isPending?1:0;};return s(b)-s(a);});
+  const sortSel=document.getElementById('accSortSel');if(sortSel&&sortSel.value!==accSort)sortSel.value=accSort;
+  const viewBtn=document.getElementById('accViewBtn');if(viewBtn)viewBtn.innerHTML='<i class="ti ti-'+(accView==='list'?'layout-grid':'list')+'"></i>';
+  grid.classList.toggle('list-mode',accView==='list');
   const pf=vis.filter(a=>a.status==='funded'||a.status==='live');
   if(bar&&pf.length){
     const totBal=pf.reduce((s,a)=>s+getBalance(a),0);
@@ -1146,6 +1337,23 @@ function renderAccounts(){
       +'<div class="kpi"><div class="klbl">Accounts</div><div class="kval">'+pf.length+'</div></div>'
       +'</div>';
   }else if(bar){bar.style.display='none';}
+  if(accView==='list'&&!groupManage){
+    grid.innerHTML=vis.map(acc=>{
+      const r=accReadyState(acc);
+      const stTxt=r.isPending?'⏳ Pending':r.isLive?'★ Live':r.isFunded?(r.canPayout?'✓ Payout ready':(r.wd>0?r.profitDays+'/'+r.wd+' days':'—')):r.passReady?'🎓 Pass ready':((acc.target||0)>0?Math.min(100,Math.max(0,Math.round((r.netPnL/acc.target)*100)))+'% to target':'◎ Eval');
+      return '<div class="acc-row" onclick="openDetail('+acc.id+',event)">'
+        +'<span style="font-weight:600;font-size:13px">'+acc.name+'</span>'
+        +(acc.number?'<span style="font-size:11px;color:var(--muted)">#'+acc.number+'</span>':'')
+        +'<span class="badge '+(r.isPending?'bo':r.isLive?'bl':r.isFunded?'bg':'ba')+'">'+(r.isPending?'⏳':r.isLive?'★ Live':r.isFunded?'✓ Funded':'◎ Eval')+'</span>'
+        +'<span style="flex:1"></span>'
+        +'<span style="font-size:12px;color:var(--text2)">'+stTxt+'</span>'
+        +'<span style="font-weight:700;font-size:13px;color:'+(r.bal>=(acc.size||0)?'var(--blue)':'var(--red)')+'">'+fmt(r.bal)+'</span>'
+        +'<span style="font-size:12px;font-weight:600;color:'+(r.netPnL>=0?'var(--green)':'var(--red)')+'">'+fmtS(r.netPnL)+'</span>'
+        +'<span style="display:flex;gap:3px"><button class="iconbtn" onclick="toggleStatus('+acc.id+',event)"><i class="ti ti-refresh"></i></button><button class="iconbtn" onclick="deleteAccount('+acc.id+',event)"><i class="ti ti-trash"></i></button></span>'
+        +'</div>';
+    }).join('');
+    return;
+  }
   grid.innerHTML=vis.map(acc=>{
     const isFunded=acc.status==='funded',isLive=acc.status==='live',bal=getBalance(acc),isPending=!!(acc.payoutPending);
     const{netPnL,profitDays,relEntries}=getPeriodStats(acc);const wd=isLive?0:winDaysOf(acc);
@@ -1163,6 +1371,7 @@ function renderAccounts(){
     return '<div class="acccard '+cardClass+'" style="'+(groupManage&&inGroup?'border-color:var(--green);border-width:1.5px':'')+'" onclick="'+clickFn+'">'+manageRow+'<div class="acchead"><div class="acchead-left"><div class="accname">'+acc.name+'</div>'+(acc.number?'<div class="accnumber"><i class="ti ti-hash" style="font-size:11px"></i>'+acc.number+'</div>':'')+'</div><div style="display:flex;gap:3px"><button class="iconbtn" onclick="toggleStatus('+acc.id+',event)"><i class="ti ti-refresh"></i></button><button class="iconbtn" onclick="deleteAccount('+acc.id+',event)"><i class="ti ti-trash"></i></button></div></div>'
       +'<div class="acc-status-row"><span class="badge '+(isPending?'bo':isLive?'bl':passReady?'bg':isFunded?'bg':'ba')+'">'+(isPending?'⏳ Pending':isLive?'★ Live':passReady?'🎓 Pass Ready':isFunded?'✓ Funded':'◎ Evaluation')+'</span>'+bufBadge+conBadge+'<span style="font-size:11px;color:var(--muted);margin-left:auto">$'+Number(acc.size).toLocaleString('en-US')+'</span></div>'
       +'<div class="balance-box '+(balDelta>0?'up':balDelta<0?'down':'')+'"><div><div class="balance-label">Balance</div><div style="font-size:22px;font-weight:700;color:'+(bal>=(acc.size||0)?'var(--blue)':'var(--red)')+'">'+fmt(bal)+'</div></div><div style="text-align:right"><div class="balance-change-label">P&L</div><div style="font-size:14px;font-weight:600;color:'+(netPnL>=0?'var(--green)':'var(--red)')+'">'+fmtS(netPnL)+'</div></div></div>'
+      +sparkline(acc)
       +((isFunded||isLive)?'<div style="font-size:12px;color:var(--muted)">'+(isPending?'⏳ Awaiting payout approval':isLive?'★ Live — no payout requirements':wd===0?'No day req.':profitDays+'/'+wd+' win days')+(canPayout&&!isLive?' <span style="color:var(--green);font-weight:600">✓ Ready</span>':'')+'</div>'
         :target>0?'<div><div class="prog-lbl"><span>Progress '+pct+'%</span><span>Target: '+fmt((acc.size||0)+target)+'</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%;background:'+(passReady?'var(--green)':'var(--amber)')+'"></div></div>'+(passReady?'<div style="font-size:11px;color:var(--green);font-weight:600;margin-top:4px;display:flex;align-items:center;gap:4px"><i class="ti ti-badge" style="font-size:13px"></i> Ready to pass to Funded!</div>':'')+'</div>':'')
       +(isFunded&&acc.livePayoutGoal>0?'<div style="font-size:12px;color:var(--muted);margin-top:2px">💰 '+(acc.payouts||[]).length+'/'+acc.livePayoutGoal+' payouts → Live'+((acc.payouts||[]).length>=acc.livePayoutGoal?' <span style="color:var(--green);font-weight:600">✓ Eligible</span>':'')+'</div>':'')
@@ -1173,7 +1382,7 @@ function renderAccounts(){
 
 /* ── ENTRIES ── */
 function toggleEntryForm(){const f=document.getElementById('entryForm');const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){document.getElementById('fd').value=todayStr();['fa','fn'].forEach(id=>document.getElementById(id).value='');document.getElementById('ft').value='payout';document.getElementById('fc').value='profit';editId=null;}}
-function saveEntry(){const date=document.getElementById('fd').value,type=document.getElementById('ft').value,amount=parseFloat(document.getElementById('fa').value)||0,cat=document.getElementById('fc').value,note=document.getElementById('fn').value;if(!date||!amount){uiAlert('Please enter date and amount.');return;}if(editId!==null){const i=entries.findIndex(e=>e.id===editId);if(i>-1)entries[i]={...entries[i],date,type,amount,cat,note};editId=null;}else entries.push({id:Date.now(),date,type,amount,cat,note});entries.sort((a,b)=>b.date.localeCompare(a.date));saveAll();renderEntries();document.getElementById('entryForm').style.display='none';}
+function saveEntry(){const date=document.getElementById('fd').value,type=document.getElementById('ft').value,amount=parseFloat(document.getElementById('fa').value)||0,cat=document.getElementById('fc').value,note=document.getElementById('fn').value;if(!date||!amount){uiAlert('Please enter date and amount.');return;}if(editId!==null){const i=entries.findIndex(e=>e.id===editId);if(i>-1)entries[i]={...entries[i],date,type,amount,cat,note};editId=null;}else entries.push({id:Date.now(),date,type,amount,cat,note});entries.sort((a,b)=>b.date.localeCompare(a.date));saveAll();renderEntries();document.getElementById('entryForm').style.display='none';showToast('Entry saved ✓');}
 async function deleteEntry(id){if(!await uiConfirm('Delete this entry?',{icon:'🗑️',title:'Delete entry',okText:'Delete',danger:true}))return;entries=entries.filter(e=>e.id!==id);saveAll();renderEntries();}
 function editEntry(id){const e=entries.find(x=>x.id===id);if(!e)return;editId=id;document.getElementById('fd').value=e.date;document.getElementById('ft').value=e.type;document.getElementById('fa').value=e.amount;document.getElementById('fc').value=e.cat;document.getElementById('fn').value=e.note||'';document.getElementById('entryForm').style.display='block';}
 function setFilter(f,btn){filter=f;document.querySelectorAll('#tabEntries .chip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');renderEntries();}
@@ -1476,7 +1685,7 @@ function tlSaveDate(key){
     acc.payouts.sort((a,b)=>a.date.localeCompare(b.date));
     if(acc.payouts.length)acc.lastPayoutDate=acc.payouts[acc.payouts.length-1].date;
   }
-  _tlEdit=null;saveAll();renderTimeline();
+  _tlEdit=null;saveAll();renderTimeline();showToast('Date updated ✓');
 }
 
 /* ── JOURNAL ── */
@@ -1534,7 +1743,7 @@ function saveTrade(){
     impulse:_jImpulse,newsCtx:g('tj_news_ctx').trim(),session:_jSession,dayStart:g('tj_daystart').trim()};
   if(_jEditId){const i=trades.findIndex(t=>t.id===_jEditId);if(i>-1)trades[i]=trade;}else trades.push(trade);
   trades.sort((a,b)=>b.date.localeCompare(a.date));
-  saveAll();toggleTradeForm();renderJournal();
+  saveAll();toggleTradeForm();renderJournal();showToast('Trade saved ✓');
 }
 async function deleteTrade(id){if(!await uiConfirm('Delete this trade?',{icon:'🗑️',title:'Delete trade',okText:'Delete',danger:true}))return;trades=trades.filter(t=>t.id!==id);saveAll();renderTradeList();}
 function toggleJCard(id){const e=document.getElementById('jc_'+id);if(e)e.classList.toggle('open');}
@@ -1764,7 +1973,7 @@ function exportTaxCSV(){
 }
 
 /* ── INIT ── */
-migrateData();initTheme();renderAccounts();
+migrateData();initTheme();renderDashboard();
 </script>
 </body>
 </html>
