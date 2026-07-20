@@ -812,6 +812,7 @@ function migrateData(){
   try{const f=localStorage.getItem('af_folders');if(f)folders=JSON.parse(f);}catch(e){}
   try{const n=localStorage.getItem('af_notes');if(n)notes=JSON.parse(n);}catch(e){}
   try{const t=localStorage.getItem('af_trades');if(t)trades=JSON.parse(t);}catch(e){}
+  trades.forEach(t=>{if(t._importKey&&t.calmRating===3)t.calmRating=null;});
   try{const p=localStorage.getItem('af_playbooks');if(p)playbooks=JSON.parse(p);}catch(e){}
   try{const tc=localStorage.getItem('af_taxconfig');if(tc)taxConfig=Object.assign(taxConfig,JSON.parse(tc));}catch(e){}
   saveAll();
@@ -2089,7 +2090,7 @@ function confirmTradeImport(){
       setup:'Imported ('+t.rawSym+')',entryReason:'Entry '+t.entry.toFixed(2)+' → Exit '+t.exit.toFixed(2)+' · '+t.qty+' contract'+(t.qty>1?'s':''),
       target:'',sl:'',rr:'',followedPlan:null,hadDoubts:null,movedStop:null,moveReason:'',
       result:t.pnl>0?'win':t.pnl<0?'loss':'be',pnl:t.pnl,entryTimed:null,exit:String(t.exit.toFixed(2)),
-      whatDiff:'',calmRating:3,hadFOMO:null,revenge:null,impulse:false,newsCtx:'',session:'',dayStart:''});
+      whatDiff:'',calmRating:null,hadFOMO:null,revenge:null,impulse:false,newsCtx:'',session:'',dayStart:''});
     added++;
   });
   trades.sort((a,b)=>b.date.localeCompare(a.date));
@@ -2133,7 +2134,7 @@ function renderTradeList(){
   const am=Object.fromEntries(accounts.map(a=>[String(a.id),a.name]));
   if(list)list.innerHTML=vis.map(t=>{
     const accN=t.accountId?(am[String(t.accountId)]||'Deleted'):'';
-    const dots=Array.from({length:5},(_,i)=>'<div class="jcalm-dot'+(i<t.calmRating?' on':'')+'"></div>').join('');
+    const dots=t.calmRating?Array.from({length:5},(_,i)=>'<div class="jcalm-dot'+(i<t.calmRating?' on':'')+'"></div>').join(''):'';
     const pnlH=t.pnl!==0?(t.pnl>0?'<span style="color:var(--green);font-weight:700">+ '+fmt(t.pnl)+'</span>':'<span style="color:var(--red);font-weight:700">- '+fmt(Math.abs(t.pnl))+'</span>'):'';
     return '<div class="jcard" id="jc_'+t.id+'">'
       +'<div class="jcard-head" onclick="toggleJCard('+t.id+')">'
@@ -2152,7 +2153,7 @@ function renderTradeList(){
 function jDetailHTML(t){
   const yn=v=>v===true?'✓ Yes':v===false?'✗ No':'—';
   const fld=(l,v)=>'<div class="jfld"><div class="jfld-l">'+l+'</div><div class="jfld-v'+((!v||v==='—')?' empty':'')+'">'+(v||'—')+'</div></div>';
-  const dots=Array.from({length:5},(_,i)=>'<div class="jcalm-dot'+(i<t.calmRating?' on':'')+'" style="width:10px;height:10px"></div>').join('');
+  const dots=t.calmRating?Array.from({length:5},(_,i)=>'<div class="jcalm-dot'+(i<t.calmRating?' on':'')+'" style="width:10px;height:10px"></div>').join(''):'<span style="color:var(--muted)">— not tracked</span>';
   return '<div class="jsect" style="border-top:none;margin-top:0">🔍 Pre-Trade</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+fld('Setup / Pattern',t.setup)+fld('Target',t.target)+fld('Stop Loss',t.sl)+fld('R:R',t.rr)+'</div>'
     +(t.entryReason?fld('Entry Reason',t.entryReason):'')
