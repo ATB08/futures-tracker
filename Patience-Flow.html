@@ -221,7 +221,10 @@ tbody tr:hover td{background:var(--s2)}
 .ccard{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:1.25rem}
 .ctitle{font-size:13px;font-weight:500;margin-bottom:.75rem;display:flex;justify-content:space-between;align-items:center}
 .barchart{display:flex;align-items:flex-end;gap:4px;height:150px;border-bottom:.5px solid var(--border);margin-bottom:6px;padding-bottom:2px}
-.bcol{flex:1;min-width:20px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.bcol{flex:1;min-width:20px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;position:relative;border-radius:8px}
+.bcol:hover{background:var(--s2)}
+.btip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--surface);border:.5px solid var(--border-s);border-radius:10px;padding:8px 12px;font-size:11.5px;white-space:nowrap;z-index:20;box-shadow:0 8px 30px rgba(0,0,0,.3);pointer-events:none;line-height:1.7}
+.bcol:hover .btip{display:block}
 .bpair{display:flex;gap:2px;align-items:flex-end;width:100%;justify-content:center}
 .bseg{flex:1;max-width:22px;min-width:5px;border-radius:3px 3px 0 0}
 .blbl{font-size:9px;color:var(--muted);margin-top:4px;white-space:nowrap;text-align:center;max-width:42px;overflow:hidden;text-overflow:ellipsis}
@@ -948,7 +951,7 @@ function buildChartData(acc){
   const entryMap={};(acc.dailyEntries||[]).forEach(e=>{entryMap[e.date]=(entryMap[e.date]||0)+e.pnl;});
   const payoutMap={};(acc.payouts||[]).forEach(p=>{payoutMap[p.date]=(payoutMap[p.date]||0)+p.amount;});
   const eventDates=[...new Set([...Object.keys(entryMap),...Object.keys(payoutMap)])].sort();
-  const labels=['START'],balData=[size];
+  const labels=['START'],balData=[size],payoutPts=[null];
   let floor=lossLimit>0?size-lossLimit:null;const floorData=lossLimit>0?[floor]:null;
   const dll=Number(acc.dll)||0;const dllData=dll>0?[size-dll]:null;
   let bal=size,peak=size;
@@ -957,11 +960,12 @@ function buildChartData(acc){
     const pnl=entryMap[date]||0,payout=payoutMap[date]||0;bal+=pnl;
     if(lossLimit>0){peak=Math.max(peak,bal);if(isFunded){const pot=Math.min(peak-lossLimit,size);floor=Math.max(floor,pot);}else{const pot=peak-lossLimit;floor=Math.max(floor,pot);}}
     bal-=payout;labels.push(date);balData.push(bal);if(floorData!==null)floorData.push(floor);if(dllData!==null)dllData.push(prevClose-dll);
+    payoutPts.push(payout>0?payout:null);
   });
-  if(labels.length<2){labels.push(todayStr());balData.push(bal);if(floorData!==null)floorData.push(floor);if(dllData!==null)dllData.push(bal-dll);}
+  if(labels.length<2){labels.push(todayStr());balData.push(bal);if(floorData!==null)floorData.push(floor);if(dllData!==null)dllData.push(bal-dll);payoutPts.push(null);}
   const profitTargetLevel=(!isFunded&&acc.target>0)?size+acc.target:null;
   const bufferLevel=(acc.status==='funded'&&acc.payoutBuffer>0)?acc.payoutBuffer:null;
-  return{labels,balData,floorData,profitTargetLevel,dllData,bufferLevel};
+  return{labels,balData,floorData,profitTargetLevel,dllData,bufferLevel,payoutPts};
 }
 
 /* ── CONFETTI ── */
@@ -1102,7 +1106,7 @@ function renderDetailDayList(acc){
 
 function renderDetailChart(acc){
   if(detailChart){detailChart.destroy();detailChart=null;}
-  const{labels,balData,floorData,profitTargetLevel,dllData,bufferLevel}=buildChartData(acc);
+  const{labels,balData,floorData,profitTargetLevel,dllData,bufferLevel,payoutPts}=buildChartData(acc);
   const isDark=getIsDark(),gc=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
   const hasHistory=labels.length>2||(labels.length===2&&labels[1]!==todayStr());
   document.getElementById('chartSubLabel').textContent=hasHistory?'Balance over time':'Starting balance — add trading days to see history';
@@ -1114,9 +1118,10 @@ function renderDetailChart(acc){
   if(floorData)ds.push({label:'Loss Limit',data:floorData,borderColor:'#ef4444',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,4],tension:0,fill:false,pointRadius:0,pointHoverRadius:0});
   if(dllData)ds.push({label:'Daily Loss Limit',data:dllData,borderColor:'#f97316',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,4],stepped:true,fill:false,pointRadius:0,pointHoverRadius:0});
   if(bufferLevel!==null)ds.push({label:'Payout Buffer',data:labels.map(()=>bufferLevel),borderColor:'#1baf7a',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,4],tension:0,fill:false,pointRadius:0,pointHoverRadius:0});
+  if(payoutPts&&payoutPts.some(v=>v!==null))ds.push({label:'Payout',data:payoutPts.map((v,i)=>v!==null?balData[i]:null),showLine:false,pointStyle:'rectRot',pointRadius:8,pointHoverRadius:10,backgroundColor:'#f59e0b',borderColor:isDark?'#141413':'#fff',borderWidth:2,_payAmts:payoutPts});
   if(profitTargetLevel!==null)ds.push({label:'Profit Target',data:labels.map(()=>profitTargetLevel),borderColor:'#f59e0b',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,4],tension:0,fill:false,pointRadius:0,pointHoverRadius:0});
   const to={backgroundColor:isDark?'#1e1e1c':'#fff',borderColor:isDark?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.1)',borderWidth:1,titleColor:isDark?'#f5f5f0':'#0b0b0b',bodyColor:isDark?'#c3c2b7':'#52514e',padding:10};
-  detailChart=new Chart(ctx,{type:'line',data:{labels:dl,datasets:ds},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'top',labels:{color:isDark?'#c3c2b7':'#52514e',usePointStyle:true,padding:16,font:{size:12}}},tooltip:{...to,callbacks:{label:c=>' '+c.dataset.label+': '+fmt(c.parsed.y)}}},scales:{x:{grid:{color:gc},ticks:{color:'#898781',maxTicksLimit:10,font:{size:11}}},y:{grid:{color:gc},ticks:{color:'#898781',font:{size:11},callback:v=>'$'+Math.round(v).toLocaleString('en-US')}}}}});
+  detailChart=new Chart(ctx,{type:'line',data:{labels:dl,datasets:ds},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'top',labels:{color:isDark?'#c3c2b7':'#52514e',usePointStyle:true,padding:16,font:{size:12}}},tooltip:{...to,callbacks:{label:c=>c.dataset.label==='Payout'?' 💰 Payout received: '+fmt(c.dataset._payAmts[c.dataIndex]||0):' '+c.dataset.label+': '+fmt(c.parsed.y)}}},scales:{x:{grid:{color:gc},ticks:{color:'#898781',maxTicksLimit:10,font:{size:11}}},y:{grid:{color:gc},ticks:{color:'#898781',font:{size:11},callback:v=>'$'+Math.round(v).toLocaleString('en-US')}}}}});
 }
 
 function toggleDetailDayForm(){const el=document.getElementById('detailDayForm');if(!el)return;const o=el.style.display==='block';el.style.display=o?'none':'block';if(!o)setTimeout(()=>{const p=document.getElementById('dd_pnl');if(p)p.focus();},50);}
@@ -1576,7 +1581,7 @@ function renderAnalytics(){
   document.getElementById('chartKpi').innerHTML='<div class="kpi"><div class="klbl">Payouts</div><div class="kval g">+ '+fmt(totP)+'</div></div><div class="kpi"><div class="klbl">Expenses</div><div class="kval r">- '+fmt(totE)+'</div></div><div class="kpi"><div class="klbl">Net</div><div class="kval '+(net>=0?'g':'r')+'">'+fmtS(net)+'</div></div><div class="kpi"><div class="klbl">Count</div><div class="kval">'+pEntries.length+'</div></div><div class="kpi"><div class="klbl">Best Day</div><div class="kval g" style="font-size:14px">'+(bd?'★ '+fmt(bd[1]):'—')+'</div></div>';
   const bc=document.getElementById('barChart');
   if(!labels.length||(!totP&&!totE)){bc.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;color:var(--muted);font-size:13px">No data for this period</div>';}
-  else{const max=Math.max(...pData,...eData,1);bc.innerHTML=labels.map((lbl,i)=>{const ph=Math.round((pData[i]/max)*130),eh=Math.round((eData[i]/max)*130);return'<div class="bcol"><div class="bpair"><div class="bseg" style="height:'+ph+'px;background:var(--green);min-height:'+(pData[i]>0?2:0)+'px"></div><div class="bseg" style="height:'+eh+'px;background:var(--red);min-height:'+(eData[i]>0?2:0)+'px"></div></div><div class="blbl">'+lbl+'</div></div>';}).join('');}
+  else{const max=Math.max(...pData,...eData,1);bc.innerHTML=labels.map((lbl,i)=>{const ph=Math.round((pData[i]/max)*130),eh=Math.round((eData[i]/max)*130);const net=pData[i]-eData[i];const tip='<div class="btip"><div style="font-weight:700;margin-bottom:2px">'+lbl+'</div><div style="color:var(--green);font-weight:600">Payouts: + '+fmt(pData[i])+'</div><div style="color:var(--red);font-weight:600">Expenses: - '+fmt(eData[i])+'</div><div style="color:'+(net>=0?'var(--green)':'var(--red)')+';font-weight:700;border-top:.5px solid var(--border);margin-top:3px;padding-top:3px">Net: '+fmtS(net)+'</div></div>';return'<div class="bcol">'+tip+'<div class="bpair"><div class="bseg" style="height:'+ph+'px;background:var(--green);min-height:'+(pData[i]>0?2:0)+'px"></div><div class="bseg" style="height:'+eh+'px;background:var(--red);min-height:'+(eData[i]>0?2:0)+'px"></div></div><div class="blbl">'+lbl+'</div></div>';}).join('');}
   const sorted=Object.entries(dm).sort((a,b)=>b[1]-a[1]).slice(0,5);const medals=['🥇','🥈','🥉','4.','5.'];
   document.getElementById('topDays').innerHTML=sorted.length?sorted.map(([date,val],i)=>'<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:.5px solid var(--border);font-size:13px"><span>'+medals[i]+'</span><span style="flex:1;color:var(--text2)">'+fmtDate(date)+'</span><span style="font-weight:500;color:var(--green)">+ '+fmt(val)+'</span></div>').join(''):'<div class="empty"><i class="ti ti-trophy"></i>No data</div>';
   renderCumulativeChart();
