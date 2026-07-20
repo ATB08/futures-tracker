@@ -6,7 +6,80 @@
 <meta name="description" content="Patience — track and manage your futures trading accounts, phases, and performance.">
 <title>Patience — Futures Tracker</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+@font-face{font-family:"tabler-icons";font-style:normal;font-weight:400;src:url(data:font/woff2;base64,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) format("woff2")}
+.ti{font-family:"tabler-icons"!important;speak:never;font-style:normal;font-weight:normal;font-variant:normal;text-transform:none;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;display:inline-block}
+.ti-alert-octagon:before{content:"\ecc6"}
+.ti-alert-triangle:before{content:"\ea06"}
+.ti-arrow-left:before{content:"\ea19"}
+.ti-badge:before{content:"\efc2"}
+.ti-bell:before{content:"\ea35"}
+.ti-bell-ringing:before{content:"\ed07"}
+.ti-bookmark:before{content:"\ea3a"}
+.ti-books:before{content:"\eff2"}
+.ti-building-bank:before{content:"\ebe2"}
+.ti-bulb:before{content:"\ea51"}
+.ti-calculator:before{content:"\eb80"}
+.ti-calendar:before{content:"\ea53"}
+.ti-calendar-event:before{content:"\ea52"}
+.ti-calendar-month:before{content:"\fd2f"}
+.ti-calendar-stats:before{content:"\ee20"}
+.ti-calendar-week:before{content:"\fd30"}
+.ti-cash:before{content:"\ea55"}
+.ti-category:before{content:"\f1f6"}
+.ti-certificate:before{content:"\ed76"}
+.ti-chart-bar:before{content:"\ea59"}
+.ti-chart-line:before{content:"\ea5c"}
+.ti-check:before{content:"\ea5e"}
+.ti-circle-check:before{content:"\ea67"}
+.ti-circle-plus:before{content:"\ea69"}
+.ti-clock:before{content:"\ea70"}
+.ti-confetti:before{content:"\ee46"}
+.ti-database-export:before{content:"\ee6e"}
+.ti-database-import:before{content:"\ee6f"}
+.ti-download:before{content:"\ea96"}
+.ti-edit:before{content:"\ea98"}
+.ti-eraser:before{content:"\eb8b"}
+.ti-file-import:before{content:"\edea"}
+.ti-filter:before{content:"\eaa5"}
+.ti-flame:before{content:"\ec2c"}
+.ti-folder:before{content:"\eaad"}
+.ti-folder-plus:before{content:"\eaab"}
+.ti-hash:before{content:"\eabc"}
+.ti-hourglass:before{content:"\ef93"}
+.ti-info-circle:before{content:"\eac5"}
+.ti-layout-cards:before{content:"\ec13"}
+.ti-layout-dashboard:before{content:"\f02c"}
+.ti-layout-grid:before{content:"\edba"}
+.ti-list:before{content:"\eb6b"}
+.ti-list-details:before{content:"\ef40"}
+.ti-lock:before{content:"\eae2"}
+.ti-moon:before{content:"\eaf8"}
+.ti-news:before{content:"\eafd"}
+.ti-notebook:before{content:"\eb96"}
+.ti-notes:before{content:"\eb6e"}
+.ti-pencil:before{content:"\eb04"}
+.ti-plus:before{content:"\eb0b"}
+.ti-receipt:before{content:"\edfd"}
+.ti-receipt-tax:before{content:"\edbd"}
+.ti-refresh:before{content:"\eb13"}
+.ti-restore:before{content:"\fafd"}
+.ti-rocket:before{content:"\ec45"}
+.ti-school:before{content:"\ecf7"}
+.ti-settings:before{content:"\eb20"}
+.ti-shield:before{content:"\eb24"}
+.ti-shield-check:before{content:"\eb22"}
+.ti-star-filled:before{content:"\f6a6"}
+.ti-sun:before{content:"\eb30"}
+.ti-target:before{content:"\eb35"}
+.ti-timeline:before{content:"\f031"}
+.ti-trash:before{content:"\eb41"}
+.ti-trending-down:before{content:"\eb42"}
+.ti-trending-up:before{content:"\eb43"}
+.ti-trophy:before{content:"\eb45"}
+.ti-upload:before{content:"\eb47"}
+.ti-x:before{content:"\eb55"}
+</style>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#f8f8f7;--surface:#fff;--s2:#f1f0ec;--border:rgba(0,0,0,.1);--border-s:rgba(0,0,0,.18);--text:#0b0b0b;--text2:#52514e;--muted:#898781;--r:8px;--green:#1baf7a;--red:#ef4444;--blue:#3b82f6;--amber:#f59e0b;--purple:#8b5cf6;--gbg:#eaf3de;--gtx:#3b6d11;--rbg:#fef2f2;--rtx:#b91c1c;--bbg:#eff6ff;--btx:#1d4ed8;--abg:#fef3c7;--atx:#92400e;--obg:#fff7ed;--otx:#c2410c;--lbg:#ede9fe;--ltx:#6d28d9;}
@@ -14,7 +87,9 @@
 html[data-theme="dark"]{--bg:#141413;--surface:#1e1e1c;--s2:#262624;--border:rgba(255,255,255,.1);--border-s:rgba(255,255,255,.18);--text:#f5f5f0;--text2:#c3c2b7;--muted:#898781;--gbg:#173404;--gtx:#97c459;--rbg:#450a0a;--rtx:#fca5a5;--bbg:#1e3a5f;--btx:#93c5fd;--abg:#3d2800;--atx:#fde68a;--obg:#431407;--otx:#fdba74;--lbg:#2e1065;--ltx:#c4b5fd;}
 html[data-theme="light"]{--bg:#f8f8f7;--surface:#fff;--s2:#f1f0ec;--border:rgba(0,0,0,.1);--border-s:rgba(0,0,0,.18);--text:#0b0b0b;--text2:#52514e;--muted:#898781;--gbg:#eaf3de;--gtx:#3b6d11;--rbg:#fef2f2;--rtx:#b91c1c;--bbg:#eff6ff;--btx:#1d4ed8;--abg:#fef3c7;--atx:#92400e;--obg:#fff7ed;--otx:#c2410c;--lbg:#ede9fe;--ltx:#6d28d9;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
-.app-header{display:flex;align-items:center;gap:10px;padding:11px 1.5rem;border-bottom:.5px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100}
+.app-header{display:flex;align-items:center;gap:10px;padding:11px 1.5rem;border-bottom:.5px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100;-webkit-app-region:drag}
+.app-header button,.app-header .navtabs,.app-header input{-webkit-app-region:no-drag}
+body.electron .app-header{padding-left:86px}
 .app-logo{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;flex-shrink:0}
 .app-logo-icon{width:30px;height:30px;border-radius:7px;overflow:hidden;flex-shrink:0}
 .navtabs{display:flex;gap:2px;background:var(--s2);border-radius:var(--r);padding:3px;border:.5px solid var(--border);flex:1;max-width:530px;margin:0 auto}
@@ -146,7 +221,10 @@ tbody tr:hover td{background:var(--s2)}
 .ccard{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:1.25rem}
 .ctitle{font-size:13px;font-weight:500;margin-bottom:.75rem;display:flex;justify-content:space-between;align-items:center}
 .barchart{display:flex;align-items:flex-end;gap:4px;height:150px;border-bottom:.5px solid var(--border);margin-bottom:6px;padding-bottom:2px}
-.bcol{flex:1;min-width:20px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.bcol{flex:1;min-width:20px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;position:relative;border-radius:8px}
+.bcol:hover{background:var(--s2)}
+.btip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--surface);border:.5px solid var(--border-s);border-radius:10px;padding:8px 12px;font-size:11.5px;white-space:nowrap;z-index:20;box-shadow:0 8px 30px rgba(0,0,0,.3);pointer-events:none;line-height:1.7}
+.bcol:hover .btip{display:block}
 .bpair{display:flex;gap:2px;align-items:flex-end;width:100%;justify-content:center}
 .bseg{flex:1;max-width:22px;min-width:5px;border-radius:3px 3px 0 0}
 .blbl{font-size:9px;color:var(--muted);margin-top:4px;white-space:nowrap;text-align:center;max-width:42px;overflow:hidden;text-overflow:ellipsis}
@@ -243,6 +321,37 @@ tbody tr:hover td{background:var(--s2)}
 .tl-dot.tl-payout{background:var(--gbg);border-color:var(--green)}
 .tl-dot.tl-pending{background:var(--abg);border-color:var(--amber)}
 .tl-dot.tl-live{background:var(--lbg);border-color:var(--purple)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);z-index:10000;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal-card{background:var(--surface);border:.5px solid var(--border-s);border-radius:14px;padding:1.4rem 1.5rem;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:modalIn .16s ease}
+@keyframes modalIn{0%{transform:scale(.94);opacity:0}100%{transform:scale(1);opacity:1}}
+.modal-icon{font-size:28px;margin-bottom:10px;line-height:1}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:6px}
+.modal-msg{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:18px;white-space:pre-line}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.modal-btn{padding:8px 18px;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;border:.5px solid var(--border-s);background:transparent;color:var(--text)}
+.modal-btn:hover{background:var(--s2)}
+.modal-btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.modal-btn.primary:hover{background:#2563eb}
+.modal-btn.danger{background:var(--red);border-color:var(--red);color:#fff}
+.modal-btn.danger:hover{background:#dc2626}
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:10001;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:var(--surface);border:.5px solid var(--border-s);border-left:3px solid var(--green);border-radius:10px;padding:10px 16px;font-size:13px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.25);display:flex;gap:8px;align-items:center;animation:toastIn .2s ease}
+@keyframes toastIn{0%{transform:translateX(24px);opacity:0}100%{transform:none;opacity:1}}
+.heat-wrap{max-width:560px;background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);padding:1rem}
+.heat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.heat-title{font-size:13px;font-weight:600}
+.heat-nav{background:none;border:.5px solid var(--border-s);border-radius:6px;color:var(--text2);cursor:pointer;padding:2px 9px;font-size:13px}
+.heat-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.heat-dow{font-size:9px;color:var(--muted);text-align:center;text-transform:uppercase;letter-spacing:.04em;padding-bottom:2px}
+.heat-cell{aspect-ratio:1.15;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--text2);background:var(--s2);cursor:default;min-height:34px}
+.heat-cell.off{background:transparent}
+.heat-cell .hp{font-size:8.5px;font-weight:700;margin-top:1px}
+.acc-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border:.5px solid var(--border);border-radius:10px;cursor:pointer;flex-wrap:wrap}
+.acc-row:hover{border-color:var(--border-s)}
+.accgrid.list-mode{display:flex;flex-direction:column;gap:8px}
+.dash-ready-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border:.5px solid var(--border);border-radius:10px;cursor:pointer;flex-wrap:wrap;margin-bottom:8px}
+.dash-ready-row:hover{border-color:var(--border-s)}
 .tl-body{flex:1;padding-top:3px}
 .tl-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:1px}
 .tl-sub{font-size:11px;color:var(--muted)}
@@ -304,13 +413,17 @@ tbody tr:hover td{background:var(--s2)}
     </div>Patience
   </div>
   <div class="navtabs">
-    <button class="ntab active" data-view="accounts" onclick="showTab('accounts',this)"><i class="ti ti-layout-cards"></i> Accounts</button>
+    <button class="ntab active" data-view="dashboard" onclick="showTab('dashboard',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
+    <button class="ntab" data-view="accounts" onclick="showTab('accounts',this)"><i class="ti ti-layout-cards"></i> Accounts</button>
     <button class="ntab" data-view="notes" onclick="showTab('notes',this)"><i class="ti ti-notes"></i> Notes/News</button>
     <button class="ntab" data-view="journal" onclick="showTab('journal',this)"><i class="ti ti-notebook"></i> Journal</button>
     <button class="ntab" data-view="entries" onclick="showTab('entries',this)"><i class="ti ti-list-details"></i> Entries</button>
     <button class="ntab" data-view="analytics" onclick="showTab('analytics',this)"><i class="ti ti-chart-bar"></i> Analytics</button>
     <button class="ntab" data-view="achievements" onclick="showTab('achievements',this)"><i class="ti ti-trophy"></i> Records</button>
   </div>
+  <button class="theme-btn" onclick="exportData()" title="Export data (backup file)"><i class="ti ti-database-export"></i></button>
+  <button class="theme-btn" onclick="document.getElementById('importFile').click()" title="Import data (from backup file)"><i class="ti ti-database-import"></i></button>
+  <input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="importData(this)">
   <button class="theme-btn" onclick="showTab('tax',null)" title="Tax"><i class="ti ti-receipt-tax"></i></button>
   <button class="theme-btn" onclick="toggleTheme()"><i class="ti ti-moon" id="themeIcon"></i></button>
 </div>
@@ -353,17 +466,38 @@ tbody tr:hover td{background:var(--s2)}
   </div>
 </div></div>
 
+<!-- TAB: DASHBOARD -->
+<div id="tabDashboard" class="page">
+  <div id="dashKpis" style="margin-bottom:1.5rem"></div>
+  <div class="stitle"><i class="ti ti-cash"></i> Payout Readiness</div>
+  <div id="dashReady" style="margin-bottom:1.75rem"></div>
+  <div class="stitle"><i class="ti ti-calendar-stats"></i> P&L Heatmap</div>
+  <div class="chips" id="dashHeatChips" style="margin-bottom:.75rem"></div>
+  <div id="dashHeatmap" style="margin-bottom:1.75rem"></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.25rem">
+    <div><div class="stitle"><i class="ti ti-notebook"></i> Recent Trades</div><div id="dashTrades"></div></div>
+    <div><div class="stitle"><i class="ti ti-notes"></i> This Week</div><div id="dashNotes"></div></div>
+  </div>
+</div>
+
 <!-- TAB: ACCOUNTS -->
-<div id="tabAccounts" class="page">
+<div id="tabAccounts" class="page" style="display:none">
   <div class="chips" id="accFilterBar" style="margin-bottom:.75rem"></div>
-  <button class="addbtn" onclick="toggleAccForm()"><i class="ti ti-plus"></i> Add Account</button>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;flex-wrap:wrap">
+    <button class="addbtn" style="margin-bottom:0" onclick="toggleAccForm()"><i class="ti ti-plus"></i> Add Account</button>
+    <span style="flex:1"></span>
+    <select id="accSortSel" onchange="setAccSort(this.value)" style="padding:6px 10px;font-size:12px;border-radius:8px;border:.5px solid var(--border-s);background:var(--surface);color:var(--text);cursor:pointer">
+      <option value="created">Newest first</option><option value="name">Name</option><option value="balance">Balance</option><option value="pnl">P&L</option><option value="ready">Payout-ready first</option>
+    </select>
+    <button class="iconbtn" id="accViewBtn" onclick="toggleAccView()" title="Toggle compact view" style="border:.5px solid var(--border-s);border-radius:8px;padding:6px 9px"><i class="ti ti-list"></i></button>
+  </div>
   <div class="fcard" id="accForm">
     <div class="fgrid">
       <!-- Account type toggle -->
       <div class="full">
         <label>Account Type</label>
         <div style="display:flex;gap:8px;margin-top:5px">
-          <button type="button" id="typeEval" class="type-btn active" onclick="setAccType('eval')">◎ Evaluation</button>
+          <button type="button" id="typeEval" class="type-btn active" onclick="setAccType('eval')"><i class="ti ti-target"></i> Evaluation</button>
           <button type="button" id="typeFunded" class="type-btn" onclick="setAccType('funded')">✓ Already Funded</button>
         </div>
       </div>
@@ -382,7 +516,7 @@ tbody tr:hover td{background:var(--s2)}
         <option value="5">5 payouts</option><option value="6">6 payouts</option><option value="8">8 payouts</option><option value="10">10 payouts</option>
       </select></div>
       <!-- Eval-only fields -->
-      <div class="fsection af-eval-only">◎ Evaluation Stage</div>
+      <div class="fsection af-eval-only"><i class="ti ti-target"></i> Evaluation Stage</div>
       <div class="af-eval-only"><label>Profit Target (USD)</label><input type="number" id="af_target" placeholder="e.g. 4000" step="0.01"></div>
       <div class="af-eval-only"><label>Loss Limit — Eval (USD)</label><input type="number" id="af_evalLoss" placeholder="e.g. 2000" step="0.01"></div>
       <div class="af-eval-only"><label>Consistency Rule — Eval</label><select id="af_evalCon">
@@ -390,7 +524,7 @@ tbody tr:hover td{background:var(--s2)}
       </select></div>
       <div class="af-eval-only"><label>Consistency % — Eval</label><input type="number" id="af_evalConPct" placeholder="e.g. 30" min="0.1" max="100" step="0.1"></div>
       <!-- Funded fields (always shown, label changes) -->
-      <div class="fsection" id="af_fundedLabel">✓ Funded Stage (pre-configure)</div>
+      <div class="fsection" id="af_fundedLabel"><i class="ti ti-circle-check"></i> Funded Stage (pre-configure)</div>
       <div><label>Loss Limit — Funded / Trailing (USD)</label><input type="number" id="af_loss" placeholder="e.g. 3000" step="0.01"></div>
       <div><label>Required Win Days</label><select id="af_windays">
         <option value="0">None</option><option value="1">1 day</option><option value="2">2 days</option>
@@ -401,6 +535,8 @@ tbody tr:hover td{background:var(--s2)}
         <option value="0">None</option><option value="1">Yes — apply rule</option>
       </select></div>
       <div><label>Consistency % — Funded</label><input type="number" id="af_conPct" placeholder="e.g. 50.5" min="0.1" max="100" step="0.1"></div>
+      <div><label>Payout Buffer — min. balance (USD)</label><input type="number" id="af_buffer" placeholder="Optional — e.g. 52600" step="0.01"></div>
+      <div><label>Profit Split — your share (%)</label><input type="number" id="af_split" placeholder="e.g. 90 — empty = 100" min="1" max="100" step="0.1"></div>
     </div>
     <div class="factions"><button class="savebtn" onclick="saveAccount()">Save</button><button class="cancelbtn" onclick="toggleAccForm()">Cancel</button></div>
   </div>
@@ -417,7 +553,11 @@ tbody tr:hover td{background:var(--s2)}
         <div class="stitle" style="margin-bottom:2px"><i class="ti ti-calendar-week"></i> Notes / News</div>
         <div id="weekLabel" style="font-size:11px;color:var(--muted)"></div>
       </div>
-      <button class="clearbtn" onclick="clearWeeklyNotes()"><i class="ti ti-trash"></i> Clear week</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="addbtn" style="margin-bottom:0" onclick="document.getElementById('reportFile').click()" title="Import a weekly report (e.g. Cowork USD report)"><i class="ti ti-file-import"></i> Import Report</button>
+        <input type="file" id="reportFile" accept=".html,.htm,text/html" style="display:none" onchange="importWeekReport(this)">
+        <button class="clearbtn" onclick="clearWeeklyNotes()"><i class="ti ti-trash"></i> Clear week</button>
+      </div>
     </div>
   </div>
   <div class="week-grid">
@@ -472,7 +612,7 @@ tbody tr:hover td{background:var(--s2)}
       <div class="full"><label>Doubts / wanted to exit early?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jdoubt_y" onclick="setJField('doubts',true)">✓ Yes</button><button type="button" class="jyn-btn" id="jdoubt_n" onclick="setJField('doubts',false)">✗ No</button></div></div>
       <div class="full"><label>Moved your stop?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jm_y" onclick="setJField('movedStop',true)">✓ Yes</button><button type="button" class="jyn-btn" id="jm_n" onclick="setJField('movedStop',false)">✗ No</button></div></div>
       <div class="full" id="jMSRWrap" style="display:none"><label>Reason — stop moved</label><input type="text" id="tj_move_reason" placeholder="Why did you move the stop?"></div>
-      <div class="fsection full">📊 Post-Trade</div>
+      <div class="fsection full"><i class="ti ti-chart-bar"></i> Post-Trade</div>
       <div class="full"><label>Result</label><div style="display:flex;gap:8px;margin-top:5px"><button type="button" id="jr_win" class="type-btn active" onclick="setJResult('win')">✓ Win</button><button type="button" id="jr_loss" class="type-btn" onclick="setJResult('loss')">✗ Loss</button><button type="button" id="jr_be" class="type-btn" onclick="setJResult('be')">○ Break Even</button></div></div>
       <div class="full"><label>P&amp;L (USD)</label><input type="number" id="tj_pnl" placeholder="+250 or −150" step="0.01"></div>
       <div class="full"><label>Was the entry well-timed?</label><div class="jyn-row"><button type="button" class="jyn-btn" id="jtimed_y" onclick="setJField('timed',true)">✓ Yes</button><button type="button" class="jyn-btn" id="jtimed_n" onclick="setJField('timed',false)">✗ No</button></div></div>
@@ -540,21 +680,22 @@ tbody tr:hover td{background:var(--s2)}
 
 <!-- TAB: TAX -->
 <div id="tabTax" class="page" style="display:none">
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem">
-    <div class="chips" id="taxYearChips" style="margin-bottom:0"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:.75rem">
+    <div class="chips" id="taxModeChips" style="margin-bottom:0"></div>
     <button class="addbtn" onclick="exportTaxCSV()" style="margin-bottom:0"><i class="ti ti-download"></i> Export CSV</button>
   </div>
+  <div id="taxRangeControls" style="margin-bottom:1.25rem"></div>
   <div class="krow" id="taxKpiRow"></div>
   <div class="stitle"><i class="ti ti-category"></i> Deductible Expense Categories</div>
   <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Click to toggle whether a category counts as a tax-deductible expense.</div>
   <div id="taxCatSettings" style="margin-bottom:1.25rem"></div>
   <div class="stitle"><i class="ti ti-list"></i> Expense Breakdown</div>
-  <div class="twrap"><table><thead><tr><th>Category</th><th class="tar">Count</th><th class="tar">Amount</th><th>Deductible</th></tr></thead><tbody id="taxCatBody"></tbody></table><div id="taxCatEmpty" class="empty" style="display:none"><i class="ti ti-receipt"></i>No expenses this year.</div></div>
+  <div class="twrap"><table><thead><tr><th>Category</th><th class="tar">Count</th><th class="tar">Amount</th><th>Deductible</th></tr></thead><tbody id="taxCatBody"></tbody></table><div id="taxCatEmpty" class="empty" style="display:none"><i class="ti ti-receipt"></i>No expenses in this period.</div></div>
 </div>
 
 <!-- TAB: ANALYTICS -->
 <div id="tabAnalytics" class="page" style="display:none">
-  <div class="chips" id="periodChips"><button class="pchip active" onclick="setPeriod('1M',this)">1 Month</button><button class="pchip" onclick="setPeriod('3M',this)">3 Months</button><button class="pchip" onclick="setPeriod('6M',this)">6 Months</button><button class="pchip" onclick="setPeriod('1J',this)">1 Year</button><button class="pchip" onclick="setPeriod('ALL',this)">All Time</button></div>
+  <div class="chips" id="periodChips"><button class="pchip active" onclick="setPeriod('ALL',this)">All Time</button><button class="pchip" onclick="setPeriod('1M',this)">1 Month</button><button class="pchip" onclick="setPeriod('3M',this)">3 Months</button><button class="pchip" onclick="setPeriod('6M',this)">6 Months</button><button class="pchip" onclick="setPeriod('1J',this)">1 Year</button></div>
   <div class="krow" id="chartKpi"></div>
   <div class="ccard"><div class="ctitle"><span id="chartTitle">–</span><span style="font-size:11px;color:var(--muted)">Green = Payouts · Red = Expenses</span></div><div class="barchart" id="barChart"><div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;color:var(--muted);font-size:13px">No data yet</div></div><div class="clegend"><div class="cli"><div class="cldot" style="background:var(--green)"></div>Payouts</div><div class="cli"><div class="cldot" style="background:var(--red)"></div>Expenses</div></div></div>
   <div class="stitle"><i class="ti ti-trending-up"></i> Cumulative Earnings</div>
@@ -606,9 +747,10 @@ const CATS={profit:'Profit Withdrawal',fee:'Platform Fee',subscription:'Subscrip
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const FEMOJI={'#3b82f6':'📁','#1baf7a':'📂','#f97316':'🗂️','#8b5cf6':'📋','#ec4899':'📌','#f59e0b':'⭐','#ef4444':'🏆','#14b8a6':'📎','#6b7280':'🗃️'};
 
-let entries=[],accounts=[],folders=[],trades=[],playbooks=[],filter='all',editId=null,currentPeriod='1M',currentTab='accounts';
+let entries=[],accounts=[],folders=[],trades=[],playbooks=[],filter='all',editId=null,currentPeriod='ALL',currentTab='dashboard';
 let accGroups=[],accFilter='all',groupManage=false,_tlEdit=null;
 let taxConfig={deductibleCats:{fee:true,subscription:true,reset:true,news:true,hardware:true,other:false}},currentTaxYear=null;
+let taxMode='year',taxMonth=null,taxFrom='',taxTo='';
 let detailAccId=null,detailChart=null,cumulativeChart=null,selectedFolderId=null,selectedColor='#3b82f6';
 let _jFilter='all',_jDir='long',_jResult='win',_jFollowed=null,_jDoubts=null,_jMovedStop=null,_jTimed=null;
 let _jFOMO=null,_jRevenge=null,_jImpulse=false,_jCalm=3,_jSession='',_jEditId=null;
@@ -661,6 +803,8 @@ function migrateData(){
     if(acc.livePayoutGoal===undefined)acc.livePayoutGoal=0;
     if(acc.resets===undefined)acc.resets=0;
     if(acc.liveDate===undefined)acc.liveDate=null;
+    if(acc.payoutBuffer===undefined)acc.payoutBuffer=0;
+    if(acc.profitSplit===undefined)acc.profitSplit=100;
   });
   try{const g=localStorage.getItem('af_accgroups');if(g)accGroups=JSON.parse(g);}catch(e){}
   try{const f=localStorage.getItem('af_folders');if(f)folders=JSON.parse(f);}catch(e){}
@@ -670,13 +814,105 @@ function migrateData(){
   try{const tc=localStorage.getItem('af_taxconfig');if(tc)taxConfig=Object.assign(taxConfig,JSON.parse(tc));}catch(e){}
   saveAll();
 }
-function saveAll(){try{localStorage.setItem('af_entries',JSON.stringify(entries));}catch(e){}try{localStorage.setItem('af_accs',JSON.stringify(accounts));}catch(e){}try{localStorage.setItem('af_folders',JSON.stringify(folders));}catch(e){alert('Storage limit reached.');}try{localStorage.setItem('af_trades',JSON.stringify(trades));}catch(e){}try{localStorage.setItem('af_playbooks',JSON.stringify(playbooks));}catch(e){}try{localStorage.setItem('af_taxconfig',JSON.stringify(taxConfig));}catch(e){}try{localStorage.setItem('af_accgroups',JSON.stringify(accGroups));}catch(e){}}
+function saveAll(){try{localStorage.setItem('af_entries',JSON.stringify(entries));}catch(e){}try{localStorage.setItem('af_accs',JSON.stringify(accounts));}catch(e){}try{localStorage.setItem('af_folders',JSON.stringify(folders));}catch(e){uiAlert('Storage limit reached.');}try{localStorage.setItem('af_trades',JSON.stringify(trades));}catch(e){}try{localStorage.setItem('af_playbooks',JSON.stringify(playbooks));}catch(e){}try{localStorage.setItem('af_taxconfig',JSON.stringify(taxConfig));}catch(e){}try{localStorage.setItem('af_accgroups',JSON.stringify(accGroups));}catch(e){}pushDesktopStats();checkPayoutReadyNotify();}
+
+/* ── DESKTOP APP: menu bar + mini widget stats ── */
+function pushDesktopStats(){
+  if(!(window.patienceDesktop&&window.patienceDesktop.updateStats))return;
+  try{
+    const pf=accounts.filter(a=>a.status==='funded'||a.status==='live');
+    const totBal=pf.reduce((s,a)=>s+getBalance(a),0);
+    const t=todayStr();let today=0;
+    accounts.forEach(a=>(a.dailyEntries||[]).forEach(e=>{if(e.date===t)today+=e.pnl;}));
+    const period=pf.reduce((s,a)=>s+getPeriodStats(a).netPnL,0);
+    let readyCount=0;
+    const lines=accounts.map(a=>{
+      const r=accReadyState(a);let st;
+      if(r.isPending)st='Payout pending approval';
+      else if(r.isLive)st='Live — payout anytime';
+      else if(r.isFunded){
+        if(r.canPayout){st='Ready to request payout ✓';}
+        else if(r.wd>0&&r.profitDays<r.wd)st=(r.wd-r.profitDays)+' win day'+(r.wd-r.profitDays>1?'s':'')+' needed';
+        else if(!r.bufferOk)st='Below payout buffer';
+        else if(!r.conOk)st='Consistency not met';
+        else st='Funded';
+      }else st=((a.target||0)>0?Math.min(100,Math.max(0,Math.round((r.netPnL/a.target)*100)))+'% to target':'Evaluation');
+      if(r.canPayout)readyCount++;
+      return{name:a.name,status:st};
+    });
+    let winProgress=null,winReady=false;
+    let best=-1;
+    accounts.forEach(a=>{
+      if(a.status!=='funded'||a.payoutPending)return;
+      const r=accReadyState(a);
+      if(r.canPayout){winReady=true;winProgress=null;best=2;return;}
+      const wd=winDaysOf(a);if(wd<=0||best>=2)return;
+      const ratio=Math.min(r.profitDays,wd)/wd;
+      if(ratio>best){best=ratio;winProgress=Math.min(r.profitDays,wd)+'/'+wd;}
+    });
+    const dk=['sun','mon','tue','wed','thu','fri','sat'][new Date().getDay()];
+    const todayNews=((notes.news||{})[dk]||[]).slice().sort((a,b)=>(a.time||'').localeCompare(b.time||'')).slice(0,3).map(n=>({time:n.time||'',text:n.text,impact:n.impact||'high'}));
+    const accountsMin=accounts.map(a=>({id:a.id,name:a.name,status:a.status}));
+    window.patienceDesktop.updateStats({totBal,today,period,readyCount,lines,winProgress,winReady,todayNews,accountsMin});
+  }catch(e){}
+}
+
+/* ── CUSTOM DIALOGS (replaces native alert/confirm) ── */
+let _modalRes=null;
+function uiDialog(msg,opts){
+  opts=opts||{};
+  return new Promise(res=>{
+    _modalRes=res;
+    let ov=document.getElementById('uiModal');
+    if(!ov){ov=document.createElement('div');ov.id='uiModal';ov.className='modal-overlay';document.body.appendChild(ov);}
+    const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    ov.innerHTML='<div class="modal-card">'
+      +(opts.icon?'<div class="modal-icon">'+opts.icon+'</div>':'')
+      +(opts.title?'<div class="modal-title">'+esc(opts.title)+'</div>':'')
+      +'<div class="modal-msg">'+esc(msg)+'</div>'
+      +'<div class="modal-actions">'
+      +(opts.confirm?'<button class="modal-btn" onclick="_uiModalDone(false)">Cancel</button>':'')
+      +'<button class="modal-btn '+(opts.danger?'danger':'primary')+'" onclick="_uiModalDone(true)">'+esc(opts.okText||'OK')+'</button>'
+      +'</div></div>';
+    ov.classList.add('open');
+    ov.onclick=e=>{if(e.target===ov&&opts.confirm)_uiModalDone(false);};
+  });
+}
+function _uiModalDone(v){const ov=document.getElementById('uiModal');if(ov)ov.classList.remove('open');const r=_modalRes;_modalRes=null;if(r)r(v);}
+function uiAlert(msg,opts){return uiDialog(msg,Object.assign({confirm:false,icon:'<i class="ti ti-info-circle"></i>'},opts||{}));}
+function uiConfirm(msg,opts){return uiDialog(msg,Object.assign({confirm:true},opts||{}));}
+document.addEventListener('keydown',e=>{const ov=document.getElementById('uiModal');if(!ov||!ov.classList.contains('open'))return;if(e.key==='Escape')_uiModalDone(false);else if(e.key==='Enter')_uiModalDone(true);});
+
+/* ── EXPORT / IMPORT (backup file — e.g. browser → desktop app) ── */
+function exportData(){
+  const data={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('af_'))data[k]=localStorage.getItem(k);}
+  const blob=new Blob([JSON.stringify({app:'patience-flow',exported:new Date().toISOString(),data},null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='patience-flow-backup-'+todayStr()+'.json';document.body.appendChild(a);a.click();a.remove();
+  URL.revokeObjectURL(url);
+  showToast('Backup downloaded ✓ — import it in the app to transfer your data');
+}
+async function importData(input){
+  const file=input.files&&input.files[0];input.value='';if(!file)return;
+  let data=null;
+  try{const parsed=JSON.parse(await file.text());if(parsed&&parsed.data&&typeof parsed.data==='object')data=parsed.data;}catch(e){}
+  if(!data||!Object.keys(data).some(k=>k.startsWith('af_'))){uiAlert('This file is not a valid Patience-Flow backup.',{icon:'<i class="ti ti-alert-triangle"></i>',title:'Import failed'});return;}
+  if(!await uiConfirm('This replaces ALL current data here with the data from the backup file.\n\nContinue?',{icon:'<i class="ti ti-database-import"></i>',title:'Import backup',okText:'Import',danger:true}))return;
+  for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&k.startsWith('af_'))localStorage.removeItem(k);}
+  Object.keys(data).forEach(k=>{if(k.startsWith('af_'))localStorage.setItem(k,data[k]);});
+  location.reload();
+}
 
 /* ── BALANCE & STATS ── */
 function getBalance(acc){const p=(acc.dailyEntries||[]).reduce((s,e)=>s+e.pnl,0);const py=(acc.payouts||[]).reduce((s,x)=>s+x.amount,0);return(acc.size||0)+p-py;}
 function getPeriodStats(acc){
   const lastDate=(acc.status==='funded'||acc.status==='live')?acc.lastPayoutDate:null;
-  const rel=lastDate?(acc.dailyEntries||[]).filter(e=>e.date>lastDate):(acc.dailyEntries||[]);
+  let rel;
+  if(lastDate){
+    const pids=(acc.payouts||[]).filter(p=>p.date===lastDate).map(p=>p.id);
+    const cut=pids.length?Math.max(...pids):null;
+    rel=(acc.dailyEntries||[]).filter(e=>e.date>lastDate||(e.date===lastDate&&cut!==null&&e.id>cut));
+  }else rel=(acc.dailyEntries||[]);
   const dm={};rel.forEach(e=>{dm[e.date]=(dm[e.date]||0)+e.pnl;});
   return{netPnL:rel.reduce((s,e)=>s+e.pnl,0),profitDays:Object.values(dm).filter(v=>v>0).length,lossDays:Object.values(dm).filter(v=>v<0).length,relEntries:rel};
 }
@@ -715,7 +951,7 @@ function buildChartData(acc){
   const entryMap={};(acc.dailyEntries||[]).forEach(e=>{entryMap[e.date]=(entryMap[e.date]||0)+e.pnl;});
   const payoutMap={};(acc.payouts||[]).forEach(p=>{payoutMap[p.date]=(payoutMap[p.date]||0)+p.amount;});
   const eventDates=[...new Set([...Object.keys(entryMap),...Object.keys(payoutMap)])].sort();
-  const labels=['START'],balData=[size];
+  const labels=['START'],balData=[size],payoutPts=[null];
   let floor=lossLimit>0?size-lossLimit:null;const floorData=lossLimit>0?[floor]:null;
   const dll=Number(acc.dll)||0;const dllData=dll>0?[size-dll]:null;
   let bal=size,peak=size;
@@ -724,10 +960,12 @@ function buildChartData(acc){
     const pnl=entryMap[date]||0,payout=payoutMap[date]||0;bal+=pnl;
     if(lossLimit>0){peak=Math.max(peak,bal);if(isFunded){const pot=Math.min(peak-lossLimit,size);floor=Math.max(floor,pot);}else{const pot=peak-lossLimit;floor=Math.max(floor,pot);}}
     bal-=payout;labels.push(date);balData.push(bal);if(floorData!==null)floorData.push(floor);if(dllData!==null)dllData.push(prevClose-dll);
+    payoutPts.push(payout>0?payout:null);
   });
-  if(labels.length<2){labels.push(todayStr());balData.push(bal);if(floorData!==null)floorData.push(floor);if(dllData!==null)dllData.push(bal-dll);}
+  if(labels.length<2){labels.push(todayStr());balData.push(bal);if(floorData!==null)floorData.push(floor);if(dllData!==null)dllData.push(bal-dll);payoutPts.push(null);}
   const profitTargetLevel=(!isFunded&&acc.target>0)?size+acc.target:null;
-  return{labels,balData,floorData,profitTargetLevel,dllData};
+  const bufferLevel=(acc.status==='funded'&&acc.payoutBuffer>0)?acc.payoutBuffer:null;
+  return{labels,balData,floorData,profitTargetLevel,dllData,bufferLevel,payoutPts};
 }
 
 /* ── CONFETTI ── */
@@ -764,14 +1002,14 @@ function triggerConfetti(){
 /* ── TAB SWITCHING ── */
 function showTab(tab,btn){
   currentTab=tab;document.getElementById('accountDetail').style.display='none';
-  ['Accounts','Notes','Journal','Entries','Tax','Analytics','Achievements'].forEach(t=>document.getElementById('tab'+t).style.display=t.toLowerCase()===tab?'block':'none');
+  ['Dashboard','Accounts','Notes','Journal','Entries','Tax','Analytics','Achievements'].forEach(t=>document.getElementById('tab'+t).style.display=t.toLowerCase()===tab?'block':'none');
   document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));if(btn)btn.classList.add('active');
-  if(tab==='entries')renderEntries();else if(tab==='tax')renderTax();else if(tab==='analytics')renderAnalytics();else if(tab==='achievements')renderAchievements();else if(tab==='notes')renderNotes();else if(tab==='journal')renderJournal();else renderAccounts();
+  if(tab==='entries')renderEntries();else if(tab==='tax')renderTax();else if(tab==='analytics')renderAnalytics();else if(tab==='achievements')renderAchievements();else if(tab==='notes')renderNotes();else if(tab==='journal')renderJournal();else if(tab==='dashboard')renderDashboard();else renderAccounts();
 }
 
 /* ── ACCOUNT DETAIL ── */
-function openDetail(id,ev){if(ev)ev.stopPropagation();detailAccId=id;_detailView='stats';_tlEdit=null;const _sf=document.getElementById('accSettingsForm');if(_sf)_sf.style.display='none';calYear=new Date().getFullYear();calMonth=new Date().getMonth();['tabAccounts','tabNotes','tabJournal','tabEntries','tabTax','tabAnalytics','tabAchievements'].forEach(t=>document.getElementById(t).style.display='none');document.getElementById('accountDetail').style.display='block';renderDetail();}
-function closeDetail(){_detailView='stats';document.getElementById('accountDetail').style.display='none';['tabAccounts','tabNotes','tabJournal','tabEntries','tabTax','tabAnalytics','tabAchievements'].forEach(el=>{const e=document.getElementById(el);if(e)e.style.display='none';});document.getElementById('tabAccounts').style.display='block';document.querySelectorAll('.ntab').forEach(t=>t.classList.toggle('active',t.dataset.view==='accounts'));if(detailChart){detailChart.destroy();detailChart=null;}renderAccounts();}
+function openDetail(id,ev){if(ev)ev.stopPropagation();detailAccId=id;_detailView='stats';_tlEdit=null;const _sf=document.getElementById('accSettingsForm');if(_sf)_sf.style.display='none';calYear=new Date().getFullYear();calMonth=new Date().getMonth();['tabDashboard','tabAccounts','tabNotes','tabJournal','tabEntries','tabTax','tabAnalytics','tabAchievements'].forEach(t=>document.getElementById(t).style.display='none');document.getElementById('accountDetail').style.display='block';renderDetail();}
+function closeDetail(){_detailView='stats';document.getElementById('accountDetail').style.display='none';['tabDashboard','tabAccounts','tabNotes','tabJournal','tabEntries','tabTax','tabAnalytics','tabAchievements'].forEach(el=>{const e=document.getElementById(el);if(e)e.style.display='none';});document.getElementById('tabAccounts').style.display='block';document.querySelectorAll('.ntab').forEach(t=>t.classList.toggle('active',t.dataset.view==='accounts'));if(detailChart){detailChart.destroy();detailChart=null;}renderAccounts();}
 
 function renderDetail(){
   // Reset tab to stats view
@@ -785,56 +1023,59 @@ function renderDetail(){
   const bal=getBalance(acc);const{netPnL,profitDays,lossDays,relEntries}=getPeriodStats(acc);
   const con=checkConsistency(acc,relEntries,netPnL);
   const conOk=!con||con.noData||con.ok;
-  const canPayout=(isFunded||isLive)&&!isPending&&(wd===0||profitDays>=wd)&&conOk;
+  const bufferOk=!isFunded||!(acc.payoutBuffer>0)||bal>=acc.payoutBuffer;
+  const canPayout=(isFunded||isLive)&&!isPending&&(wd===0||profitDays>=wd)&&conOk&&bufferOk;
   const balDelta=bal-(acc.size||0);
   const streak=getWinStreak(acc);
 
   document.getElementById('detailName').textContent=acc.name;
   document.getElementById('detailNumber').innerHTML=acc.number?'<i class="ti ti-hash" style="font-size:11px"></i>'+acc.number:'';
-  document.getElementById('detailBadge').innerHTML='<span class="badge '+(isPending?'bo':isLive?'bl':isFunded?'bg':'ba')+'">'+(isPending?'⏳ Payout Pending':isLive?'★ Live':isFunded?'✓ Funded':'◎ Evaluation')+'</span>';
-  document.getElementById('detailPendingNotice').innerHTML=isPending?'<div class="pending-notice" style="margin-bottom:1.25rem"><div class="pending-notice-icon">⏳</div><div class="pending-notice-body"><div class="pending-notice-title">Payout Pending — '+fmt(acc.payoutPending.amount)+'</div><div class="pending-notice-sub">Requested '+fmtDate(acc.payoutPending.requestDate)+' · Trading paused until firm approves</div></div></div>':'';
+  document.getElementById('detailBadge').innerHTML='<span class="badge '+(isPending?'bo':isLive?'bl':isFunded?'bg':'ba')+'">'+(isPending?'<i class="ti ti-hourglass"></i> Payout Pending':isLive?'<i class="ti ti-star-filled"></i> Live':isFunded?'<i class="ti ti-circle-check"></i> Funded':'<i class="ti ti-target"></i> Evaluation')+'</span>'+(isFunded&&acc.payoutBuffer>0?' <span class="badge '+(bufferOk?'bg':'bo')+'">'+(bufferOk?'<i class="ti ti-trending-up"></i> Over Buffer':'<i class="ti ti-trending-down"></i> Below Buffer')+'</span>':'');
+  document.getElementById('detailPendingNotice').innerHTML=isPending?'<div class="pending-notice" style="margin-bottom:1.25rem"><div class="pending-notice-icon"><i class="ti ti-hourglass"></i></div><div class="pending-notice-body"><div class="pending-notice-title">Payout Pending — '+fmt(acc.payoutPending.amount)+'</div><div class="pending-notice-sub">Requested '+fmtDate(acc.payoutPending.requestDate)+' · Trading paused until firm approves</div></div></div>':'';
   document.getElementById('detailBalBox').className='balance-box '+(balDelta>0?'up':balDelta<0?'down':'');
-  document.getElementById('detailBalBox').innerHTML='<div><div class="balance-label">Account Balance</div><div class="balance-value" style="color:'+(bal>=(acc.size||0)?'var(--blue)':'var(--red)')+'">'+fmt(bal)+'</div></div><div><div class="balance-change-label">P&L '+(isFunded?'since last payout':'since start')+'</div><div class="balance-change" style="color:'+(netPnL>=0?'var(--green)':'var(--red)')+'">'+fmtS(netPnL)+'</div></div>';
+  document.getElementById('detailBalBox').innerHTML='<div><div class="balance-label">Account Balance</div><div class="balance-value" style="color:'+(bal>=(acc.size||0)?'var(--blue)':'var(--red)')+'">'+fmt(bal)+(isFunded&&acc.payoutBuffer>0?' <span style="font-size:14px;color:var(--muted);font-weight:500">/ '+fmt(acc.payoutBuffer)+'</span>':'')+'</div></div><div><div class="balance-change-label">P&L '+(isFunded?'since last payout':'since start')+'</div><div class="balance-change" style="color:'+(netPnL>=0?'var(--green)':'var(--red)')+'">'+fmtS(netPnL)+'</div></div>';
 
   renderDetailChart(acc);
 
   // Consistency display
   if(con&&!con.noData){
     const ok=con.ok,clr=ok?'var(--green)':'var(--red)';
-    const fixSection=!ok?'<div style="margin-top:10px;padding:10px 12px;background:rgba(0,0,0,.18);border-radius:8px;border-left:3px solid var(--amber)"><div style="font-size:12px;font-weight:600;color:var(--amber);margin-bottom:6px">△ To fix inconsistency:</div><div style="font-size:12px;margin-bottom:4px">Need <strong>'+fmt(con.needFromOtherDays)+'</strong> more from <em>other</em> days to reach '+con.threshold+'%</div><div style="font-size:11px;color:var(--text2);opacity:.8">Formula: '+fmt(con.bestDayAmount)+' ÷ '+con.threshold+'% = '+fmt(con.requiredTotal)+' required total</div></div>':'';
-    const maxSection='<div style="margin-top:8px;padding:10px 12px;background:rgba(0,0,0,.15);border-radius:8px"><div style="font-size:12px;font-weight:600;margin-bottom:5px">📊 Max single day (if adding more trades):</div><div style="font-size:15px;font-weight:700;color:var(--amber);margin-bottom:4px">'+fmt(con.maxNewDay)+' before violating '+con.threshold+'% rule</div><div style="font-size:11px;color:var(--text2);opacity:.8">Formula: '+fmt(con.totalProfit)+' × '+con.threshold+'% ÷ (100% – '+con.threshold+'%) = '+fmt(con.maxNewDay)+'</div></div>';
-    document.getElementById('detailConsistency').innerHTML='<div class="con-card '+(ok?'ok':'warn')+'" style="margin-bottom:1rem"><div class="con-label">Consistency Rule (max '+con.threshold+'% per day)</div><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px"><div class="con-status" style="color:'+clr+'">'+(ok?'✓ Consistent':'⚠ Inconsistent')+'</div><div style="font-size:13px;color:'+clr+';font-weight:500">'+con.bestDayPct.toFixed(2)+'% of total profit</div></div>'+(con.bestDayAmount>0?'<div style="font-size:12px;color:var(--text2);margin-bottom:2px">Best day: <strong>'+fmt(con.bestDayAmount)+'</strong>'+(con.bestDay?' on '+fmtDate(con.bestDay):'')+'</div>':'')+fixSection+maxSection+'</div>';
+    const fixSection=!ok?'<div style="margin-top:10px;padding:10px 12px;background:rgba(0,0,0,.18);border-radius:8px;border-left:3px solid var(--amber)"><div style="font-size:12px;font-weight:600;color:var(--amber);margin-bottom:6px"><i class="ti ti-alert-triangle"></i> To fix inconsistency:</div><div style="font-size:12px;margin-bottom:4px">Need <strong>'+fmt(con.needFromOtherDays)+'</strong> more from <em>other</em> days to reach '+con.threshold+'%</div><div style="font-size:11px;color:var(--text2);opacity:.8">Formula: '+fmt(con.bestDayAmount)+' ÷ '+con.threshold+'% = '+fmt(con.requiredTotal)+' required total</div></div>':'';
+    const maxSection='<div style="margin-top:8px;padding:10px 12px;background:rgba(0,0,0,.15);border-radius:8px"><div style="font-size:12px;font-weight:600;margin-bottom:5px"><i class="ti ti-chart-bar"></i> Max single day (if adding more trades):</div><div style="font-size:15px;font-weight:700;color:var(--amber);margin-bottom:4px">'+fmt(con.maxNewDay)+' before violating '+con.threshold+'% rule</div><div style="font-size:11px;color:var(--text2);opacity:.8">Formula: '+fmt(con.totalProfit)+' × '+con.threshold+'% ÷ (100% – '+con.threshold+'%) = '+fmt(con.maxNewDay)+'</div></div>';
+    document.getElementById('detailConsistency').innerHTML='<div class="con-card '+(ok?'ok':'warn')+'" style="margin-bottom:1rem"><div class="con-label">Consistency Rule (max '+con.threshold+'% per day)</div><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px"><div class="con-status" style="color:'+clr+'">'+(ok?'✓ Consistent':'<i class="ti ti-alert-triangle"></i> Inconsistent')+'</div><div style="font-size:13px;color:'+clr+';font-weight:500">'+con.bestDayPct.toFixed(2)+'% of total profit</div></div>'+(con.bestDayAmount>0?'<div style="font-size:12px;color:var(--text2);margin-bottom:2px">Best day: <strong>'+fmt(con.bestDayAmount)+'</strong>'+(con.bestDay?' on '+fmtDate(con.bestDay):'')+'</div>':'')+fixSection+maxSection+'</div>';
   }else document.getElementById('detailConsistency').innerHTML='';
 
   if(isFunded||isLive){
-    document.getElementById('detailStats').innerHTML='<div class="stat3"><div class="sbox"><div class="sbox-l">Win Days (this period)</div><div class="sbox-v" style="color:'+(canPayout?'var(--green)':'var(--text')+'">'+(wd===0?'No req.':profitDays+'/'+wd+(canPayout?' ✓':''))+'</div></div><div class="sbox"><div class="sbox-l">Loss Days</div><div class="sbox-v" style="color:'+(lossDays>0?'var(--red)':'var(--muted)')+'">'+lossDays+'</div></div><div class="sbox"><div class="sbox-l">Win Streak 🔥</div><div class="sbox-v" style="color:'+(streak>0?'var(--amber)':'var(--muted)')+'">'+(streak>0?streak+' day'+(streak>1?'s':''):'—')+'</div></div></div>';
+    document.getElementById('detailStats').innerHTML='<div class="stat3"><div class="sbox"><div class="sbox-l">Win Days (this period)</div><div class="sbox-v" style="color:'+(canPayout?'var(--green)':'var(--text')+'">'+(wd===0?'No req.':profitDays+'/'+wd+(canPayout?' ✓':''))+'</div></div><div class="sbox"><div class="sbox-l">Loss Days</div><div class="sbox-v" style="color:'+(lossDays>0?'var(--red)':'var(--muted)')+'">'+lossDays+'</div></div><div class="sbox"><div class="sbox-l">Win Streak <i class="ti ti-flame"></i></div><div class="sbox-v" style="color:'+(streak>0?'var(--amber)':'var(--muted)')+'">'+(streak>0?streak+' day'+(streak>1?'s':''):'—')+'</div></div></div>';
     if(isFunded&&acc.livePayoutGoal>0){
       const pn=(acc.payouts||[]).length,g=acc.livePayoutGoal,pp=Math.min(100,Math.round(pn/g*100));
-      document.getElementById('detailProgress').innerHTML='<div class="prog-lbl"><span>💰 Payouts toward Live: '+pn+'/'+g+'</span><span>'+(pn>=g?'🎉 Live eligible!':(g-pn)+' to go')+'</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pp+'%;background:'+(pn>=g?'var(--green)':'var(--blue)')+'"></div></div>'
-        +(pn>=g?'<div style="margin-top:10px;padding:1rem;background:var(--lbg);border:1.5px solid var(--purple);border-radius:12px;text-align:center"><div style="font-size:13px;font-weight:600;color:var(--ltx);margin-bottom:10px">All payouts collected — your firm\'s Live program is unlocked!</div><button class="greenbtn" style="margin:0 auto;background:var(--purple)" onclick="goLive()"><i class="ti ti-rocket"></i> Unlock Live Account ★</button></div>':'');
+      document.getElementById('detailProgress').innerHTML='<div class="prog-lbl"><span><i class="ti ti-cash"></i> Payouts toward Live: '+pn+'/'+g+'</span><span>'+(pn>=g?'<i class="ti ti-confetti"></i> Live eligible!':(g-pn)+' to go')+'</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pp+'%;background:'+(pn>=g?'var(--green)':'var(--blue)')+'"></div></div>'
+        +(pn>=g?'<div style="margin-top:10px;padding:1rem;background:var(--lbg);border:1.5px solid var(--purple);border-radius:12px;text-align:center"><div style="font-size:13px;font-weight:600;color:var(--ltx);margin-bottom:10px">All payouts collected — your firm\'s Live program is unlocked!</div><button class="greenbtn" style="margin:0 auto;background:var(--purple)" onclick="goLive()"><i class="ti ti-rocket"></i> Unlock Live Account</button></div>':'');
     }else if(isLive){
-      document.getElementById('detailProgress').innerHTML='<div style="padding:8px 12px;background:var(--lbg);border:.5px solid var(--purple);border-radius:var(--r);font-size:12px;font-weight:600;color:var(--ltx)">★ Live Account'+(acc.liveDate?' — since '+fmtDate(acc.liveDate):'')+' · no payout requirements</div>';
+      document.getElementById('detailProgress').innerHTML='<div style="padding:8px 12px;background:var(--lbg);border:.5px solid var(--purple);border-radius:var(--r);font-size:12px;font-weight:600;color:var(--ltx)"><i class="ti ti-star-filled"></i> Live Account'+(acc.liveDate?' — since '+fmtDate(acc.liveDate):'')+' · no payout requirements</div>';
     }else document.getElementById('detailProgress').innerHTML='';
     document.getElementById('detailPassSection').innerHTML='';
     if(wd>0){const dots=Array.from({length:wd},(_,i)=>'<div class="pd-dot '+(i<profitDays?'ok':'empty-dot')+'">'+(i<profitDays?'✓':'')+'</div>').join('');document.getElementById('detailDots').innerHTML='<div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+wd+' profitable days required</div><div class="pd-dots">'+dots+'</div>';}
     else document.getElementById('detailDots').innerHTML='<div style="font-size:11px;color:var(--muted)">No day requirement</div>';
     if(!isPending){
-      document.getElementById('detailPayoutSection').innerHTML='<div class="acc-footer"><span style="font-size:11px;color:var(--muted)">Last payout: '+fmtDate(acc.lastPayoutDate)+'</span><button class="payoutbtn" '+(canPayout?'':'disabled')+' onclick="toggleDetailPayoutForm()">'+(canPayout?'💰 Request Payout':(wd>0&&profitDays<wd)?'⏳ '+(wd-profitDays)+' days needed':!conOk?'⚠ Consistency not met':'⏳ Pending')+'</button></div>';
-      document.getElementById('detailPayoutForm').innerHTML='<div class="payout-form" id="dPayoutForm"><div class="payout-form-title"><i class="ti ti-cash"></i> Request Payout</div><div class="payout-form-info">Net P&L since last payout: <strong>'+fmtS(netPnL)+'</strong><br>Balance: <strong>'+fmt(bal)+'</strong><br><span style="opacity:.8">Trading pauses until firm approves.</span></div><label>Payout Amount (USD)</label><input type="number" id="dPayoutAmt" placeholder="Enter amount" step="0.01" value="'+Math.max(0,netPnL).toFixed(2)+'"><div class="payout-form-actions"><button class="payout-confirm-btn" onclick="confirmDetailPayout()">✓ Request</button><button class="payout-cancel-btn" onclick="toggleDetailPayoutForm()">Cancel</button></div></div>';
+      document.getElementById('detailPayoutSection').innerHTML='<div class="acc-footer"><span style="font-size:11px;color:var(--muted)">Last payout: '+fmtDate(acc.lastPayoutDate)+'</span><button class="payoutbtn" '+(canPayout?'':'disabled')+' onclick="toggleDetailPayoutForm()">'+(canPayout?'<i class="ti ti-cash"></i> Request Payout':(wd>0&&profitDays<wd)?'<i class="ti ti-hourglass"></i> '+(wd-profitDays)+' days needed':!bufferOk?'<i class="ti ti-trending-down"></i> '+fmt(acc.payoutBuffer-bal)+' below buffer':!conOk?'<i class="ti ti-alert-triangle"></i> Consistency not met':'<i class="ti ti-hourglass"></i> Pending')+'</button></div>';
+      document.getElementById('detailPayoutForm').innerHTML='<div class="payout-form" id="dPayoutForm"><div class="payout-form-title"><i class="ti ti-cash"></i> Request Payout</div><div class="payout-form-info">Net P&L since last payout: <strong>'+fmtS(netPnL)+'</strong><br>Balance: <strong>'+fmt(bal)+'</strong><br><span style="opacity:.8">Trading pauses until firm approves.</span></div><label>Payout Amount (USD)</label><input type="number" id="dPayoutAmt" placeholder="Enter amount" step="0.01" value="'+Math.max(0,netPnL).toFixed(2)+'" oninput="updSplitNote()"><div id="dSplitNote" style="font-size:11px;color:var(--amber);font-weight:600;margin:4px 0 8px"></div><label>Payout Date</label><input type="date" id="dPayoutDate" value="'+todayStr()+'"><div class="payout-form-actions"><button class="payout-confirm-btn" onclick="confirmDetailPayout()">✓ Request</button><button class="payout-cancel-btn" onclick="toggleDetailPayoutForm()">Cancel</button></div></div>';
+      updSplitNote();
       document.getElementById('detailApproveSection').innerHTML='';
     }else{
       document.getElementById('detailPayoutSection').innerHTML='';document.getElementById('detailPayoutForm').innerHTML='';
-      document.getElementById('detailApproveSection').innerHTML='<div style="padding:1.25rem;background:var(--gbg);border:.5px solid var(--green);border-radius:12px;text-align:center"><div style="font-size:32px;margin-bottom:8px">🏦</div><div style="font-size:15px;font-weight:600;color:var(--gtx);margin-bottom:4px">Waiting for Firm Approval</div><div style="font-size:12px;color:var(--gtx);opacity:.8;margin-bottom:16px">Amount: '+fmt(acc.payoutPending.amount)+'</div><button class="greenbtn" style="margin:0 auto" onclick="approvePayout()"><i class="ti ti-check"></i> Payout Approved ✓</button></div>';
+      const _sp=accSplit(acc),_rec=splitAmount(acc.payoutPending.amount,_sp);
+      document.getElementById('detailApproveSection').innerHTML='<div style="padding:1.25rem;background:var(--gbg);border:.5px solid var(--green);border-radius:12px;text-align:center"><div style="font-size:32px;margin-bottom:8px"><i class="ti ti-building-bank"></i></div><div style="font-size:15px;font-weight:600;color:var(--gtx);margin-bottom:4px">Waiting for Firm Approval</div><div style="font-size:12px;color:var(--gtx);opacity:.8;margin-bottom:12px">Amount: '+fmt(acc.payoutPending.amount)+(_sp<100?' · You receive: <strong>'+fmt(_rec)+'</strong> ('+_sp+'% split)':'')+'</div><div style="margin-bottom:14px"><div style="font-size:11px;color:var(--gtx);opacity:.8;margin-bottom:4px">Payout Date (when you actually received it)</div><input type="date" id="dApproveDate" value="'+(acc.payoutPending.requestDate||todayStr())+'" style="max-width:180px"></div><button class="greenbtn" style="margin:0 auto" onclick="approvePayout()"><i class="ti ti-check"></i> Payout Approved ✓</button></div>';
     }
   }else{
     // EVAL stage
     const target=acc.target||0,pct=target>0?Math.min(100,Math.max(0,Math.round((netPnL/target)*100))):0,missing=Math.max(0,target-netPnL);
     const pctColor=pct>=100?'var(--green)':pct>=60?'var(--amber)':'var(--blue)';
-    document.getElementById('detailStats').innerHTML='<div class="stat3"><div class="sbox"><div class="sbox-l">Current P&L</div><div class="sbox-v" style="color:'+(netPnL>=0?'var(--green)':'var(--red)')+'">'+fmtS(netPnL)+'</div></div><div class="sbox"><div class="sbox-l">Still Needed</div><div class="sbox-v" style="color:'+(missing>0?'var(--red)':'var(--green)')+'">'+( missing>0?'- '+fmt(missing):'✓ Done')+'</div></div><div class="sbox"><div class="sbox-l">Days</div><div class="sbox-v">'+profitDays+'✓ '+lossDays+'✗</div></div></div>'+(streak>0?'<div class="streak-card">🔥 Win Streak: <strong>'+streak+' day'+(streak>1?'s':'')+'</strong> in a row</div>':'');
+    document.getElementById('detailStats').innerHTML='<div class="stat3"><div class="sbox"><div class="sbox-l">Current P&L</div><div class="sbox-v" style="color:'+(netPnL>=0?'var(--green)':'var(--red)')+'">'+fmtS(netPnL)+'</div></div><div class="sbox"><div class="sbox-l">Still Needed</div><div class="sbox-v" style="color:'+(missing>0?'var(--red)':'var(--green)')+'">'+( missing>0?'- '+fmt(missing):'✓ Done')+'</div></div><div class="sbox"><div class="sbox-l">Days</div><div class="sbox-v">'+profitDays+'✓ '+lossDays+'✗</div></div></div>'+(streak>0?'<div class="streak-card"><i class="ti ti-flame"></i> Win Streak: <strong>'+streak+' day'+(streak>1?'s':'')+'</strong> in a row</div>':'');
     document.getElementById('detailProgress').innerHTML=target>0?'<div class="prog-lbl"><span>Progress '+pct+'%</span><span>Target: '+fmt((acc.size||0)+target)+'</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%;background:'+pctColor+'"></div></div>':'';
     document.getElementById('detailDots').innerHTML='';
     const blown=(acc.evalLossLimit||0)>0&&bal<=(acc.size||0)-acc.evalLossLimit;
-    document.getElementById('detailPayoutSection').innerHTML=(blown?'<div class="pending-notice" style="border-color:var(--red);background:var(--rbg);margin-bottom:.75rem"><div class="pending-notice-icon">💥</div><div class="pending-notice-body"><div class="pending-notice-title" style="color:var(--rtx)">Account Blown</div><div class="pending-notice-sub" style="color:var(--rtx)">Loss limit reached — reset the account to try again</div></div></div>':'')
+    document.getElementById('detailPayoutSection').innerHTML=(blown?'<div class="pending-notice" style="border-color:var(--red);background:var(--rbg);margin-bottom:.75rem"><div class="pending-notice-icon"><i class="ti ti-alert-octagon"></i></div><div class="pending-notice-body"><div class="pending-notice-title" style="color:var(--rtx)">Account Blown</div><div class="pending-notice-sub" style="color:var(--rtx)">Loss limit reached — reset the account to try again</div></div></div>':'')
       +'<div class="acc-footer"><span style="font-size:11px;color:var(--muted)">Resets so far: '+(acc.resets||0)+'</span><button class="payoutbtn" style="'+(blown?'border-color:var(--red);background:var(--rbg);color:var(--rtx)':'')+'" onclick="resetEvalAccount()"><i class="ti ti-restore"></i> Reset Account</button></div>';
     document.getElementById('detailPayoutForm').innerHTML='';document.getElementById('detailApproveSection').innerHTML='';
 
@@ -842,7 +1083,7 @@ function renderDetail(){
     const targetHit=target>0&&netPnL>=target;
     const canPass=targetHit&&conOk;
     if(target>0){
-      document.getElementById('detailPassSection').innerHTML='<div style="margin-top:1.25rem;padding:1.25rem;background:'+(canPass?'var(--gbg)':'var(--s2)')+';border:'+(canPass?'1.5px solid var(--green)':'.5px solid var(--border)')+';border-radius:14px;text-align:center">'+(canPass?'<div style="font-size:36px;margin-bottom:10px">🎓</div><div style="font-size:16px;font-weight:700;color:var(--gtx);margin-bottom:4px">Profit Target Reached!</div><div style="font-size:12px;color:var(--gtx);opacity:.8;margin-bottom:18px">All conditions satisfied — ready to convert to Funded</div><button class="greenbtn" style="margin:0 auto" onclick="passToFunded()"><i class="ti ti-badge"></i> Convert to Funded Account ✓</button>':'<div style="font-size:13px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px"><i class="ti ti-lock" style="font-size:16px"></i>'+(targetHit?'Consistency rule not yet satisfied — see rule card above':'Still '+fmt(missing)+' away from target')+'</div>')+'</div>';
+      document.getElementById('detailPassSection').innerHTML='<div style="margin-top:1.25rem;padding:1.25rem;background:'+(canPass?'var(--gbg)':'var(--s2)')+';border:'+(canPass?'1.5px solid var(--green)':'.5px solid var(--border)')+';border-radius:14px;text-align:center">'+(canPass?'<div style="font-size:36px;margin-bottom:10px"><i class="ti ti-school"></i></div><div style="font-size:16px;font-weight:700;color:var(--gtx);margin-bottom:4px">Profit Target Reached!</div><div style="font-size:12px;color:var(--gtx);opacity:.8;margin-bottom:18px">All conditions satisfied — ready to convert to Funded</div><button class="greenbtn" style="margin:0 auto" onclick="passToFunded()"><i class="ti ti-badge"></i> Convert to Funded Account ✓</button>':'<div style="font-size:13px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px"><i class="ti ti-lock" style="font-size:16px"></i>'+(targetHit?'Consistency rule not yet satisfied — see rule card above':'Still '+fmt(missing)+' away from target')+'</div>')+'</div>';
     }else{
       document.getElementById('detailPassSection').innerHTML='';
     }
@@ -850,7 +1091,7 @@ function renderDetail(){
   renderDetailDayList(acc);
   document.getElementById('detailAddDaySection').innerHTML=isPending
     ?'<div style="padding:10px 14px;background:var(--s2);border-radius:var(--r);border:.5px solid var(--border);font-size:12px;color:var(--muted);text-align:center;margin-bottom:.75rem"><i class="ti ti-lock"></i> Trading paused — payout pending approval</div>'
-    :'<button class="addbtn" style="width:100%;justify-content:center;margin-bottom:.5rem" onclick="toggleDetailDayForm()"><i class="ti ti-plus"></i> Add Trading Day (+/− allowed)</button><div class="day-add-form" id="detailDayForm"><div class="daf-title"><i class="ti ti-plus-circle"></i> Add Trading Day</div><div class="day-add-row"><div><label>Date</label><input type="date" id="dd_date" value="'+todayStr()+'"></div><div><label>Day P&L (USD)</label><input type="number" id="dd_pnl" placeholder="+250 or −150" step="0.01"><div class="pnl-hint">+ for profit · − for loss</div></div></div><button class="day-add-submit" onclick="addDetailDay()"><i class="ti ti-check"></i> Save Day</button></div>';
+    :'<button class="addbtn" style="width:100%;justify-content:center;margin-bottom:.5rem" onclick="toggleDetailDayForm()"><i class="ti ti-plus"></i> Add Trading Day (+/− allowed)</button><div class="day-add-form" id="detailDayForm"><div class="daf-title"><i class="ti ti-circle-plus"></i> Add Trading Day</div><div class="day-add-row"><div><label>Date</label><input type="date" id="dd_date" value="'+todayStr()+'"></div><div><label>Day P&L (USD)</label><input type="number" id="dd_pnl" placeholder="+250 or −150" step="0.01"><div class="pnl-hint">+ for profit · − for loss</div></div></div><button class="day-add-submit" onclick="addDetailDay()"><i class="ti ti-check"></i> Save Day</button></div>';
 }
 
 function renderDetailDayList(acc){
@@ -865,7 +1106,7 @@ function renderDetailDayList(acc){
 
 function renderDetailChart(acc){
   if(detailChart){detailChart.destroy();detailChart=null;}
-  const{labels,balData,floorData,profitTargetLevel,dllData}=buildChartData(acc);
+  const{labels,balData,floorData,profitTargetLevel,dllData,bufferLevel,payoutPts}=buildChartData(acc);
   const isDark=getIsDark(),gc=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
   const hasHistory=labels.length>2||(labels.length===2&&labels[1]!==todayStr());
   document.getElementById('chartSubLabel').textContent=hasHistory?'Balance over time':'Starting balance — add trading days to see history';
@@ -876,51 +1117,69 @@ function renderDetailChart(acc){
   const ds=[{label:'Balance',data:balData,borderColor:'#3b82f6',backgroundColor:grad,borderWidth:2.5,tension:0.4,fill:true,pointRadius:balData.length>10?0:3,pointHoverRadius:5,pointBackgroundColor:'#3b82f6'}];
   if(floorData)ds.push({label:'Loss Limit',data:floorData,borderColor:'#ef4444',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,4],tension:0,fill:false,pointRadius:0,pointHoverRadius:0});
   if(dllData)ds.push({label:'Daily Loss Limit',data:dllData,borderColor:'#f97316',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,4],stepped:true,fill:false,pointRadius:0,pointHoverRadius:0});
+  if(bufferLevel!==null)ds.push({label:'Payout Buffer',data:labels.map(()=>bufferLevel),borderColor:'#1baf7a',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,4],tension:0,fill:false,pointRadius:0,pointHoverRadius:0});
+  if(payoutPts&&payoutPts.some(v=>v!==null))ds.push({label:'Payout',data:payoutPts.map((v,i)=>v!==null?balData[i]:null),showLine:false,pointStyle:'rectRot',pointRadius:12,pointHoverRadius:14,backgroundColor:'#1e40af',borderColor:'#7dd3fc',borderWidth:2.5,_payAmts:payoutPts});
   if(profitTargetLevel!==null)ds.push({label:'Profit Target',data:labels.map(()=>profitTargetLevel),borderColor:'#f59e0b',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,4],tension:0,fill:false,pointRadius:0,pointHoverRadius:0});
   const to={backgroundColor:isDark?'#1e1e1c':'#fff',borderColor:isDark?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.1)',borderWidth:1,titleColor:isDark?'#f5f5f0':'#0b0b0b',bodyColor:isDark?'#c3c2b7':'#52514e',padding:10};
-  detailChart=new Chart(ctx,{type:'line',data:{labels:dl,datasets:ds},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'top',labels:{color:isDark?'#c3c2b7':'#52514e',usePointStyle:true,padding:16,font:{size:12}}},tooltip:{...to,callbacks:{label:c=>' '+c.dataset.label+': '+fmt(c.parsed.y)}}},scales:{x:{grid:{color:gc},ticks:{color:'#898781',maxTicksLimit:10,font:{size:11}}},y:{grid:{color:gc},ticks:{color:'#898781',font:{size:11},callback:v=>'$'+Math.round(v).toLocaleString('en-US')}}}}});
+  detailChart=new Chart(ctx,{type:'line',data:{labels:dl,datasets:ds},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'top',labels:{color:isDark?'#c3c2b7':'#52514e',usePointStyle:true,padding:16,font:{size:12}}},tooltip:{...to,callbacks:{label:c=>c.dataset.label==='Payout'?' 💰 Payout received: '+fmt(c.dataset._payAmts[c.dataIndex]||0):' '+c.dataset.label+': '+fmt(c.parsed.y)}}},scales:{x:{grid:{color:gc},ticks:{color:'#898781',maxTicksLimit:10,font:{size:11}}},y:{grid:{color:gc},ticks:{color:'#898781',font:{size:11},callback:v=>'$'+Math.round(v).toLocaleString('en-US')}}}}});
 }
 
 function toggleDetailDayForm(){const el=document.getElementById('detailDayForm');if(!el)return;const o=el.style.display==='block';el.style.display=o?'none':'block';if(!o)setTimeout(()=>{const p=document.getElementById('dd_pnl');if(p)p.focus();},50);}
 function addDetailDay(){
   const date=document.getElementById('dd_date').value,pnl=parseFloat(document.getElementById('dd_pnl').value);
-  if(!date){alert('Please enter a date.');return;}if(isNaN(pnl)||pnl===0){alert('Please enter a P&L value.');return;}
+  if(!date){uiAlert('Please enter a date.');return;}if(isNaN(pnl)||pnl===0){uiAlert('Please enter a P&L value.');return;}
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   if(!accounts[i].dailyEntries)accounts[i].dailyEntries=[];
   accounts[i].dailyEntries.push({id:Date.now(),date,pnl});accounts[i].dailyEntries.sort((a,b)=>a.date.localeCompare(b.date));
-  saveAll();renderDetail();
+  saveAll();renderDetail();showToast('Trading day saved ✓');
 }
 function removeDetailDay(dayId){const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;accounts[i].dailyEntries=(accounts[i].dailyEntries||[]).filter(e=>e.id!==dayId);saveAll();renderDetail();}
 function toggleDetailPayoutForm(){const f=document.getElementById('dPayoutForm');if(!f)return;f.style.display=f.style.display==='block'?'none':'block';}
-function confirmDetailPayout(){
+async function confirmDetailPayout(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   const acc=accounts[i],wd=winDaysOf(acc);const{profitDays,relEntries,netPnL}=getPeriodStats(acc);
-  if(wd>0&&profitDays<wd){alert('You need at least '+wd+' profitable days!');return;}
+  if(wd>0&&profitDays<wd){uiAlert('You need at least '+wd+' profitable days!');return;}
   const con=checkConsistency(acc,relEntries,netPnL);
-  if(con&&!con.noData&&!con.ok){alert('Payout blocked — consistency rule not satisfied.\n\nBest day ('+con.bestDayPct+'%) exceeds the '+con.threshold+'% limit.\nBalance it out with more profitable days first.');return;}
+  if(con&&!con.noData&&!con.ok){uiAlert('Payout blocked — consistency rule not satisfied.\n\nBest day ('+con.bestDayPct+'%) exceeds the '+con.threshold+'% limit.\nBalance it out with more profitable days first.');return;}
+  if(acc.status==='funded'&&acc.payoutBuffer>0&&getBalance(acc)<acc.payoutBuffer){uiAlert('Payout blocked — balance is below the payout buffer.\n\nBalance: '+fmt(getBalance(acc))+'\nBuffer: '+fmt(acc.payoutBuffer)+'\nStill needed: '+fmt(acc.payoutBuffer-getBalance(acc)));return;}
   const payoutAmt=parseFloat(document.getElementById('dPayoutAmt').value)||0;
-  if(payoutAmt<=0){alert('Please enter a payout amount.');return;}
-  if(!confirm('Request payout of '+fmt(payoutAmt)+'?\n\nTrading pauses until the firm approves.'))return;
-  accounts[i].payoutPending={amount:payoutAmt,requestDate:todayStr()};
+  if(payoutAmt<=0){uiAlert('Please enter a payout amount.');return;}
+  const pd=(document.getElementById('dPayoutDate')||{}).value||todayStr();
+  const split=accSplit(acc),rec=splitAmount(payoutAmt,split);
+  if(!await uiConfirm('Request payout of '+fmt(payoutAmt)+'?\n'+(split<100?'\nYou will receive '+fmt(rec)+' ('+split+'% split).':'')+'\nTrading pauses until the firm approves.',{icon:'<i class="ti ti-cash"></i>',title:'Request Payout',okText:'Request'}))return;
+  accounts[i].payoutPending={amount:payoutAmt,requestDate:pd};
   saveAll();renderDetail();
 }
-function approvePayout(){
+function accSplit(acc){return Math.min(100,Math.max(1,Number(acc.profitSplit)||100));}
+function splitAmount(amt,split){return Math.round(amt*split)/100;}
+function updSplitNote(){
+  const acc=accounts.find(a=>a.id===detailAccId);const el=document.getElementById('dSplitNote');
+  if(!acc||!el)return;
+  const amt=parseFloat((document.getElementById('dPayoutAmt')||{}).value)||0;
+  const split=accSplit(acc);
+  el.textContent=split<100?'Profit split '+split+'/'+Math.round((100-split)*10)/10+' — you receive '+fmt(splitAmount(amt,split)):'';
+}
+async function approvePayout(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   const acc=accounts[i];if(!acc.payoutPending)return;
   const{amount}=acc.payoutPending;
-  if(!confirm('Confirm payout approval of '+fmt(amount)+'?\n\nBalance drops by this amount and trading resumes.'))return;
+  const split=accSplit(acc),rec=splitAmount(amount,split);
+  const d=(document.getElementById('dApproveDate')||{}).value||todayStr();
+  if(!await uiConfirm('Confirm payout approval of '+fmt(amount)+' on '+fmtDate(d)+'?\n'+(split<100?'\nYou receive '+fmt(rec)+' ('+split+'% split).':'')+'\nBalance drops by '+fmt(amount)+' and trading resumes.',{icon:'<i class="ti ti-building-bank"></i>',title:'Payout Approved',okText:'Approve'}))return;
   if(!accounts[i].payouts)accounts[i].payouts=[];
-  accounts[i].payouts.push({id:Date.now(),date:todayStr(),amount});
-  accounts[i].lastPayoutDate=todayStr();accounts[i].lastPayoutAmount=amount;accounts[i].payoutPending=null;
-  entries.push({id:Date.now()+1,date:todayStr(),type:'payout',amount,cat:'profit',note:'Payout Approved — '+acc.name});
+  accounts[i].payouts.push({id:Date.now(),date:d,amount});
+  accounts[i].payouts.sort((a,b)=>a.date.localeCompare(b.date));
+  accounts[i].lastPayoutDate=accounts[i].payouts[accounts[i].payouts.length-1].date;
+  accounts[i].lastPayoutAmount=amount;accounts[i].payoutPending=null;
+  entries.push({id:Date.now()+1,date:d,type:'payout',amount:rec,cat:'profit',note:'Payout Approved — '+acc.name+(split<100?' ('+split+'% of '+fmt(amount)+')':'')});
   entries.sort((a,b)=>b.date.localeCompare(a.date));saveAll();triggerConfetti();renderDetail();
 }
 
 /* ── PASS TO FUNDED ── */
-function passToFunded(){
+async function passToFunded(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   const acc=accounts[i];
-  if(!confirm('Convert "'+acc.name+'" to Funded?\n\nThe account restarts from '+fmt(acc.size)+' with funded stage rules.\n\nEval trading history is cleared.'))return;
+  if(!await uiConfirm('Convert "'+acc.name+'" to Funded?\n\nThe account restarts from '+fmt(acc.size)+' with funded stage rules.\n\nEval trading history is cleared.',{icon:'<i class="ti ti-school"></i>',title:'Convert to Funded',okText:'Convert'}))return;
   accounts[i].status='funded';
   accounts[i].startDate=todayStr();
   accounts[i].fundedDate=todayStr();
@@ -932,20 +1191,20 @@ function passToFunded(){
 }
 
 /* ── GO LIVE ── */
-function goLive(){
+async function goLive(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   const acc=accounts[i];
-  if(!confirm('Unlock Live for "'+acc.name+'"?\n\nThe account moves to the Live stage and restarts from '+fmt(acc.size||0)+'.\nFunded trading history is cleared.'))return;
+  if(!await uiConfirm('Unlock Live for "'+acc.name+'"?\n\nThe account moves to the Live stage and restarts from '+fmt(acc.size||0)+'.\nFunded trading history is cleared.',{icon:'<i class="ti ti-rocket"></i>',title:'Unlock Live',okText:'Go Live'}))return;
   acc.status='live';acc.liveDate=todayStr();acc.startDate=todayStr();
   acc.dailyEntries=[];acc.payouts=[];acc.lastPayoutDate=null;acc.lastPayoutAmount=0;acc.payoutPending=null;
   saveAll();triggerConfetti();renderDetail();
 }
 
 /* ── RESET (blown eval) ── */
-function resetEvalAccount(){
+async function resetEvalAccount(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   const acc=accounts[i];
-  if(!confirm('Reset "'+acc.name+'"?\n\nAll trading days are cleared and the balance returns to '+fmt(acc.size||0)+'.\nThis will be reset #'+((acc.resets||0)+1)+'.'))return;
+  if(!await uiConfirm('Reset "'+acc.name+'"?\n\nAll trading days are cleared and the balance returns to '+fmt(acc.size||0)+'.\nThis will be reset #'+((acc.resets||0)+1)+'.',{icon:'<i class="ti ti-restore"></i>',title:'Reset Account',okText:'Reset',danger:true}))return;
   acc.dailyEntries=[];acc.payouts=[];acc.payoutPending=null;acc.lastPayoutDate=null;acc.lastPayoutAmount=0;
   acc.startDate=todayStr();acc.resets=(acc.resets||0)+1;
   saveAll();renderDetail();
@@ -961,6 +1220,8 @@ function toggleAccSettings(){
   f.innerHTML='<div class="fgrid">'
     +'<div><label>Daily Loss Limit — DLL (USD)</label><input type="number" id="as_dll" step="0.01" value="'+(acc.dll||'')+'" placeholder="Optional — orange line on chart"></div>'
     +'<div><label>'+(isFundedLike?'Loss Limit — Funded / Trailing (USD)':'Loss Limit — Eval (USD)')+'</label><input type="number" id="as_loss" step="0.01" value="'+((isFundedLike?acc.lossLimit:acc.evalLossLimit)||'')+'"></div>'
+    +(acc.status==='live'?'':'<div><label>Payout Buffer — min. balance (USD)</label><input type="number" id="as_buffer" step="0.01" value="'+(acc.payoutBuffer||'')+'" placeholder="Optional — payouts only above this"></div>')
+    +'<div><label>Profit Split — your share (%)</label><input type="number" id="as_split" min="1" max="100" step="0.1" value="'+(acc.profitSplit&&acc.profitSplit!==100?acc.profitSplit:'')+'" placeholder="Empty = 100% (full amount)"></div>'
     +(acc.status==='live'?'':'<div><label>Payouts → Live Program</label><select id="as_liveGoal">'+goals.sort((a,b)=>a-b).map(n=>'<option value="'+n+'"'+((acc.livePayoutGoal||0)===n?' selected':'')+'>'+(n===0?'Off':n+' payouts')+'</option>').join('')+'</select></div>')
     +'</div><div class="factions"><button class="savebtn" onclick="saveAccSettings()">Save</button><button class="cancelbtn" onclick="toggleAccSettings()">Cancel</button></div>';
   f.style.display='block';
@@ -971,17 +1232,163 @@ function saveAccSettings(){
   acc.dll=parseFloat(document.getElementById('as_dll').value)||0;
   const loss=parseFloat(document.getElementById('as_loss').value)||0;
   if(acc.status==='eval')acc.evalLossLimit=loss;else acc.lossLimit=loss;
+  const bf=document.getElementById('as_buffer');if(bf)acc.payoutBuffer=parseFloat(bf.value)||0;
+  const sp=document.getElementById('as_split');if(sp)acc.profitSplit=Math.min(100,Math.max(1,parseFloat(sp.value)||100));
   const lg=document.getElementById('as_liveGoal');if(lg)acc.livePayoutGoal=parseInt(lg.value)||0;
   document.getElementById('accSettingsForm').style.display='none';
-  saveAll();renderDetail();
+  saveAll();renderDetail();showToast('Settings saved ✓');
 }
+
+/* ── TOASTS ── */
+function showToast(msg){
+  let w=document.getElementById('toastWrap');
+  if(!w){w=document.createElement('div');w.id='toastWrap';w.className='toast-wrap';document.body.appendChild(w);}
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  w.appendChild(t);
+  setTimeout(()=>{t.style.transition='opacity .3s';t.style.opacity='0';setTimeout(()=>t.remove(),350);},2600);
+}
+
+/* ── READINESS (shared by cards, sort, dashboard) ── */
+function accReadyState(acc){
+  const isFunded=acc.status==='funded',isLive=acc.status==='live',isPending=!!(acc.payoutPending);
+  const bal=getBalance(acc);
+  const{netPnL,profitDays,relEntries}=getPeriodStats(acc);
+  const wd=isLive?0:winDaysOf(acc);
+  const con=checkConsistency(acc,relEntries,netPnL);
+  const conOk=!con||con.noData||con.ok;
+  const bufferOk=!isFunded||!(acc.payoutBuffer>0)||bal>=acc.payoutBuffer;
+  const canPayout=(isFunded||isLive)&&!isPending&&(wd===0||profitDays>=wd)&&conOk&&bufferOk;
+  const passReady=!isFunded&&!isLive&&(acc.target||0)>0&&netPnL>=acc.target&&conOk;
+  return{isFunded,isLive,isPending,bal,netPnL,profitDays,wd,conOk,bufferOk,canPayout,passReady};
+}
+
+/* ── SPARKLINE ── */
+function sparkline(acc){
+  const{balData}=buildChartData(acc);
+  if(balData.length<3)return'';
+  const min=Math.min(...balData),max=Math.max(...balData),rng=(max-min)||1;
+  const pts=balData.map((v,i)=>((i/(balData.length-1))*100).toFixed(2)+','+(28-((v-min)/rng)*24+2).toFixed(2)).join(' ');
+  const clr=balData[balData.length-1]>=balData[0]?'#1baf7a':'#ef4444';
+  return '<svg viewBox="0 0 100 32" preserveAspectRatio="none" style="width:100%;height:32px;display:block;margin:2px 0 4px"><polyline points="'+pts+'" fill="none" stroke="'+clr+'" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+}
+
+/* ── DASHBOARD ── */
+let dashHeatFilter='funded',heatY=new Date().getFullYear(),heatM=new Date().getMonth();
+function renderDashboard(){
+  const pf=accounts.filter(a=>a.status==='funded'||a.status==='live');
+  const totBal=pf.reduce((s,a)=>s+getBalance(a),0);
+  const totPnL=pf.reduce((s,a)=>s+getPeriodStats(a).netPnL,0);
+  const totPay=entries.filter(e=>e.type==='payout').reduce((s,e)=>s+e.amount,0);
+  const nEval=accounts.filter(a=>a.status==='eval').length,nFun=accounts.filter(a=>a.status==='funded').length,nLive=accounts.filter(a=>a.status==='live').length;
+  document.getElementById('dashKpis').innerHTML='<div class="krow" style="margin-bottom:0">'
+    +'<div class="kpi"><div class="klbl">Total Balance (Funded + Live)</div><div class="kval b">'+fmt(totBal)+'</div></div>'
+    +'<div class="kpi"><div class="klbl">P&L this period</div><div class="kval '+(totPnL>=0?'g':'r')+'">'+fmtS(totPnL)+'</div></div>'
+    +'<div class="kpi"><div class="klbl">Total Payouts</div><div class="kval g">'+fmt(totPay)+'</div></div>'
+    +'<div class="kpi"><div class="klbl">Accounts</div><div class="kval">'+nEval+' Eval · '+nFun+' Funded · '+nLive+' Live</div></div>'
+    +'</div>';
+  // Payout readiness
+  document.getElementById('dashReady').innerHTML=accounts.length?accounts.map(acc=>{
+    const r=accReadyState(acc);
+    let status,clr;
+    if(r.isPending){status='<i class="ti ti-hourglass"></i> Payout pending — awaiting approval';clr='var(--amber)';}
+    else if(r.isLive){status='<i class="ti ti-star-filled"></i> Live — payout anytime';clr='var(--purple)';}
+    else if(r.isFunded){
+      if(r.canPayout){status='✓ Ready to request payout';clr='var(--green)';}
+      else{const parts=[];
+        if(r.wd>0&&r.profitDays<r.wd)parts.push((r.wd-r.profitDays)+' win day'+(r.wd-r.profitDays>1?'s':'')+' needed');
+        if(!r.bufferOk)parts.push(fmt(acc.payoutBuffer-r.bal)+' below buffer');
+        if(!r.conOk)parts.push('consistency not met');
+        status='<i class="ti ti-hourglass"></i> '+parts.join(' · ');clr='var(--muted)';}
+    }else{
+      const target=acc.target||0,pct=target>0?Math.min(100,Math.max(0,Math.round((r.netPnL/target)*100))):0;
+      status=r.passReady?'<i class="ti ti-school"></i> Ready to pass to Funded!':target>0?pct+'% to target — '+fmt(Math.max(0,target-r.netPnL))+' left':'<i class="ti ti-target"></i> Evaluation';
+      clr=r.passReady?'var(--green)':'var(--blue)';
+    }
+    return '<div class="dash-ready-row" onclick="openDetail('+acc.id+',event)">'
+      +'<span style="font-weight:600;font-size:13px">'+acc.name+'</span>'
+      +'<span class="badge '+(r.isPending?'bo':r.isLive?'bl':r.isFunded?'bg':'ba')+'">'+(r.isPending?'<i class="ti ti-hourglass"></i>':r.isLive?'<i class="ti ti-star-filled"></i> Live':r.isFunded?'<i class="ti ti-circle-check"></i> Funded':'<i class="ti ti-target"></i> Eval')+'</span>'
+      +'<span style="flex:1"></span>'
+      +'<span style="font-size:12px;font-weight:600;color:'+clr+'">'+status+'</span>'
+      +'<span style="font-size:12px;color:var(--text2);font-weight:600">'+fmt(r.bal)+'</span>'
+      +'</div>';
+  }).join(''):'<div class="empty" style="padding:1.25rem"><i class="ti ti-layout-cards"></i>No accounts yet — create one in the Accounts tab.</div>';
+  renderDashHeatChips();renderDashHeatmap();
+  // Recent trades
+  const rec=trades.slice(0,5);
+  document.getElementById('dashTrades').innerHTML=rec.length?rec.map(t=>{
+    const am=accounts.find(a=>String(a.id)===String(t.accountId));
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:.5px solid var(--border);border-radius:10px;margin-bottom:6px">'
+      +'<span style="font-size:12px;color:var(--muted);min-width:52px">'+fmtShort(t.date)+'</span>'
+      +'<span style="font-weight:600;font-size:13px">'+t.symbol+'</span>'
+      +'<span class="badge '+(t.direction==='long'?'bg':'br')+'">'+(t.direction==='long'?'▲ Long':'▼ Short')+'</span>'
+      +'<span style="flex:1"></span>'
+      +'<span class="badge '+(t.result==='win'?'bg':t.result==='loss'?'br':'ba')+'">'+t.result.toUpperCase()+'</span>'
+      +(t.pnl?'<span style="font-size:12px;font-weight:600;color:'+(t.pnl>=0?'var(--green)':'var(--red)')+'">'+fmtS(t.pnl)+'</span>':'')
+      +'</div>';
+  }).join(''):'<div class="empty" style="padding:1.25rem"><i class="ti ti-notebook"></i>No trades logged yet.</div>';
+  // Notes peek
+  const dow=['sun','mon','tue','wed','thu','fri','sat'][new Date().getDay()];
+  const todayNote=(notes[dow]||'').trim(),weekNote=(notes.weekGeneral||'').trim();
+  const ex=s=>s.length>180?s.slice(0,180)+'…':s;
+  document.getElementById('dashNotes').innerHTML=(todayNote||weekNote)
+    ?(todayNote?'<div style="padding:10px 14px;background:var(--surface);border:.5px solid var(--border);border-radius:10px;margin-bottom:6px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:4px">Today</div><div style="font-size:13px;white-space:pre-line">'+ex(todayNote)+'</div></div>':'')
+      +(weekNote?'<div style="padding:10px 14px;background:var(--surface);border:.5px solid var(--border);border-radius:10px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:4px">Week General</div><div style="font-size:13px;white-space:pre-line">'+ex(weekNote)+'</div></div>':'')
+    :'<div class="empty" style="padding:1.25rem"><i class="ti ti-notes"></i>No notes this week yet.</div>';
+}
+function renderDashHeatChips(){
+  const bar=document.getElementById('dashHeatChips');if(!bar)return;
+  const chip=(v,l)=>'<button class="chip'+(dashHeatFilter===v?' active':'')+'" onclick="dashHeatFilter=\''+v+'\';renderDashHeatChips();renderDashHeatmap()">'+l+'</button>';
+  let h=chip('eval','<i class="ti ti-target"></i> Evaluation')+chip('funded','<i class="ti ti-circle-check"></i> Funded')+chip('live','<i class="ti ti-star-filled"></i> Live');
+  h+=accGroups.map(g=>chip('g'+g.id,'<i class="ti ti-folder"></i> '+g.name)).join('');
+  bar.innerHTML=h;
+}
+function renderDashHeatmap(){
+  const el=document.getElementById('dashHeatmap');if(!el)return;
+  let accs;
+  if(dashHeatFilter==='eval')accs=accounts.filter(a=>a.status==='eval');
+  else if(dashHeatFilter==='funded')accs=accounts.filter(a=>a.status==='funded');
+  else if(dashHeatFilter==='live')accs=accounts.filter(a=>a.status==='live');
+  else{const gid=Number(String(dashHeatFilter).slice(1));accs=accounts.filter(a=>(a.groups||[]).includes(gid));}
+  const dm={};accs.forEach(a=>(a.dailyEntries||[]).forEach(e=>{dm[e.date]=(dm[e.date]||0)+e.pnl;}));
+  const days=new Date(heatY,heatM+1,0).getDate();
+  const startDow=(new Date(heatY,heatM,1).getDay()+6)%7;
+  const monthVals=[];for(let d=1;d<=days;d++){const k=heatY+'-'+String(heatM+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');if(dm[k])monthVals.push(Math.abs(dm[k]));}
+  const mx=Math.max(...monthVals,1);
+  let cells='';
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d=>cells+='<div class="heat-dow">'+d+'</div>');
+  for(let i=0;i<startDow;i++)cells+='<div class="heat-cell off"></div>';
+  let monTot=0;
+  for(let d=1;d<=days;d++){
+    const k=heatY+'-'+String(heatM+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const v=dm[k];monTot+=v||0;
+    let style='',pl='';
+    if(v!==undefined&&v!==0){
+      const a=(0.25+0.65*(Math.abs(v)/mx)).toFixed(2);
+      style='background:rgba('+(v>0?'27,175,122':'239,68,68')+','+a+');color:#fff';
+      pl='<span class="hp">'+(v>0?'+':'−')+(Math.abs(v)>=1000?(Math.abs(v)/1000).toFixed(1)+'k':Math.round(Math.abs(v)))+'</span>';
+    }
+    cells+='<div class="heat-cell" style="'+style+'" title="'+fmtDate(k)+': '+fmtS(v||0)+'"><span>'+d+'</span>'+pl+'</div>';
+  }
+  el.innerHTML='<div class="heat-wrap"><div class="heat-head">'
+    +'<button class="heat-nav" onclick="heatM--;if(heatM<0){heatM=11;heatY--;}renderDashHeatmap()">‹</button>'
+    +'<div class="heat-title">'+MONTHS[heatM]+' '+heatY+' <span style="color:'+(monTot>=0?'var(--green)':'var(--red)')+';font-size:12px;margin-left:6px">'+fmtS(monTot)+'</span></div>'
+    +'<button class="heat-nav" onclick="heatM++;if(heatM>11){heatM=0;heatY++;}renderDashHeatmap()">›</button>'
+    +'</div><div class="heat-grid">'+cells+'</div>'
+    +(accs.length?'':'<div style="font-size:11px;color:var(--muted);margin-top:8px;text-align:center">No accounts in this view</div>')
+    +'</div>';
+}
+
+/* ── ACCOUNT SORT & VIEW ── */
+let accSort=localStorage.getItem('af_accsort')||'created',accView=localStorage.getItem('af_accview')||'cards';
+function setAccSort(v){accSort=v;localStorage.setItem('af_accsort',v);renderAccounts();}
+function toggleAccView(){accView=accView==='cards'?'list':'cards';localStorage.setItem('af_accview',accView);renderAccounts();}
 
 /* ── ACCOUNTS TAB ── */
 let accFormType='eval';
-function setAccType(type){accFormType=type;document.getElementById('typeEval').classList.toggle('active',type==='eval');document.getElementById('typeFunded').classList.toggle('active',type==='funded');document.querySelectorAll('.af-eval-only').forEach(el=>el.style.display=type==='eval'?'':'none');document.getElementById('af_fundedLabel').textContent=type==='eval'?'✓ Funded Stage (pre-configure)':'✓ Funded Stage Settings';}
-function toggleAccForm(){const f=document.getElementById('accForm');const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){['af_name','af_number','af_target','af_evalLoss','af_evalConPct','af_loss','af_conPct','af_dll'].forEach(id=>document.getElementById(id).value='');document.getElementById('af_start').value=todayStr();document.getElementById('af_size').value='50000';document.getElementById('af_windays').value='5';document.getElementById('af_evalCon').value='0';document.getElementById('af_fundedCon').value='0';document.getElementById('af_liveGoal').value='0';setAccType('eval');}}
+function setAccType(type){accFormType=type;document.getElementById('typeEval').classList.toggle('active',type==='eval');document.getElementById('typeFunded').classList.toggle('active',type==='funded');document.querySelectorAll('.af-eval-only').forEach(el=>el.style.display=type==='eval'?'':'none');document.getElementById('af_fundedLabel').textContent=type==='eval'?'<i class="ti ti-circle-check"></i> Funded Stage (pre-configure)':'<i class="ti ti-circle-check"></i> Funded Stage Settings';}
+function toggleAccForm(){const f=document.getElementById('accForm');const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){['af_name','af_number','af_target','af_evalLoss','af_evalConPct','af_loss','af_conPct','af_dll','af_buffer','af_split'].forEach(id=>document.getElementById(id).value='');document.getElementById('af_start').value=todayStr();document.getElementById('af_size').value='50000';document.getElementById('af_windays').value='5';document.getElementById('af_evalCon').value='0';document.getElementById('af_fundedCon').value='0';document.getElementById('af_liveGoal').value='0';setAccType('eval');}}
 function saveAccount(){
-  const name=document.getElementById('af_name').value.trim();if(!name){alert('Please enter an account name.');return;}
+  const name=document.getElementById('af_name').value.trim();if(!name){uiAlert('Please enter an account name.');return;}
   const size=parseFloat(document.getElementById('af_size').value)||50000;
   accounts.push({id:Date.now(),name,
     number:document.getElementById('af_number').value.trim(),size,
@@ -997,12 +1404,14 @@ function saveAccount(){
     startDate:document.getElementById('af_start').value,
     fundedDate:accFormType==='funded'?(document.getElementById('af_start').value||todayStr()):null,
     dll:parseFloat(document.getElementById('af_dll').value)||0,
+    payoutBuffer:parseFloat(document.getElementById('af_buffer').value)||0,
+    profitSplit:Math.min(100,Math.max(1,parseFloat(document.getElementById('af_split').value)||100)),
     livePayoutGoal:parseInt(document.getElementById('af_liveGoal').value)||0,
     groups:[],resets:0,
     lastPayoutDate:null,lastPayoutAmount:0,dailyEntries:[],payouts:[],payoutPending:null});
-  saveAll();renderAccounts();document.getElementById('accForm').style.display='none';
+  saveAll();renderAccounts();document.getElementById('accForm').style.display='none';showToast('Account created ✓');
 }
-function deleteAccount(id,e){e.stopPropagation();if(!confirm('Delete this account?'))return;accounts=accounts.filter(a=>a.id!==id);saveAll();renderAccounts();}
+async function deleteAccount(id,e){e.stopPropagation();if(!await uiConfirm('Delete this account?\n\nAll its trading days and settings are removed.',{icon:'<i class="ti ti-trash"></i>',title:'Delete account',okText:'Delete',danger:true}))return;accounts=accounts.filter(a=>a.id!==id);saveAll();renderAccounts();}
 function toggleStatus(id,e){e.stopPropagation();const i=accounts.findIndex(a=>a.id===id);if(i<0)return;const s=accounts[i].status;accounts[i].status=s==='eval'?'funded':s==='funded'?'live':'eval';if(accounts[i].status==='live'&&!accounts[i].liveDate)accounts[i].liveDate=todayStr();saveAll();renderAccounts();}
 
 /* ── ACCOUNT FILTER / CUSTOM GROUPS ── */
@@ -1010,8 +1419,8 @@ let groupCreating=false;
 function renderAccFilterBar(){
   const bar=document.getElementById('accFilterBar');if(!bar)return;
   const chip=(v,l)=>'<button class="chip'+(accFilter===v?' active':'')+'" onclick="setAccFilter(\''+v+'\')">'+l+'</button>';
-  let h=chip('all','All')+chip('eval','◎ Evaluation')+chip('funded','✓ Funded')+chip('live','★ Live');
-  h+=accGroups.map(g=>chip('g'+g.id,'🗂 '+g.name)).join('');
+  let h=chip('all','All')+chip('eval','<i class="ti ti-target"></i> Evaluation')+chip('funded','<i class="ti ti-circle-check"></i> Funded')+chip('live','<i class="ti ti-star-filled"></i> Live');
+  h+=accGroups.map(g=>chip('g'+g.id,'<i class="ti ti-folder"></i> '+g.name)).join('');
   h+=groupCreating
     ?'<span style="display:inline-flex;gap:6px;align-items:center"><input type="text" id="newGroupName" placeholder="Group name" style="padding:5px 12px;font-size:12px;border-radius:16px;border:.5px solid var(--blue);background:var(--surface);color:var(--text);width:150px;outline:none" onkeydown="if(event.key===\'Enter\')confirmAccGroup();else if(event.key===\'Escape\'){groupCreating=false;renderAccounts();}"><button class="chip" style="border-color:var(--green);color:var(--gtx)" onclick="confirmAccGroup()">✓</button><button class="chip" onclick="groupCreating=false;renderAccounts()">✕</button></span>'
     :'<button class="chip" title="Create a custom group" onclick="groupCreating=true;renderAccounts();setTimeout(()=>{const e=document.getElementById(\'newGroupName\');if(e)e.focus();},50)">+ Group</button>';
@@ -1026,11 +1435,11 @@ function confirmAccGroup(){
   const e=document.getElementById('newGroupName');const name=((e&&e.value)||'').trim();
   if(!name)return;
   const g={id:Date.now(),name};accGroups.push(g);
-  groupCreating=false;accFilter='g'+g.id;groupManage=true;saveAll();renderAccounts();
+  groupCreating=false;accFilter='g'+g.id;groupManage=true;saveAll();renderAccounts();showToast('Group created ✓ — click accounts to add them');
 }
-function deleteAccGroup(){
+async function deleteAccGroup(){
   const gid=Number(String(accFilter).slice(1));const g=accGroups.find(x=>x.id===gid);if(!g)return;
-  if(!confirm('Delete group "'+g.name+'"?\n\nThe accounts themselves are not deleted.'))return;
+  if(!await uiConfirm('Delete group "'+g.name+'"?\n\nThe accounts themselves are not deleted.'))return;
   accGroups=accGroups.filter(x=>x.id!==gid);
   accounts.forEach(a=>{a.groups=(a.groups||[]).filter(x=>x!==gid);});
   accFilter='all';groupManage=false;saveAll();renderAccounts();
@@ -1056,6 +1465,14 @@ function renderAccounts(){
   else if(gid!==null)vis=groupManage?accounts:accounts.filter(a=>(a.groups||[]).includes(gid));
   if(!vis.length){grid.innerHTML='';empty.style.display='block';empty.innerHTML='<i class="ti ti-filter"></i>No accounts in this view.';}
   else empty.style.display='none';
+  vis=[...vis];
+  if(accSort==='name')vis.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(accSort==='balance')vis.sort((a,b)=>getBalance(b)-getBalance(a));
+  else if(accSort==='pnl')vis.sort((a,b)=>getPeriodStats(b).netPnL-getPeriodStats(a).netPnL);
+  else if(accSort==='ready')vis.sort((a,b)=>{const s=x=>{const r=accReadyState(x);return r.canPayout||r.passReady?2:r.isPending?1:0;};return s(b)-s(a);});
+  const sortSel=document.getElementById('accSortSel');if(sortSel&&sortSel.value!==accSort)sortSel.value=accSort;
+  const viewBtn=document.getElementById('accViewBtn');if(viewBtn)viewBtn.innerHTML='<i class="ti ti-'+(accView==='list'?'layout-grid':'list')+'"></i>';
+  grid.classList.toggle('list-mode',accView==='list');
   const pf=vis.filter(a=>a.status==='funded'||a.status==='live');
   if(bar&&pf.length){
     const totBal=pf.reduce((s,a)=>s+getBalance(a),0);
@@ -1064,7 +1481,7 @@ function renderAccounts(){
       ?entries.filter(e=>e.type==='payout').reduce((s,e)=>s+e.amount,0)
       :pf.reduce((s,a)=>s+(a.payouts||[]).reduce((x,p)=>x+p.amount,0),0);
     const g=gid!==null?accGroups.find(x=>x.id===gid):null;
-    const title=accFilter==='live'?'Live Portfolio':accFilter==='funded'?'Funded Portfolio':g?('🗂 '+g.name+' — Portfolio'):'Portfolio (Funded + Live)';
+    const title=accFilter==='live'?'Live Portfolio':accFilter==='funded'?'Funded Portfolio':g?('<i class="ti ti-folder"></i> '+g.name+' — Portfolio'):'Portfolio (Funded + Live)';
     bar.style.display='block';
     bar.innerHTML='<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="ti ti-layout-dashboard" style="font-size:13px"></i> '+title+'</div>'
       +'<div class="krow" style="margin-bottom:0">'
@@ -1074,12 +1491,31 @@ function renderAccounts(){
       +'<div class="kpi"><div class="klbl">Accounts</div><div class="kval">'+pf.length+'</div></div>'
       +'</div>';
   }else if(bar){bar.style.display='none';}
+  if(accView==='list'&&!groupManage){
+    grid.innerHTML=vis.map(acc=>{
+      const r=accReadyState(acc);
+      const stTxt=r.isPending?'<i class="ti ti-hourglass"></i> Pending':r.isLive?'<i class="ti ti-star-filled"></i> Live':r.isFunded?(r.canPayout?'✓ Payout ready':(r.wd>0?r.profitDays+'/'+r.wd+' days':'—')):r.passReady?'<i class="ti ti-school"></i> Pass ready':((acc.target||0)>0?Math.min(100,Math.max(0,Math.round((r.netPnL/acc.target)*100)))+'% to target':'<i class="ti ti-target"></i> Eval');
+      return '<div class="acc-row" onclick="openDetail('+acc.id+',event)">'
+        +'<span style="font-weight:600;font-size:13px">'+acc.name+'</span>'
+        +(acc.number?'<span style="font-size:11px;color:var(--muted)">#'+acc.number+'</span>':'')
+        +'<span class="badge '+(r.isPending?'bo':r.isLive?'bl':r.isFunded?'bg':'ba')+'">'+(r.isPending?'<i class="ti ti-hourglass"></i>':r.isLive?'<i class="ti ti-star-filled"></i> Live':r.isFunded?'<i class="ti ti-circle-check"></i> Funded':'<i class="ti ti-target"></i> Eval')+'</span>'
+        +'<span style="flex:1"></span>'
+        +'<span style="font-size:12px;color:var(--text2)">'+stTxt+'</span>'
+        +'<span style="font-weight:700;font-size:13px;color:'+(r.bal>=(acc.size||0)?'var(--blue)':'var(--red)')+'">'+fmt(r.bal)+'</span>'
+        +'<span style="font-size:12px;font-weight:600;color:'+(r.netPnL>=0?'var(--green)':'var(--red)')+'">'+fmtS(r.netPnL)+'</span>'
+        +'<span style="display:flex;gap:3px"><button class="iconbtn" onclick="toggleStatus('+acc.id+',event)"><i class="ti ti-refresh"></i></button><button class="iconbtn" onclick="deleteAccount('+acc.id+',event)"><i class="ti ti-trash"></i></button></span>'
+        +'</div>';
+    }).join('');
+    return;
+  }
   grid.innerHTML=vis.map(acc=>{
     const isFunded=acc.status==='funded',isLive=acc.status==='live',bal=getBalance(acc),isPending=!!(acc.payoutPending);
     const{netPnL,profitDays,relEntries}=getPeriodStats(acc);const wd=isLive?0:winDaysOf(acc);
-    const con=checkConsistency(acc,relEntries,netPnL);const conBadge=con&&!con.noData&&!con.ok?'<span class="badge bo">⚠ Consistency</span>':'';
+    const con=checkConsistency(acc,relEntries,netPnL);const conBadge=con&&!con.noData&&!con.ok?'<span class="badge bo"><i class="ti ti-alert-triangle"></i> Consistency</span>':'';
     const conOk=!con||con.noData||con.ok;
-    const canPayout=(isFunded||isLive)&&!isPending&&(wd===0||profitDays>=wd)&&conOk;const balDelta=bal-(acc.size||0);const winStreak=getWinStreak(acc);
+    const bufferOk=!isFunded||!(acc.payoutBuffer>0)||bal>=acc.payoutBuffer;
+    const bufBadge=isFunded&&acc.payoutBuffer>0?'<span class="badge '+(bufferOk?'bg':'bo')+'">'+(bufferOk?'<i class="ti ti-trending-up"></i> Over Buffer':'<i class="ti ti-trending-down"></i> Below Buffer')+'</span>':'';
+    const canPayout=(isFunded||isLive)&&!isPending&&(wd===0||profitDays>=wd)&&conOk&&bufferOk;const balDelta=bal-(acc.size||0);const winStreak=getWinStreak(acc);
     const target=acc.target||0,pct=!isFunded&&target>0?Math.min(100,Math.max(0,Math.round((netPnL/target)*100))):0;
     const passReady=!isFunded&&target>0&&netPnL>=target&&conOk;
     const cardClass=isPending?'pending-card':passReady?'pass-ready':(canPayout&&!isLive)?'funded-ready':'';
@@ -1087,20 +1523,21 @@ function renderAccounts(){
     const clickFn=groupManage?'toggleAccInGroup('+acc.id+',event)':'openDetail('+acc.id+',event)';
     const manageRow=groupManage?'<div style="font-size:12px;font-weight:600;margin-bottom:6px;color:'+(inGroup?'var(--green)':'var(--muted)')+'">'+(inGroup?'✓ In group — click to remove':'○ Click to add to group')+'</div>':'';
     return '<div class="acccard '+cardClass+'" style="'+(groupManage&&inGroup?'border-color:var(--green);border-width:1.5px':'')+'" onclick="'+clickFn+'">'+manageRow+'<div class="acchead"><div class="acchead-left"><div class="accname">'+acc.name+'</div>'+(acc.number?'<div class="accnumber"><i class="ti ti-hash" style="font-size:11px"></i>'+acc.number+'</div>':'')+'</div><div style="display:flex;gap:3px"><button class="iconbtn" onclick="toggleStatus('+acc.id+',event)"><i class="ti ti-refresh"></i></button><button class="iconbtn" onclick="deleteAccount('+acc.id+',event)"><i class="ti ti-trash"></i></button></div></div>'
-      +'<div class="acc-status-row"><span class="badge '+(isPending?'bo':isLive?'bl':passReady?'bg':isFunded?'bg':'ba')+'">'+(isPending?'⏳ Pending':isLive?'★ Live':passReady?'🎓 Pass Ready':isFunded?'✓ Funded':'◎ Evaluation')+'</span>'+conBadge+'<span style="font-size:11px;color:var(--muted);margin-left:auto">$'+Number(acc.size).toLocaleString('en-US')+'</span></div>'
+      +'<div class="acc-status-row"><span class="badge '+(isPending?'bo':isLive?'bl':passReady?'bg':isFunded?'bg':'ba')+'">'+(isPending?'<i class="ti ti-hourglass"></i> Pending':isLive?'<i class="ti ti-star-filled"></i> Live':passReady?'<i class="ti ti-school"></i> Pass Ready':isFunded?'<i class="ti ti-circle-check"></i> Funded':'<i class="ti ti-target"></i> Evaluation')+'</span>'+bufBadge+conBadge+'<span style="font-size:11px;color:var(--muted);margin-left:auto">$'+Number(acc.size).toLocaleString('en-US')+'</span></div>'
       +'<div class="balance-box '+(balDelta>0?'up':balDelta<0?'down':'')+'"><div><div class="balance-label">Balance</div><div style="font-size:22px;font-weight:700;color:'+(bal>=(acc.size||0)?'var(--blue)':'var(--red)')+'">'+fmt(bal)+'</div></div><div style="text-align:right"><div class="balance-change-label">P&L</div><div style="font-size:14px;font-weight:600;color:'+(netPnL>=0?'var(--green)':'var(--red)')+'">'+fmtS(netPnL)+'</div></div></div>'
-      +((isFunded||isLive)?'<div style="font-size:12px;color:var(--muted)">'+(isPending?'⏳ Awaiting payout approval':isLive?'★ Live — no payout requirements':wd===0?'No day req.':profitDays+'/'+wd+' win days')+(canPayout&&!isLive?' <span style="color:var(--green);font-weight:600">✓ Ready</span>':'')+'</div>'
+      +sparkline(acc)
+      +((isFunded||isLive)?'<div style="font-size:12px;color:var(--muted)">'+(isPending?'<i class="ti ti-hourglass"></i> Awaiting payout approval':isLive?'<i class="ti ti-star-filled"></i> Live — no payout requirements':wd===0?'No day req.':profitDays+'/'+wd+' win days')+(canPayout&&!isLive?' <span style="color:var(--green);font-weight:600">✓ Ready</span>':'')+'</div>'
         :target>0?'<div><div class="prog-lbl"><span>Progress '+pct+'%</span><span>Target: '+fmt((acc.size||0)+target)+'</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%;background:'+(passReady?'var(--green)':'var(--amber)')+'"></div></div>'+(passReady?'<div style="font-size:11px;color:var(--green);font-weight:600;margin-top:4px;display:flex;align-items:center;gap:4px"><i class="ti ti-badge" style="font-size:13px"></i> Ready to pass to Funded!</div>':'')+'</div>':'')
-      +(isFunded&&acc.livePayoutGoal>0?'<div style="font-size:12px;color:var(--muted);margin-top:2px">💰 '+(acc.payouts||[]).length+'/'+acc.livePayoutGoal+' payouts → Live'+((acc.payouts||[]).length>=acc.livePayoutGoal?' <span style="color:var(--green);font-weight:600">✓ Eligible</span>':'')+'</div>':'')
-      +(winStreak>=2?'<div class="streak-box" style="margin-top:2px">🔥 '+winStreak+'-day win streak</div>':'')
+      +(isFunded&&acc.livePayoutGoal>0?'<div style="font-size:12px;color:var(--muted);margin-top:2px"><i class="ti ti-cash"></i> '+(acc.payouts||[]).length+'/'+acc.livePayoutGoal+' payouts → Live'+((acc.payouts||[]).length>=acc.livePayoutGoal?' <span style="color:var(--green);font-weight:600">✓ Eligible</span>':'')+'</div>':'')
+      +(winStreak>=2?'<div class="streak-box" style="margin-top:2px"><i class="ti ti-flame"></i> '+winStreak+'-day win streak</div>':'')
       +'<div class="card-hint"><i class="ti ti-chart-line" style="font-size:12px"></i> Click for chart & details</div></div>';
   }).join('');
 }
 
 /* ── ENTRIES ── */
 function toggleEntryForm(){const f=document.getElementById('entryForm');const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){document.getElementById('fd').value=todayStr();['fa','fn'].forEach(id=>document.getElementById(id).value='');document.getElementById('ft').value='payout';document.getElementById('fc').value='profit';editId=null;}}
-function saveEntry(){const date=document.getElementById('fd').value,type=document.getElementById('ft').value,amount=parseFloat(document.getElementById('fa').value)||0,cat=document.getElementById('fc').value,note=document.getElementById('fn').value;if(!date||!amount){alert('Please enter date and amount.');return;}if(editId!==null){const i=entries.findIndex(e=>e.id===editId);if(i>-1)entries[i]={...entries[i],date,type,amount,cat,note};editId=null;}else entries.push({id:Date.now(),date,type,amount,cat,note});entries.sort((a,b)=>b.date.localeCompare(a.date));saveAll();renderEntries();document.getElementById('entryForm').style.display='none';}
-function deleteEntry(id){if(!confirm('Delete?'))return;entries=entries.filter(e=>e.id!==id);saveAll();renderEntries();}
+function saveEntry(){const date=document.getElementById('fd').value,type=document.getElementById('ft').value,amount=parseFloat(document.getElementById('fa').value)||0,cat=document.getElementById('fc').value,note=document.getElementById('fn').value;if(!date||!amount){uiAlert('Please enter date and amount.');return;}if(editId!==null){const i=entries.findIndex(e=>e.id===editId);if(i>-1)entries[i]={...entries[i],date,type,amount,cat,note};editId=null;}else entries.push({id:Date.now(),date,type,amount,cat,note});entries.sort((a,b)=>b.date.localeCompare(a.date));saveAll();renderEntries();document.getElementById('entryForm').style.display='none';showToast('Entry saved ✓');}
+async function deleteEntry(id){if(!await uiConfirm('Delete this entry?',{icon:'<i class="ti ti-trash"></i>',title:'Delete entry',okText:'Delete',danger:true}))return;entries=entries.filter(e=>e.id!==id);saveAll();renderEntries();}
 function editEntry(id){const e=entries.find(x=>x.id===id);if(!e)return;editId=id;document.getElementById('fd').value=e.date;document.getElementById('ft').value=e.type;document.getElementById('fa').value=e.amount;document.getElementById('fc').value=e.cat;document.getElementById('fn').value=e.note||'';document.getElementById('entryForm').style.display='block';}
 function setFilter(f,btn){filter=f;document.querySelectorAll('#tabEntries .chip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');renderEntries();}
 function renderEntries(){
@@ -1144,7 +1581,7 @@ function renderAnalytics(){
   document.getElementById('chartKpi').innerHTML='<div class="kpi"><div class="klbl">Payouts</div><div class="kval g">+ '+fmt(totP)+'</div></div><div class="kpi"><div class="klbl">Expenses</div><div class="kval r">- '+fmt(totE)+'</div></div><div class="kpi"><div class="klbl">Net</div><div class="kval '+(net>=0?'g':'r')+'">'+fmtS(net)+'</div></div><div class="kpi"><div class="klbl">Count</div><div class="kval">'+pEntries.length+'</div></div><div class="kpi"><div class="klbl">Best Day</div><div class="kval g" style="font-size:14px">'+(bd?'★ '+fmt(bd[1]):'—')+'</div></div>';
   const bc=document.getElementById('barChart');
   if(!labels.length||(!totP&&!totE)){bc.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;color:var(--muted);font-size:13px">No data for this period</div>';}
-  else{const max=Math.max(...pData,...eData,1);bc.innerHTML=labels.map((lbl,i)=>{const ph=Math.round((pData[i]/max)*130),eh=Math.round((eData[i]/max)*130);return'<div class="bcol"><div class="bpair"><div class="bseg" style="height:'+ph+'px;background:var(--green);min-height:'+(pData[i]>0?2:0)+'px"></div><div class="bseg" style="height:'+eh+'px;background:var(--red);min-height:'+(eData[i]>0?2:0)+'px"></div></div><div class="blbl">'+lbl+'</div></div>';}).join('');}
+  else{const max=Math.max(...pData,...eData,1);bc.innerHTML=labels.map((lbl,i)=>{const ph=Math.round((pData[i]/max)*130),eh=Math.round((eData[i]/max)*130);const net=pData[i]-eData[i];const tip='<div class="btip"><div style="font-weight:700;margin-bottom:2px">'+lbl+'</div><div style="color:var(--green);font-weight:600">Payouts: + '+fmt(pData[i])+'</div><div style="color:var(--red);font-weight:600">Expenses: - '+fmt(eData[i])+'</div><div style="color:'+(net>=0?'var(--green)':'var(--red)')+';font-weight:700;border-top:.5px solid var(--border);margin-top:3px;padding-top:3px">Net: '+fmtS(net)+'</div></div>';return'<div class="bcol">'+tip+'<div class="bpair"><div class="bseg" style="height:'+ph+'px;background:var(--green);min-height:'+(pData[i]>0?2:0)+'px"></div><div class="bseg" style="height:'+eh+'px;background:var(--red);min-height:'+(eData[i]>0?2:0)+'px"></div></div><div class="blbl">'+lbl+'</div></div>';}).join('');}
   const sorted=Object.entries(dm).sort((a,b)=>b[1]-a[1]).slice(0,5);const medals=['🥇','🥈','🥉','4.','5.'];
   document.getElementById('topDays').innerHTML=sorted.length?sorted.map(([date,val],i)=>'<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:.5px solid var(--border);font-size:13px"><span>'+medals[i]+'</span><span style="flex:1;color:var(--text2)">'+fmtDate(date)+'</span><span style="font-weight:500;color:var(--green)">+ '+fmt(val)+'</span></div>').join(''):'<div class="empty"><i class="ti ti-trophy"></i>No data</div>';
   renderCumulativeChart();
@@ -1153,8 +1590,8 @@ function renderAnalytics(){
 /* ── ACHIEVEMENTS / RECORDS ── */
 function selectColor(color,el){selectedColor=color;document.querySelectorAll('.color-opt').forEach(e=>e.classList.remove('selected'));el.classList.add('selected');}
 function toggleFolderForm(){const f=document.getElementById('folderForm');const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){document.getElementById('ff_name').value='';selectedColor='#3b82f6';document.querySelectorAll('.color-opt').forEach((e,i)=>e.classList.toggle('selected',i===0));}}
-function saveFolder(){const name=document.getElementById('ff_name').value.trim();if(!name){alert('Please enter a folder name.');return;}folders.push({id:Date.now(),name,color:selectedColor,certificates:[]});saveAll();document.getElementById('folderForm').style.display='none';renderAchievements();}
-function deleteFolder(){if(!selectedFolderId)return;if(!confirm('Delete this folder and all its certificates?'))return;folders=folders.filter(f=>f.id!==selectedFolderId);selectedFolderId=null;saveAll();closeFolder();}
+function saveFolder(){const name=document.getElementById('ff_name').value.trim();if(!name){uiAlert('Please enter a folder name.');return;}folders.push({id:Date.now(),name,color:selectedColor,certificates:[]});saveAll();document.getElementById('folderForm').style.display='none';renderAchievements();}
+async function deleteFolder(){if(!selectedFolderId)return;if(!await uiConfirm('Delete this folder and all its certificates?',{icon:'<i class="ti ti-trash"></i>',title:'Delete folder',okText:'Delete',danger:true}))return;folders=folders.filter(f=>f.id!==selectedFolderId);selectedFolderId=null;saveAll();closeFolder();}
 function openFolder(id){selectedFolderId=id;document.getElementById('achFolderView').style.display='none';document.getElementById('achDetailView').style.display='block';renderFolderDetail();}
 function closeFolder(){selectedFolderId=null;document.getElementById('achDetailView').style.display='none';document.getElementById('achFolderView').style.display='block';renderAchievements();}
 function renderAchievements(){
@@ -1183,7 +1620,7 @@ async function uploadCertificate(event){
   folder.certificates.push({id:Date.now(),name,date:todayStr(),imageData});
   saveAll();renderFolderDetail();event.target.value='';
 }
-function deleteCert(certId){if(!confirm('Delete this certificate?'))return;const folder=folders.find(f=>f.id===selectedFolderId);if(!folder)return;folder.certificates=(folder.certificates||[]).filter(c=>c.id!==certId);saveAll();renderFolderDetail();}
+async function deleteCert(certId){if(!await uiConfirm('Delete this certificate?',{icon:'<i class="ti ti-trash"></i>',title:'Delete certificate',okText:'Delete',danger:true}))return;const folder=folders.find(f=>f.id===selectedFolderId);if(!folder)return;folder.certificates=(folder.certificates||[]).filter(c=>c.id!==certId);saveAll();renderFolderDetail();}
 function openLightbox(certId){const folder=folders.find(f=>f.id===selectedFolderId);if(!folder)return;const cert=folder.certificates.find(c=>c.id===Number(certId)||c.id===certId);if(!cert||!cert.imageData)return;document.getElementById('lightboxImg').src=cert.imageData;document.getElementById('lightbox').classList.add('open');}
 function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.getElementById('lightboxImg').src='';}
 
@@ -1222,7 +1659,7 @@ function renderNewsList(dayKey){
   });
   let itemsH="";
   items.forEach(function(item){
-    itemsH+='<div class="news-item"><div class="news-dot" style="background:'+(IMPACT_COLORS[item.impact||"high"]||"#dc2626")+'"></div>'+(item.time?'<span class="news-meta">'+item.time+'</span>':'')+( item.currency?'<span class="news-meta" style="font-weight:600">'+item.currency+'</span>':'')+' <span class="news-text">'+item.text+'</span><button class="iconbtn" style="font-size:12px" onclick="removeNewsItem(&quot;'+dayKey+'&quot;,'+item.id+')"><i class="ti ti-x"></i></button></div>';
+    itemsH+='<div class="news-item"><div class="news-dot" style="background:'+(IMPACT_COLORS[item.impact||"high"]||"#dc2626")+'"></div>'+(item.time?'<span class="news-meta">'+item.time+'</span>':'')+( item.currency?'<span class="news-meta" style="font-weight:600">'+item.currency+'</span>':'')+' <span class="news-text">'+item.text+'</span><button class="iconbtn" style="font-size:12px;color:'+(item.notify?'var(--amber)':'var(--muted)')+'" title="'+(item.notify?'Notification ON (5 min before)':'Notify me 5 min before')+'" onclick="toggleNewsNotify(&quot;'+dayKey+'&quot;,'+item.id+')"><i class="ti ti-bell'+(item.notify?'-ringing':'')+'"></i></button><button class="iconbtn" style="font-size:12px" onclick="removeNewsItem(&quot;'+dayKey+'&quot;,'+item.id+')"><i class="ti ti-x"></i></button></div>';
   });
   let tmplH="";
   if(templates.length){
@@ -1256,10 +1693,47 @@ function addNewsItem(dayKey){
   const nc=document.getElementById('nc_'+dayKey);if(nc)nc.value='';
 }
 function removeNewsItem(dayKey,id){notes.news[dayKey]=(notes.news[dayKey]||[]).filter(x=>x.id!==id);saveNotesNow();renderNewsList(dayKey);const f=document.getElementById('nf_'+dayKey);if(f)f.style.display='none';}
+function toggleNewsNotify(dayKey,id){
+  const it=(notes.news[dayKey]||[]).find(x=>x.id===id);if(!it)return;
+  it.notify=!it.notify;saveNotesNow();renderNewsList(dayKey);
+  showToast(it.notify?'Notification on — 5 min before '+(it.time||'the event'):'Notification off');
+  if(it.notify&&typeof Notification!=='undefined'&&Notification.permission==='default')Notification.requestPermission();
+}
+
+/* ── NOTIFICATIONS (news reminders + payout ready) ── */
+let _newsTimer=null,_firedNews={};
+function notifyMsg(title,body){try{if(typeof Notification!=='undefined'&&Notification.permission==='granted')new Notification(title,{body});}catch(e){}}
+function checkNewsNotifications(){
+  const now=new Date();
+  const dk=['sun','mon','tue','wed','thu','fri','sat'][now.getDay()];
+  ((notes.news||{})[dk]||[]).forEach(it=>{
+    if(!it.notify||!it.time)return;
+    const m=String(it.time).match(/^(\d{1,2}):(\d{2})/);if(!m)return;
+    const ev=new Date(now);ev.setHours(+m[1],+m[2],0,0);
+    const lead=new Date(ev.getTime()-5*60000);
+    const fk=todayStr()+'_'+it.id;
+    if(_firedNews[fk])return;
+    if(now>=lead&&now<=ev){_firedNews[fk]=1;notifyMsg('News in ~5 min — '+it.time,(it.currency?it.currency+' \u00b7 ':'')+it.text);}
+  });
+}
+function checkPayoutReadyNotify(){
+  try{
+    const ready=accounts.filter(a=>accReadyState(a).canPayout).map(a=>String(a.id));
+    let prev=[];try{prev=JSON.parse(localStorage.getItem('af_ready_notified')||'[]');}catch(e){}
+    ready.filter(id=>!prev.includes(id)).forEach(id=>{const a=accounts.find(x=>String(x.id)===id);if(a)notifyMsg('Payout ready \ud83c\udf89',a.name+' meets all payout conditions \u2014 you can request it!');});
+    localStorage.setItem('af_ready_notified',JSON.stringify(ready));
+  }catch(e){}
+}
+function initNotifications(){
+  if(typeof Notification==='undefined')return;
+  if(_newsTimer)clearInterval(_newsTimer);
+  _newsTimer=setInterval(checkNewsNotifications,30000);
+  checkNewsNotifications();
+}
 function saveNewsTemplate(dayKey){
   const text=(document.getElementById('ne_'+dayKey)||{}).value||'';
   const cur=(document.getElementById('nc_'+dayKey)||{}).value||'';
-  if(!text.trim()){alert('Enter an event name first.');return;}
+  if(!text.trim()){uiAlert('Enter an event name first.');return;}
   if(!notes.newsTemplates)notes.newsTemplates=[];
   notes.newsTemplates.push({id:Date.now(),impact:_newsImpact[dayKey]||'high',text:text.trim(),currency:cur.trim()});
   saveNotesNow();renderNewsList(dayKey);const f=document.getElementById('nf_'+dayKey);if(f)f.style.display='block';
@@ -1279,14 +1753,84 @@ function useTemplate(dayKey,id){
 
 let _notesSaveTimer=null;
 function saveNotesNow(){try{localStorage.setItem('af_notes',JSON.stringify(notes));}catch(e){}}
+
+/* ── WEEKLY REPORT IMPORT (e.g. Cowork USD report) ── */
+function parseWeekReport(doc){
+  const dayMap={mo:'mon',di:'tue',mi:'wed','do':'thu',fr:'fri'};
+  const events=[];
+  doc.querySelectorAll('table').forEach(tb=>{
+    const card=tb.closest('.card')||tb.parentElement;
+    const h2=card?card.querySelector('h2'):null;
+    if(h2&&/ausblick|woche danach|next week/i.test(h2.textContent))return;
+    const heads=[...tb.querySelectorAll('th')].map(th=>th.textContent.trim().toLowerCase());
+    if(!heads.some(h=>h.includes('event')))return;
+    tb.querySelectorAll('tbody tr').forEach(tr=>{
+      const td=[...tr.querySelectorAll('td')].map(x=>x.textContent.trim());
+      if(td.length<4)return;
+      const dm=(td[0].match(/\b(Mo|Di|Mi|Do|Fr)\b/i)||[])[1];
+      if(!dm)return;
+      const key=dayMap[dm.toLowerCase()];if(!key)return;
+      const imp=/rot|red/i.test(td[2])?'high':/orange/i.test(td[2])?'medium':/grau|gray/i.test(td[2])?'holiday':'low';
+      let text=td[3];
+      if(td[4])text+=' (F: '+td[4]+(td[5]?' · P: '+td[5]:'')+')';
+      events.push({key,time:td[1],impact:imp,text});
+    });
+  });
+  const lowNote=doc.querySelector('.empty-week .note');
+  if(lowNote){
+    const rx=/\b(Mo|Di|Mi|Do|Fr)\s+(\d{1,2}:\d{2})\s+([^·.]+)/g;let m;
+    while((m=rx.exec(lowNote.textContent))){
+      const key=dayMap[m[1].toLowerCase()];
+      if(key)events.push({key,time:m[2],impact:'low',text:m[3].trim()});
+    }
+  }
+  let summary='';
+  doc.querySelectorAll('.card').forEach(c=>{
+    const h2=c.querySelector('h2');if(!h2)return;
+    if(/wochenüberblick|überblick|overview/i.test(h2.textContent)){
+      summary+=[...c.querySelectorAll('p')].map(p=>p.textContent.trim()).join('\n');
+    }
+  });
+  const verdict=doc.querySelector('.verdict');
+  if(verdict)summary+=(summary?'\n\n':'')+verdict.textContent.trim();
+  return{events,summary};
+}
+async function importWeekReport(input){
+  const file=input.files&&input.files[0];input.value='';if(!file)return;
+  let doc;
+  try{doc=new DOMParser().parseFromString(await file.text(),'text/html');}
+  catch(e){uiAlert('Could not read this file.',{icon:'<i class="ti ti-alert-triangle"></i>',title:'Import failed'});return;}
+  const{events,summary}=parseWeekReport(doc);
+  if(!events.length&&!summary){
+    uiAlert('No events or weekly summary found in this file.\n\nExpected a weekly report like the Cowork USD report.',{icon:'<i class="ti ti-alert-triangle"></i>',title:'Import failed'});
+    return;
+  }
+  const title=((doc.querySelector('title')||{}).textContent||'Report').trim();
+  if(!await uiConfirm('Found '+events.length+' news event'+(events.length!==1?'s':'')+(summary?' + weekly summary':'')+' in:\n"'+title+'"\n\nAdd them to Notes/News?',{icon:'<i class="ti ti-file-import"></i>',title:'Import report',okText:'Import'}))return;
+  if(!notes.news)notes.news={mon:[],tue:[],wed:[],thu:[],fri:[]};
+  const cur=(title.match(/\b(USD|EUR|GBP|JPY|CHF|AUD|CAD|NZD)\b/i)||['','USD'])[1].toUpperCase();
+  let added=0;
+  events.forEach((ev,ix)=>{
+    if(!notes.news[ev.key])notes.news[ev.key]=[];
+    if(notes.news[ev.key].some(x=>x.text===ev.text&&x.time===ev.time))return;
+    notes.news[ev.key].push({id:Date.now()+ix,impact:ev.impact,text:ev.text,time:ev.time,currency:cur});
+    added++;
+  });
+  if(summary&&!(notes.weekGeneral||'').includes(summary.slice(0,60))){
+    notes.weekGeneral=(notes.weekGeneral?notes.weekGeneral+'\n\n':'')+'— Imported: '+title+' —\n'+summary;
+  }
+  saveNotesNow();
+  if(currentTab==='notes')renderNotes();
+  showToast(added+' news event'+(added!==1?'s':'')+' imported ✓');
+}
 function autoSaveNotes(){
   ['mon','tue','wed','thu','fri'].forEach(k=>{const el=document.getElementById('dayNote_'+k);if(el)notes[k]=el.value;});
   const wg=document.getElementById('weekGeneral');if(wg)notes.weekGeneral=wg.value;
   const gn=document.getElementById('generalNotes');if(gn)notes.general=gn.value;
   clearTimeout(_notesSaveTimer);_notesSaveTimer=setTimeout(saveNotesNow,600);
 }
-function clearWeeklyNotes(){
-  if(!confirm("Clear all notes and news for this week?"))return;
+async function clearWeeklyNotes(){
+  if(!await uiConfirm("Clear all notes and news for this week?",{icon:'<i class="ti ti-eraser"></i>',title:"Clear week",okText:"Clear",danger:true}))return;
   ['mon','tue','wed','thu','fri'].forEach(k=>{notes[k]='';if(!notes.news)notes.news={};notes.news[k]=[];const el=document.getElementById('dayNote_'+k);if(el)el.value='';});
   notes.weekGeneral='';const wg=document.getElementById('weekGeneral');if(wg)wg.value='';
   saveNotesNow();renderNotes();
@@ -1378,7 +1922,7 @@ function renderTimeline(){
   (acc.payouts||[]).forEach((p,i)=>events.push({key:'p'+p.id,date:p.date,type:'payout',title:'Payout #'+(i+1)+' Received',amount:p.amount}));
   if(acc.payoutPending)events.push({key:'pending',date:acc.payoutPending.requestDate,type:'pending',title:'Payout Pending',sub:'Awaiting firm approval',amount:acc.payoutPending.amount});
   events.sort((a,b)=>b.date.localeCompare(a.date));
-  const icons={start:'📅',funded:'🎓',payout:'💰',pending:'⏳',live:'🚀'};
+  const icons={start:'<i class="ti ti-calendar"></i>',funded:'<i class="ti ti-school"></i>',payout:'<i class="ti ti-cash"></i>',pending:'<i class="ti ti-hourglass"></i>',live:'<i class="ti ti-rocket"></i>'};
   const dotCls={start:'tl-start',funded:'tl-funded',payout:'tl-payout',pending:'tl-pending',live:'tl-live'};
   const dateHtml=ev=>_tlEdit===ev.key
     ?'<div style="display:flex;gap:6px;align-items:center;margin-top:4px;flex-wrap:wrap"><input type="date" id="tlDateInput" value="'+ev.date+'" style="padding:4px 8px;font-size:12px"><button class="chip" onclick="tlSaveDate(\''+ev.key+'\')">✓ Save</button><button class="chip" onclick="_tlEdit=null;renderTimeline()">✕ Cancel</button></div>'
@@ -1390,7 +1934,7 @@ function renderTimeline(){
 }
 function tlEditDate(key){_tlEdit=key;renderTimeline();}
 function tlSaveDate(key){
-  const v=(document.getElementById('tlDateInput')||{}).value;if(!v){alert('Please pick a date.');return;}
+  const v=(document.getElementById('tlDateInput')||{}).value;if(!v){uiAlert('Please pick a date.');return;}
   const acc=accounts.find(a=>a.id===detailAccId);if(!acc)return;
   if(key==='start')acc.startDate=v;
   else if(key==='funded')acc.fundedDate=v;
@@ -1402,7 +1946,7 @@ function tlSaveDate(key){
     acc.payouts.sort((a,b)=>a.date.localeCompare(b.date));
     if(acc.payouts.length)acc.lastPayoutDate=acc.payouts[acc.payouts.length-1].date;
   }
-  _tlEdit=null;saveAll();renderTimeline();
+  _tlEdit=null;saveAll();renderTimeline();showToast('Date updated ✓');
 }
 
 /* ── JOURNAL ── */
@@ -1449,7 +1993,7 @@ function toggleTradeForm(){
 }
 function saveTrade(){
   const date=(document.getElementById('tj_date')||{}).value,sym=((document.getElementById('tj_sym')||{}).value||'').trim();
-  if(!date||!sym){alert('Please enter date and symbol.');return;}
+  if(!date||!sym){uiAlert('Please enter date and symbol.');return;}
   const g=id=>(document.getElementById(id)||{}).value||'';
   const trade={id:_jEditId||Date.now(),date,accountId:g('tj_acc')||null,symbol:sym,direction:_jDir,
     setup:g('tj_setup').trim(),entryReason:g('tj_entry_reason').trim(),target:g('tj_target').trim(),
@@ -1460,9 +2004,9 @@ function saveTrade(){
     impulse:_jImpulse,newsCtx:g('tj_news_ctx').trim(),session:_jSession,dayStart:g('tj_daystart').trim()};
   if(_jEditId){const i=trades.findIndex(t=>t.id===_jEditId);if(i>-1)trades[i]=trade;}else trades.push(trade);
   trades.sort((a,b)=>b.date.localeCompare(a.date));
-  saveAll();toggleTradeForm();renderJournal();
+  saveAll();toggleTradeForm();renderJournal();showToast('Trade saved ✓');
 }
-function deleteTrade(id){if(!confirm('Delete this trade?'))return;trades=trades.filter(t=>t.id!==id);saveAll();renderTradeList();}
+async function deleteTrade(id){if(!await uiConfirm('Delete this trade?',{icon:'<i class="ti ti-trash"></i>',title:'Delete trade',okText:'Delete',danger:true}))return;trades=trades.filter(t=>t.id!==id);saveAll();renderTradeList();}
 function toggleJCard(id){const e=document.getElementById('jc_'+id);if(e)e.classList.toggle('open');}
 function renderJournal(){
   const chips=document.getElementById('jAccChips');
@@ -1508,7 +2052,7 @@ function jDetailHTML(t){
     +'<div class="jsect">⚡ During</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">'+fld('Followed Plan',yn(t.followedPlan))+fld('Doubts',yn(t.hadDoubts))+fld('Stop Moved',yn(t.movedStop))+'</div>'
     +(t.moveReason?fld('Stop Reason',t.moveReason):'')
-    +'<div class="jsect">📊 Post-Trade</div>'
+    +'<div class="jsect"><i class="ti ti-chart-bar"></i> Post-Trade</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+fld('Entry Timed',yn(t.entryTimed))+fld('Earlier/Later',t.exit||'—')+'</div>'
     +(t.whatDiff?fld('What to Change',t.whatDiff):'')
     +'<div class="jsect">🧠 Psychology</div>'
@@ -1531,11 +2075,11 @@ function setJournalView(view){
 /* ── PLAYBOOKS ── */
 function togglePlaybookForm(){const f=document.getElementById('playbookForm');if(!f)return;const o=f.style.display==='block';f.style.display=o?'none':'block';if(!o){document.getElementById('pb_name').value='';document.getElementById('pb_desc').value='';setTimeout(()=>{const e=document.getElementById('pb_name');if(e)e.focus();},50);}}
 function savePlaybook(){
-  const name=(document.getElementById('pb_name').value||'').trim();if(!name){alert('Please enter a name.');return;}
+  const name=(document.getElementById('pb_name').value||'').trim();if(!name){uiAlert('Please enter a name.');return;}
   playbooks.push({id:Date.now(),name,description:(document.getElementById('pb_desc').value||'').trim()});
   saveAll();togglePlaybookForm();renderPlaybooks();
 }
-function deletePlaybook(id){if(!confirm('Delete this playbook?'))return;playbooks=playbooks.filter(p=>p.id!==id);saveAll();renderPlaybooks();}
+async function deletePlaybook(id){if(!await uiConfirm('Delete this playbook?',{icon:'<i class="ti ti-trash"></i>',title:'Delete playbook',okText:'Delete',danger:true}))return;playbooks=playbooks.filter(p=>p.id!==id);saveAll();renderPlaybooks();}
 function renderPlaybooks(){
   const grid=document.getElementById('playbookGrid'),empty=document.getElementById('playbookEmpty');if(!grid)return;
   if(!playbooks.length){grid.innerHTML='';if(empty)empty.style.display='block';return;}if(empty)empty.style.display='none';
@@ -1638,13 +2182,35 @@ function calcPositionSize(){
 const TAX_EXP_CATS=['fee','subscription','reset','news','hardware','other'];
 function getTaxYears(){const years=new Set(entries.map(e=>e.date.slice(0,4)));years.add(String(new Date().getFullYear()));return[...years].sort((a,b)=>b.localeCompare(a));}
 function setTaxYear(y){currentTaxYear=y;renderTax();}
+function setTaxMode(m){taxMode=m;renderTax();}
+function taxFilteredEntries(){
+  if(taxMode==='all')return entries.slice();
+  if(taxMode==='month')return entries.filter(e=>e.date.slice(0,7)===taxMonth);
+  if(taxMode==='range')return(taxFrom&&taxTo)?entries.filter(e=>e.date>=taxFrom&&e.date<=taxTo):[];
+  return entries.filter(e=>e.date.slice(0,4)===currentTaxYear);
+}
+function taxRangeLabel(){
+  if(taxMode==='all')return 'all-time';
+  if(taxMode==='month')return taxMonth;
+  if(taxMode==='range')return taxFrom+'_to_'+taxTo;
+  return currentTaxYear;
+}
 function toggleTaxCat(cat){taxConfig.deductibleCats[cat]=!taxConfig.deductibleCats[cat];saveAll();renderTax();}
 function renderTax(){
   const years=getTaxYears();
   if(!currentTaxYear||!years.includes(currentTaxYear))currentTaxYear=years[0];
-  const yc=document.getElementById('taxYearChips');
-  if(yc)yc.innerHTML=years.map(y=>'<button class="chip'+(y===currentTaxYear?' active':'')+'" onclick="setTaxYear(\''+y+'\')">'+y+'</button>').join('');
-  const yearEntries=entries.filter(e=>e.date.slice(0,4)===currentTaxYear);
+  if(!taxMonth)taxMonth=todayStr().slice(0,7);
+  const mc=document.getElementById('taxModeChips');
+  const mchip=(v,l)=>'<button class="chip'+(taxMode===v?' active':'')+'" onclick="setTaxMode(\''+v+'\')">'+l+'</button>';
+  if(mc)mc.innerHTML=mchip('year','Year')+mchip('month','Month')+mchip('range','Custom Range')+mchip('all','All Time');
+  const rc=document.getElementById('taxRangeControls');
+  if(rc){
+    if(taxMode==='year')rc.innerHTML='<div class="chips" style="margin-bottom:0">'+years.map(y=>'<button class="chip'+(y===currentTaxYear?' active':'')+'" onclick="setTaxYear(\''+y+'\')">'+y+'</button>').join('')+'</div>';
+    else if(taxMode==='month')rc.innerHTML='<input type="month" value="'+taxMonth+'" onchange="taxMonth=this.value;renderTax()" style="padding:7px 12px;font-size:13px;border-radius:8px;border:.5px solid var(--border-s);background:var(--surface);color:var(--text)">';
+    else if(taxMode==='range')rc.innerHTML='<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted)"><span>From</span><input type="date" value="'+taxFrom+'" onchange="taxFrom=this.value;renderTax()" style="padding:7px 12px;font-size:13px;border-radius:8px;border:.5px solid var(--border-s);background:var(--surface);color:var(--text)"><span>to</span><input type="date" value="'+taxTo+'" onchange="taxTo=this.value;renderTax()" style="padding:7px 12px;font-size:13px;border-radius:8px;border:.5px solid var(--border-s);background:var(--surface);color:var(--text)">'+((!taxFrom||!taxTo)?'<span style="color:var(--amber)">Pick both dates</span>':'')+'</div>';
+    else rc.innerHTML='';
+  }
+  const yearEntries=taxFilteredEntries();
   const payouts=yearEntries.filter(e=>e.type==='payout'),expenses=yearEntries.filter(e=>e.type==='expense');
   const totalPayouts=payouts.reduce((s,e)=>s+e.amount,0);
   const deductible=expenses.filter(e=>taxConfig.deductibleCats[e.cat]);
@@ -1675,8 +2241,8 @@ function renderTax(){
   }
 }
 function exportTaxCSV(){
-  const yearEntries=entries.filter(e=>e.date.slice(0,4)===currentTaxYear).sort((a,b)=>a.date.localeCompare(b.date));
-  if(!yearEntries.length){alert('No entries for '+currentTaxYear+'.');return;}
+  const yearEntries=taxFilteredEntries().sort((a,b)=>a.date.localeCompare(b.date));
+  if(!yearEntries.length){uiAlert('No entries in the selected period.');return;}
   let csv='Date,Type,Category,Note,Amount,Deductible\n';
   yearEntries.forEach(e=>{
     const deductible=e.type==='expense'?(taxConfig.deductibleCats[e.cat]?'Yes':'No'):'—';
@@ -1685,12 +2251,25 @@ function exportTaxCSV(){
   });
   const blob=new Blob([csv],{type:'text/csv'});
   const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download='tax-report-'+currentTaxYear+'.csv';document.body.appendChild(a);a.click();a.remove();
+  const a=document.createElement('a');a.href=url;a.download='tax-report-'+taxRangeLabel()+'.csv';document.body.appendChild(a);a.click();a.remove();
   URL.revokeObjectURL(url);
 }
 
 /* ── INIT ── */
-migrateData();initTheme();renderAccounts();
+if(navigator.userAgent.includes('Electron'))document.body.classList.add('electron');
+migrateData();initTheme();renderDashboard();initNotifications();
+if(window.patienceDesktop&&window.patienceDesktop.onQuickAdd)window.patienceDesktop.onQuickAdd(d=>{
+  const a=accounts.find(x=>String(x.id)===String(d.accountId));
+  const pnl=parseFloat(d.pnl);
+  if(!a||!pnl)return;
+  if(!a.dailyEntries)a.dailyEntries=[];
+  a.dailyEntries.push({id:Date.now(),date:todayStr(),pnl});
+  a.dailyEntries.sort((x,y)=>x.date.localeCompare(y.date));
+  saveAll();
+  if(currentTab==='dashboard')renderDashboard();else if(currentTab==='accounts')renderAccounts();
+  if(detailAccId===a.id)renderDetail();
+  showToast('Quick-added '+fmtS(pnl)+' to '+a.name);
+});
 </script>
 </body>
 </html>
