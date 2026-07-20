@@ -301,6 +301,9 @@ tbody tr:hover td{background:var(--s2)}
 .cal-cell.cal-loss{background:var(--rbg);border-color:var(--red)}
 .cal-cell.cal-today{border-color:var(--blue);border-width:1.5px}
 .cal-cell.cal-weekend{opacity:.55}
+.cal-cell.cal-best{border:2px solid #f0b90b;box-shadow:0 0 0 2px rgba(240,185,11,.28),0 0 14px rgba(240,185,11,.35)}
+.cal-cell.cal-best .cal-day{color:#f0b90b;font-weight:800}
+.cal-best-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:20px;background:rgba(240,185,11,.1);border:1px solid rgba(240,185,11,.5);color:#f0b90b;font-size:12.5px;font-weight:700;margin-bottom:12px}
 .cal-day{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px}
 .cal-cell.empty .cal-day{color:var(--muted);opacity:.4}
 .cal-pnl{font-size:11px;font-weight:700}
@@ -1867,6 +1870,10 @@ function renderTradeCalendar(){
   const lastDay=new Date(calYear,calMonth+1,0);
   const startDow=firstDay.getDay();
   const today=todayStr();
+  // All-time best day of this account
+  const allMap={};(acc.dailyEntries||[]).forEach(e=>{allMap[e.date]=(allMap[e.date]||0)+e.pnl;});
+  const bestEntry=Object.entries(allMap).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1])[0];
+  const bestDate=bestEntry?bestEntry[0]:null,bestVal=bestEntry?bestEntry[1]:0;
   // Navigation
   let html='<div class="cal-nav">'
     +'<button class="cal-nav-btn" onclick="moveCalYear(-1)">&lt;&lt;</button>'
@@ -1875,6 +1882,10 @@ function renderTradeCalendar(){
     +'<button class="cal-nav-btn" onclick="moveCalMonth(1)">&gt;</button>'
     +'<button class="cal-nav-btn" onclick="moveCalYear(1)">&gt;&gt;</button>'
     +'</div>';
+  if(bestDate){
+    const inThisMonth=bestDate.slice(0,7)===calYear+'-'+String(calMonth+1).padStart(2,'0');
+    html+='<div class="cal-best-badge"><i class="ti ti-trophy"></i> Best Day: '+fmtDate(bestDate)+' · '+fmtS(bestVal)+(inThisMonth?'':' <span style="opacity:.7;font-weight:500">— not in this month</span>')+'</div>';
+  }
   // Grid headers
   html+='<div class="cal-grid">';
   ['SUN','MON','TUE','WED','THU','FRI','SAT'].forEach(d=>{html+='<div class="cal-hdr">'+d+'</div>';});
@@ -1893,6 +1904,7 @@ function renderTradeCalendar(){
     if(isToday)cls+=' cal-today';
     if(pnl!==undefined)cls+=pnl>=0?' cal-profit':' cal-loss';
     else if(isWeekend)cls+=' cal-weekend';
+    if(dateStr===bestDate)cls+=' cal-best';
     html+='<div class="'+cls+'">'
       +'<div class="cal-day">'+d+'</div>'
       +(pnl!==undefined?'<div class="cal-pnl">'+(pnl>=0?'+ ':'− ')+fmt(Math.abs(pnl))+'</div>':'')
