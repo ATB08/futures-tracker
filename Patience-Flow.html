@@ -820,7 +820,7 @@ function migrateData(){
   try{const tc=localStorage.getItem('af_taxconfig');if(tc)taxConfig=Object.assign(taxConfig,JSON.parse(tc));}catch(e){}
   saveAll();
 }
-function saveAll(){try{localStorage.setItem('af_entries',JSON.stringify(entries));}catch(e){}try{localStorage.setItem('af_accs',JSON.stringify(accounts));}catch(e){}try{localStorage.setItem('af_folders',JSON.stringify(folders));}catch(e){uiAlert('Storage limit reached.');}try{localStorage.setItem('af_trades',JSON.stringify(trades));}catch(e){}try{localStorage.setItem('af_playbooks',JSON.stringify(playbooks));}catch(e){}try{localStorage.setItem('af_taxconfig',JSON.stringify(taxConfig));}catch(e){}try{localStorage.setItem('af_accgroups',JSON.stringify(accGroups));}catch(e){}pushDesktopStats();checkPayoutReadyNotify();}
+function saveAll(){try{localStorage.setItem('af_entries',JSON.stringify(entries));}catch(e){}try{localStorage.setItem('af_accs',JSON.stringify(accounts));}catch(e){}try{localStorage.setItem('af_folders',JSON.stringify(folders));}catch(e){uiAlert('Storage limit reached.');}try{localStorage.setItem('af_trades',JSON.stringify(trades));}catch(e){}try{localStorage.setItem('af_playbooks',JSON.stringify(playbooks));}catch(e){}try{localStorage.setItem('af_taxconfig',JSON.stringify(taxConfig));}catch(e){}try{localStorage.setItem('af_accgroups',JSON.stringify(accGroups));}catch(e){}pushDesktopStats();checkPayoutReadyNotify();autoBackup();}
 
 /* ── DESKTOP APP: menu bar + mini widget stats ── */
 function pushDesktopStats(){
@@ -890,13 +890,29 @@ function uiConfirm(msg,opts){return uiDialog(msg,Object.assign({confirm:true},op
 document.addEventListener('keydown',e=>{const ov=document.getElementById('uiModal');if(!ov||!ov.classList.contains('open'))return;if(e.key==='Escape')_uiModalDone(false);else if(e.key==='Enter')_uiModalDone(true);});
 
 /* ── EXPORT / IMPORT (backup file — e.g. browser → desktop app) ── */
-function exportData(){
+function gatherBackup(){
   const data={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('af_'))data[k]=localStorage.getItem(k);}
-  const blob=new Blob([JSON.stringify({app:'patience-flow',exported:new Date().toISOString(),data},null,2)],{type:'application/json'});
+  return{app:'patience-flow',exported:new Date().toISOString(),data};
+}
+function applyBackupData(data){
+  if(!data||!Object.keys(data).some(k=>k.startsWith('af_')))return false;
+  for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&k.startsWith('af_'))localStorage.removeItem(k);}
+  Object.keys(data).forEach(k=>{if(k.startsWith('af_'))localStorage.setItem(k,data[k]);});
+  return true;
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify(gatherBackup(),null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download='patience-flow-backup-'+todayStr()+'.json';document.body.appendChild(a);a.click();a.remove();
   URL.revokeObjectURL(url);
   showToast('Backup downloaded ✓ — import it in the app to transfer your data');
+}
+/* Auto-backup to a single file in the desktop app (debounced, always overwritten) */
+let _autoBackupTimer=null;
+function autoBackup(){
+  if(!(window.patienceDesktop&&window.patienceDesktop.backup))return;
+  clearTimeout(_autoBackupTimer);
+  _autoBackupTimer=setTimeout(()=>{try{window.patienceDesktop.backup(JSON.stringify(gatherBackup()));}catch(e){}},1500);
 }
 async function importData(input){
   const file=input.files&&input.files[0];input.value='';if(!file)return;
@@ -904,9 +920,15 @@ async function importData(input){
   try{const parsed=JSON.parse(await file.text());if(parsed&&parsed.data&&typeof parsed.data==='object')data=parsed.data;}catch(e){}
   if(!data||!Object.keys(data).some(k=>k.startsWith('af_'))){uiAlert('This file is not a valid Patience-Flow backup.',{icon:'<i class="ti ti-alert-triangle"></i>',title:'Import failed'});return;}
   if(!await uiConfirm('This replaces ALL current data here with the data from the backup file.\n\nContinue?',{icon:'<i class="ti ti-database-import"></i>',title:'Import backup',okText:'Import',danger:true}))return;
-  for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&k.startsWith('af_'))localStorage.removeItem(k);}
-  Object.keys(data).forEach(k=>{if(k.startsWith('af_'))localStorage.setItem(k,data[k]);});
+  applyBackupData(data);
   location.reload();
+}
+async function restoreAutoBackup(json){
+  let data=null;
+  try{const p=JSON.parse(json);if(p&&p.data)data=p.data;}catch(e){}
+  if(!data||!Object.keys(data).some(k=>k.startsWith('af_'))){uiAlert('No valid auto-backup found yet.',{icon:'<i class="ti ti-alert-triangle"></i>',title:'Restore'});return;}
+  if(!await uiConfirm('Restore your data from the automatic backup?\n\nThis replaces ALL current data with the last saved state.',{icon:'<i class="ti ti-history"></i>',title:'Restore auto-backup',okText:'Restore',danger:true}))return;
+  applyBackupData(data);location.reload();
 }
 
 /* ── BALANCE & STATS ── */
@@ -2390,6 +2412,7 @@ if(window.patienceDesktop&&window.patienceDesktop.onQuickAdd)window.patienceDesk
   if(detailAccId===a.id)renderDetail();
   showToast('Quick-added '+fmtS(pnl)+' to '+a.name);
 });
+if(window.patienceDesktop&&window.patienceDesktop.onRestoreBackup)window.patienceDesktop.onRestoreBackup(json=>restoreAutoBackup(json));
 </script>
 </body>
 </html>

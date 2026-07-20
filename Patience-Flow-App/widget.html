@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;user-select:none}
+  html,body{background:transparent;overflow:hidden}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-app-region:drag}
+  .card{background:rgba(20,20,19,.92);backdrop-filter:blur(20px);border:.5px solid rgba(255,255,255,.14);border-radius:16px;padding:14px 16px;color:#f5f5f0;height:100vh;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+  .top{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+  .logo{width:16px;height:16px;flex-shrink:0}
+  .name{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#898781;flex:1}
+  .xbtn{-webkit-app-region:no-drag;background:none;border:none;color:#898781;font-size:13px;cursor:pointer;padding:2px 5px;border-radius:5px;line-height:1}
+  .xbtn:hover{background:rgba(255,255,255,.1);color:#f5f5f0}
+  .bal{font-size:24px;font-weight:700;color:#3b82f6;font-variant-numeric:tabular-nums;line-height:1.15}
+  .row{display:flex;justify-content:space-between;font-size:11px;margin-top:6px;font-variant-numeric:tabular-nums}
+  .lbl{color:#898781}
+  .pos{color:#1baf7a;font-weight:600}.neg{color:#ef4444;font-weight:600}.mut{color:#898781;font-weight:600}
+  .news{margin-top:7px;padding-top:7px;border-top:.5px solid rgba(255,255,255,.1);display:none}
+  .news.show{display:block}
+  .news-t{font-size:8.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#898781;margin-bottom:3px}
+  .nrow{display:flex;align-items:center;gap:5px;font-size:10.5px;color:#c3c2b7;margin-bottom:2px}
+  .nrow .ndot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+  .nrow .ntime{color:#898781;font-variant-numeric:tabular-nums;flex-shrink:0}
+  .nrow .ntxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ready{margin-top:auto;padding-top:8px;border-top:.5px solid rgba(255,255,255,.1);font-size:10.5px;color:#c3c2b7;display:flex;align-items:center;gap:5px}
+  .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+  .open{-webkit-app-region:no-drag;background:none;border:none;color:#3b82f6;font-size:10.5px;cursor:pointer;padding:0;margin-left:auto}
+  .open:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="top">
+    <svg class="logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#0a1628"/><defs><linearGradient id="hl" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#1e40af"/><stop offset="100%" stop-color="#7dd3fc"/></linearGradient></defs><path d="M14,72 C24,66 32,58 40,52 C46,47 47,55 54,51 C62,46 70,32 80,20" fill="none" stroke="url(#hl)" stroke-width="7" stroke-linecap="round"/><circle cx="80" cy="20" r="6" fill="#dbeafe"/></svg>
+    <span class="name">Patience</span>
+    <button class="xbtn" onclick="patienceWidget.hideWidget()" title="Hide widget">✕</button>
+  </div>
+  <div class="bal" id="wBal">—</div>
+  <div class="row"><span class="lbl">Today</span><span id="wToday" class="mut">—</span></div>
+  <div class="row"><span class="lbl">P&amp;L this period</span><span id="wPeriod" class="mut">—</span></div>
+  <div class="news" id="wNews"><div class="news-t">Today's news</div><div id="wNewsRows"></div></div>
+  <div class="ready"><span class="dot" id="wDot" style="background:#898781"></span><span id="wReady">Waiting for data…</span><button class="open" onclick="patienceWidget.openApp()">Open</button></div>
+</div>
+<script>
+  const fmt=n=>(n<0?'-$':'$')+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+  const fmtS=n=>(n>=0?'+$':'-$')+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+  patienceWidget.onStats(s=>{
+    document.getElementById('wBal').textContent=fmt(s.totBal||0);
+    const t=document.getElementById('wToday');
+    t.textContent=s.today?fmtS(s.today):'$0';
+    t.className=s.today>0?'pos':s.today<0?'neg':'mut';
+    const p=document.getElementById('wPeriod');
+    p.textContent=fmtS(s.period||0);
+    p.className=s.period>0?'pos':s.period<0?'neg':'mut';
+    const dot=document.getElementById('wDot'),r=document.getElementById('wReady');
+    if(s.readyCount>0){dot.style.background='#1baf7a';r.textContent=s.readyCount+' account'+(s.readyCount>1?'s':'')+' payout-ready';}
+    else if(s.lines&&s.lines.length){dot.style.background='#f59e0b';r.textContent=s.lines[0].status;}
+    else{dot.style.background='#898781';r.textContent='No accounts yet';}
+    const IMP={high:'#dc2626',medium:'#f97316',low:'#f5c518',holiday:'#1e3a5f'};
+    const nw=document.getElementById('wNews'),nr=document.getElementById('wNewsRows');
+    if(s.todayNews&&s.todayNews.length){
+      nw.classList.add('show');
+      nr.innerHTML=s.todayNews.map(n=>'<div class="nrow"><span class="ndot" style="background:'+(IMP[n.impact]||'#dc2626')+'"></span><span class="ntime">'+n.time+'</span><span class="ntxt">'+n.text+'</span></div>').join('');
+    }else nw.classList.remove('show');
+  });
+</script>
+</body>
+</html>
