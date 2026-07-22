@@ -489,9 +489,18 @@ tbody tr:hover td{background:var(--s2)}
   <div id="dashKpis" style="margin-bottom:1.5rem"></div>
   <div class="stitle"><i class="ti ti-cash"></i> Payout Readiness</div>
   <div id="dashReady" style="margin-bottom:1.75rem"></div>
-  <div class="stitle"><i class="ti ti-calendar-stats"></i> P&L Heatmap</div>
-  <div class="chips" id="dashHeatChips" style="margin-bottom:.75rem"></div>
-  <div id="dashHeatmap" style="margin-bottom:1.75rem"></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.25rem;margin-bottom:1.75rem;align-items:start">
+    <div>
+      <div class="stitle"><i class="ti ti-calendar-stats"></i> P&L Heatmap</div>
+      <div class="chips" id="dashHeatChips" style="margin-bottom:.75rem"></div>
+      <div id="dashHeatmap"></div>
+    </div>
+    <div>
+      <div class="stitle"><i class="ti ti-clipboard-list"></i> Plans</div>
+      <textarea class="notes-area" id="dashPlans" style="min-height:480px" placeholder="Trading plan, rules for this week, levels to watch, goals..." oninput="savePlans()"></textarea>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;text-align:right">Auto-saved</div>
+    </div>
+  </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.25rem">
     <div><div class="stitle"><i class="ti ti-notebook"></i> Recent Trades</div><div id="dashTrades"></div></div>
     <div><div class="stitle"><i class="ti ti-notes"></i> This Week</div><div id="dashNotes"></div></div>
@@ -1317,7 +1326,14 @@ function sparkline(acc){
 
 /* ── DASHBOARD ── */
 let dashHeatFilter='funded',heatY=new Date().getFullYear(),heatM=new Date().getMonth();
+function savePlans(){
+  const el=document.getElementById('dashPlans');if(!el)return;
+  try{localStorage.setItem('af_plans',el.value);}catch(e){}
+  autoBackup();
+}
 function renderDashboard(){
+  const plansEl=document.getElementById('dashPlans');
+  if(plansEl&&document.activeElement!==plansEl)plansEl.value=localStorage.getItem('af_plans')||'';
   const pf=accounts.filter(a=>a.status==='funded'||a.status==='live');
   const totBal=pf.reduce((s,a)=>s+getBalance(a),0);
   const totPnL=pf.reduce((s,a)=>s+getPeriodStats(a).netPnL,0);
