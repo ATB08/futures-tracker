@@ -1116,8 +1116,13 @@ function renderDetail(){
       document.getElementById('detailApproveSection').innerHTML='';
     }else{
       document.getElementById('detailPayoutSection').innerHTML='';document.getElementById('detailPayoutForm').innerHTML='';
-      const _sp=accSplit(acc),_rec=splitAmount(acc.payoutPending.amount,_sp);
-      document.getElementById('detailApproveSection').innerHTML='<div style="padding:1.25rem;background:var(--gbg);border:.5px solid var(--green);border-radius:12px;text-align:center"><div style="font-size:32px;margin-bottom:8px"><i class="ti ti-building-bank"></i></div><div style="font-size:15px;font-weight:600;color:var(--gtx);margin-bottom:4px">Waiting for Firm Approval</div><div style="font-size:12px;color:var(--gtx);opacity:.8;margin-bottom:12px">Amount: '+fmt(acc.payoutPending.amount)+(_sp<100?' · You receive: <strong>'+fmt(_rec)+'</strong> ('+_sp+'% split)':'')+'</div><div style="margin-bottom:14px"><div style="font-size:11px;color:var(--gtx);opacity:.8;margin-bottom:4px">Payout Date (when you actually received it)</div><input type="date" id="dApproveDate" value="'+(acc.payoutPending.requestDate||todayStr())+'" style="max-width:180px"></div><button class="greenbtn" style="margin:0 auto" onclick="approvePayout()"><i class="ti ti-check"></i> Payout Approved ✓</button></div>';
+      document.getElementById('detailApproveSection').innerHTML='<div style="padding:1.25rem;background:var(--gbg);border:.5px solid var(--green);border-radius:12px;text-align:center"><div style="font-size:32px;margin-bottom:8px"><i class="ti ti-building-bank"></i></div><div style="font-size:15px;font-weight:600;color:var(--gtx);margin-bottom:12px">Waiting for Firm Approval</div>'
+        +'<div style="display:inline-flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-bottom:12px;text-align:left">'
+        +'<div><div style="font-size:11px;color:var(--gtx);opacity:.8;margin-bottom:4px">Payout Amount (USD)</div><input type="number" id="dApproveAmt" step="0.01" value="'+acc.payoutPending.amount+'" oninput="updApproveSplit()" style="max-width:150px"></div>'
+        +'<div><div style="font-size:11px;color:var(--gtx);opacity:.8;margin-bottom:4px">Payout Date (when received)</div><input type="date" id="dApproveDate" value="'+(acc.payoutPending.requestDate||todayStr())+'" style="max-width:170px"></div>'
+        +'</div><div id="dApproveSplit" style="font-size:12px;color:var(--gtx);font-weight:600;margin-bottom:16px"></div>'
+        +'<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="cancelbtn" onclick="cancelPayoutRequest()"><i class="ti ti-x"></i> Cancel Request</button><button class="greenbtn" style="margin:0" onclick="approvePayout()"><i class="ti ti-check"></i> Payout Approved ✓</button></div></div>';
+      updApproveSplit();
     }
   }else{
     // EVAL stage
@@ -1211,10 +1216,24 @@ function updSplitNote(){
   const split=accSplit(acc);
   el.textContent=split<100?'Profit split '+split+'/'+Math.round((100-split)*10)/10+' — you receive '+fmt(splitAmount(amt,split)):'';
 }
+function updApproveSplit(){
+  const acc=accounts.find(a=>a.id===detailAccId),el=document.getElementById('dApproveSplit');
+  if(!acc||!el)return;
+  const amt=parseFloat((document.getElementById('dApproveAmt')||{}).value)||0;
+  const sp=accSplit(acc);
+  el.textContent=sp<100?'You receive '+fmt(splitAmount(amt,sp))+' ('+sp+'% split)':'';
+}
+async function cancelPayoutRequest(){
+  const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
+  if(!accounts[i].payoutPending)return;
+  if(!await uiConfirm('Cancel this payout request?\n\nThe pending request is discarded and trading resumes. No payout is recorded.',{icon:'<i class="ti ti-x"></i>',title:'Cancel request',okText:'Cancel request',danger:true}))return;
+  accounts[i].payoutPending=null;saveAll();renderDetail();showToast('Payout request cancelled');
+}
 async function approvePayout(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   const acc=accounts[i];if(!acc.payoutPending)return;
-  const{amount}=acc.payoutPending;
+  const amount=parseFloat((document.getElementById('dApproveAmt')||{}).value)||0;
+  if(amount<=0){uiAlert('Please enter a payout amount.');return;}
   const split=accSplit(acc),rec=splitAmount(amount,split);
   const d=(document.getElementById('dApproveDate')||{}).value||todayStr();
   if(!await uiConfirm('Confirm payout approval of '+fmt(amount)+' on '+fmtDate(d)+'?\n'+(split<100?'\nYou receive '+fmt(rec)+' ('+split+'% split).':'')+'\nBalance drops by '+fmt(amount)+' and trading resumes.',{icon:'<i class="ti ti-building-bank"></i>',title:'Payout Approved',okText:'Approve'}))return;
