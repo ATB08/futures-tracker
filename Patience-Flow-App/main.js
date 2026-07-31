@@ -164,9 +164,15 @@ function openQuickAdd() {
 function updateTray() {
   if (!tray) return;
   if (lastStats) {
+    const multi = (lastStats.fundedCount || 0) > 1;
     let title = ' ' + fmt(lastStats.totBal || 0);
-    if (lastStats.winReady) title += ' · ✓';
-    else if (lastStats.winProgress) title += ' · ' + lastStats.winProgress;
+    if (multi) {
+      // Aggregate view: total balance, ready count, today's total — no ambiguous single-account progress
+      if (lastStats.readyCount > 0) title += ' · ' + lastStats.readyCount + '✓';
+    } else {
+      if (lastStats.winReady) title += ' · ✓';
+      else if (lastStats.winProgress) title += ' · ' + lastStats.winProgress;
+    }
     if (lastStats.today) title += '  ' + (lastStats.today > 0 ? '▲' : '▼') + fmt(Math.abs(lastStats.today));
     tray.setTitle(title, { fontType: 'monospacedDigit' });
   } else {
@@ -179,12 +185,19 @@ function updateTray() {
     { type: 'separator' },
   ];
   if (lastStats && lastStats.lines && lastStats.lines.length) {
-    lastStats.lines.slice(0, 8).forEach((l) => {
-      items.push({ label: l.name + ' — ' + l.status, enabled: false });
+    lastStats.lines.slice(0, 12).forEach((l) => {
+      const bal = typeof l.bal === 'number' ? '   ' + fmt(l.bal) : '';
+      const tdy = l.today ? '   ' + (l.today > 0 ? '▲' : '▼') + fmt(Math.abs(l.today)) : '';
+      const item = { label: l.name + bal + tdy, enabled: false };
+      const sub = [{ label: l.status, enabled: false }];
+      item.submenu = sub;
+      item.enabled = true;
+      items.push(item);
     });
     items.push({ type: 'separator' });
+    items.push({ label: 'Total balance: ' + fmt(lastStats.totBal || 0), enabled: false });
     items.push({ label: 'P&L this period: ' + fmtS(lastStats.period || 0), enabled: false });
-    items.push({ label: 'Today: ' + fmtS(lastStats.today || 0), enabled: false });
+    items.push({ label: 'Today (all accounts): ' + fmtS(lastStats.today || 0), enabled: false });
     items.push({ type: 'separator' });
   }
   items.push({ label: (widgetVisible ? 'Hide' : 'Show') + ' Mini Widget', click: () => toggleWidget() });

@@ -856,6 +856,7 @@ function pushDesktopStats(){
     accounts.forEach(a=>(a.dailyEntries||[]).forEach(e=>{if(e.date===t)today+=e.pnl;}));
     const period=pf.reduce((s,a)=>s+getPeriodStats(a).netPnL,0);
     let readyCount=0;
+    const tdy=todayStr();
     const lines=accounts.map(a=>{
       const r=accReadyState(a);let st;
       if(r.isPending)st='Payout pending approval';
@@ -868,8 +869,10 @@ function pushDesktopStats(){
         else st='Funded';
       }else st=((a.target||0)>0?Math.min(100,Math.max(0,Math.round((r.netPnL/a.target)*100)))+'% to target':'Evaluation');
       if(r.canPayout)readyCount++;
-      return{name:a.name,status:st};
+      const aToday=(a.dailyEntries||[]).filter(e=>e.date===tdy).reduce((s,e)=>s+e.pnl,0);
+      return{name:a.name,status:st,bal:r.bal,today:aToday,stage:a.status};
     });
+    const fundedCount=accounts.filter(a=>a.status==='funded'||a.status==='live').length;
     let winProgress=null,winReady=false;
     let best=-1;
     accounts.forEach(a=>{
@@ -883,7 +886,7 @@ function pushDesktopStats(){
     const dk=['sun','mon','tue','wed','thu','fri','sat'][new Date().getDay()];
     const todayNews=((notes.news||{})[dk]||[]).slice().sort((a,b)=>(a.time||'').localeCompare(b.time||'')).slice(0,3).map(n=>({time:n.time||'',text:n.text,impact:n.impact||'high'}));
     const accountsMin=accounts.map(a=>({id:a.id,name:a.name,status:a.status}));
-    window.patienceDesktop.updateStats({totBal,today,period,readyCount,lines,winProgress,winReady,todayNews,accountsMin});
+    window.patienceDesktop.updateStats({totBal,today,period,readyCount,lines,winProgress,winReady,todayNews,accountsMin,fundedCount});
   }catch(e){}
 }
 
