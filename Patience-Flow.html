@@ -1457,12 +1457,19 @@ function renderDashHeatChips(){
 }
 function renderDashHeatmap(){
   const el=document.getElementById('dashHeatmap');if(!el)return;
-  let accs;
-  if(dashHeatFilter==='eval')accs=accounts.filter(a=>a.status==='eval');
-  else if(dashHeatFilter==='funded')accs=accounts.filter(a=>a.status==='funded');
-  else if(dashHeatFilter==='live')accs=accounts.filter(a=>a.status==='live');
-  else{const gid=Number(String(dashHeatFilter).slice(1));accs=accounts.filter(a=>(a.groups||[]).includes(gid));}
-  const dm={};accs.forEach(a=>(a.dailyEntries||[]).forEach(e=>{dm[e.date]=(dm[e.date]||0)+e.pnl;}));
+  // Collect P&L by date for the selected stage. Entries belong to a stage by the
+  // account's current status (current dailyEntries) OR by an archived entry's stage
+  // tag — so funded-stage days stay in the Funded view even after going live.
+  const dm={};const add=e=>{dm[e.date]=(dm[e.date]||0)+e.pnl;};
+  const gid=String(dashHeatFilter).startsWith('g')?Number(String(dashHeatFilter).slice(1)):null;
+  accounts.forEach(a=>{
+    if(gid!==null){
+      if((a.groups||[]).includes(gid)){(a.dailyEntries||[]).forEach(add);(a.archivedEntries||[]).forEach(add);}
+      return;
+    }
+    if(a.status===dashHeatFilter)(a.dailyEntries||[]).forEach(add);
+    (a.archivedEntries||[]).forEach(e=>{if((e.stage||'funded')===dashHeatFilter)add(e);});
+  });
   const days=new Date(heatY,heatM+1,0).getDate();
   const startDow=(new Date(heatY,heatM,1).getDay()+6)%7;
   const monthVals=[];for(let d=1;d<=days;d++){const k=heatY+'-'+String(heatM+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');if(dm[k])monthVals.push(Math.abs(dm[k]));}
@@ -1487,7 +1494,7 @@ function renderDashHeatmap(){
     +'<div class="heat-title">'+MONTHS[heatM]+' '+heatY+' <span style="color:'+(monTot>=0?'var(--green)':'var(--red)')+';font-size:12px;margin-left:6px">'+fmtS(monTot)+'</span></div>'
     +'<button class="heat-nav" onclick="heatM++;if(heatM>11){heatM=0;heatY++;}renderDashHeatmap()">›</button>'
     +'</div><div class="heat-grid">'+cells+'</div>'
-    +(accs.length?'':'<div style="font-size:11px;color:var(--muted);margin-top:8px;text-align:center">No accounts in this view</div>')
+    +(Object.keys(dm).length?'':'<div style="font-size:11px;color:var(--muted);margin-top:8px;text-align:center">No data in this view</div>')
     +'</div>';
 }
 
