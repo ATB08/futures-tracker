@@ -310,7 +310,8 @@ tbody tr:hover td{background:var(--s2)}
 .dtab.active{background:var(--bbg);color:var(--btx);border-color:var(--blue);font-weight:600}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .cal-hdr{text-align:center;font-size:10px;font-weight:600;color:var(--muted);padding:6px 2px;text-transform:uppercase;letter-spacing:.05em}
-.cal-cell{border-radius:10px;padding:8px 6px;min-height:72px;background:var(--s2);border:.5px solid var(--border)}
+.cal-cell{border-radius:10px;padding:8px 6px;min-height:72px;background:var(--s2);border:.5px solid var(--border);cursor:pointer;transition:border-color .12s}
+.cal-cell:not(.empty):hover{border-color:var(--blue)}
 .cal-cell.empty{background:transparent;border-color:transparent;pointer-events:none}
 .cal-cell.cal-profit{background:var(--gbg);border-color:var(--green)}
 .cal-cell.cal-loss{background:var(--rbg);border-color:var(--red)}
@@ -2012,7 +2013,7 @@ function renderTradeCalendar(){
     if(isArch)cls+=' cal-arch';
     if(isLiveStart)cls+=' cal-live';
     if(dateStr===bestDate)cls+=' cal-best';
-    html+='<div class="'+cls+'" title="'+(isLiveStart?'Went Live':isArch?'Funded stage':'')+'">'
+    html+='<div class="'+cls+'" onclick="showCalDayDialog(\''+dateStr+'\')" title="'+(isLiveStart?'Went Live · click to edit':isArch?'Funded stage · click to edit':'Click to add/edit P&L')+'">'
       +'<div class="cal-day">'+d+(isLiveStart?' <i class="ti ti-star-filled" style="font-size:9px;color:var(--purple)"></i>':'')+'</div>'
       +(pnl!==undefined?'<div class="cal-pnl">'+(pnl>=0?'+ ':'− ')+fmt(Math.abs(pnl))+'</div>':'')
       +'</div>';
@@ -2034,6 +2035,55 @@ function renderTradeCalendar(){
 }
 function moveCalMonth(dir){calMonth+=dir;if(calMonth<0){calMonth=11;calYear--;}else if(calMonth>11){calMonth=0;calYear++;}renderTradeCalendar();}
 function moveCalYear(dir){calYear+=dir;renderTradeCalendar();}
+function showCalDayDialog(dateStr){
+  const acc=accounts.find(a=>a.id===detailAccId);if(!acc)return;
+  const inCur=(acc.dailyEntries||[]).some(e=>e.date===dateStr);
+  const inArch=(acc.archivedEntries||[]).some(e=>e.date===dateStr);
+  const curSum=(acc.dailyEntries||[]).filter(e=>e.date===dateStr).reduce((s,e)=>s+e.pnl,0);
+  const archSum=(acc.archivedEntries||[]).filter(e=>e.date===dateStr).reduce((s,e)=>s+e.pnl,0);
+  const existing=inCur?curSum:inArch?archSum:null;
+  const isFundedStage=acc.status==='live'&&acc.liveDate&&dateStr<acc.liveDate;
+  const stageNote=(existing===null&&isFundedStage)?'<div style="font-size:11px;color:var(--ltx);margin-bottom:10px"><i class="ti ti-info-circle"></i> Before go-live — saved as funded-stage history (does not change the live balance).</div>':'';
+  let ov=document.getElementById('uiModal');
+  if(!ov){ov=document.createElement('div');ov.id='uiModal';ov.className='modal-overlay';document.body.appendChild(ov);}
+  ov.innerHTML='<div class="modal-card"><div class="modal-icon"><i class="ti ti-calendar-event"></i></div><div class="modal-title">'+(existing!==null?'Edit':'Add')+' P&L — '+fmtDate(dateStr)+'</div>'
+    +stageNote
+    +'<div style="margin-bottom:16px"><label style="font-size:11px;color:var(--muted)">Day P&L (USD)</label><input type="number" id="calDayPnl" step="0.01" value="'+(existing!==null?existing:'')+'" placeholder="+250 or −150" style="width:100%;margin-top:4px;padding:8px 10px;border-radius:8px;border:.5px solid var(--border-s);background:var(--bg);color:var(--text)"><div style="font-size:11px;color:var(--muted);margin-top:4px">+ for profit · − for loss</div></div>'
+    +'<div class="modal-actions">'+(existing!==null?'<button class="modal-btn danger" onclick="removeCalDay(\''+dateStr+'\')"><i class="ti ti-trash"></i> Remove</button>':'')+'<button class="modal-btn" onclick="_uiModalDone(false)">Cancel</button><button class="modal-btn primary" onclick="saveCalDay(\''+dateStr+'\')">Save</button></div></div>';
+  ov.classList.add('open');
+  ov.onclick=e=>{if(e.target===ov)_uiModalDone(false);};
+  setTimeout(()=>{const el=document.getElementById('calDayPnl');if(el)el.focus();},60);
+}
+function saveCalDay(dateStr){
+  const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
+  const pnl=parseFloat((document.getElementById('calDayPnl')||{}).value);
+  if(isNaN(pnl)||pnl===0){uiAlert('Please enter a P&L value (not zero).');return;}
+  const acc=accounts[i];
+  if(!acc.dailyEntries)acc.dailyEntries=[];if(!acc.archivedEntries)acc.archivedEntries=[];
+  const inCur=acc.dailyEntries.some(e=>e.date===dateStr);
+  const inArch=acc.archivedEntries.some(e=>e.date===dateStr);
+  const toArchived=inArch||(!inCur&&acc.status==='live'&&acc.liveDate&&dateStr<acc.liveDate);
+  // replace any existing entries for this date in the target array with one net value
+  if(toArchived){
+    acc.archivedEntries=acc.archivedEntries.filter(e=>e.date!==dateStr);
+    acc.archivedEntries.push({id:Date.now(),date:dateStr,pnl,stage:'funded'});
+    acc.archivedEntries.sort((a,b)=>a.date.localeCompare(b.date));
+  }else{
+    acc.dailyEntries=acc.dailyEntries.filter(e=>e.date!==dateStr);
+    acc.dailyEntries.push({id:Date.now(),date:dateStr,pnl});
+    acc.dailyEntries.sort((a,b)=>a.date.localeCompare(b.date));
+  }
+  _uiModalDone(true);saveAll();renderDetail();setDetailTab('calendar');showToast('Day saved ✓');
+}
+async function removeCalDay(dateStr){
+  const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
+  _uiModalDone(true);
+  if(!await uiConfirm('Remove all P&L for '+fmtDate(dateStr)+'?',{icon:'<i class="ti ti-trash"></i>',title:'Remove day',okText:'Remove',danger:true}))return;
+  const acc=accounts[i];
+  acc.dailyEntries=(acc.dailyEntries||[]).filter(e=>e.date!==dateStr);
+  acc.archivedEntries=(acc.archivedEntries||[]).filter(e=>e.date!==dateStr);
+  saveAll();renderDetail();setDetailTab('calendar');showToast('Day removed');
+}
 
 /* ── TIMELINE ── */
 function renderTimeline(){
