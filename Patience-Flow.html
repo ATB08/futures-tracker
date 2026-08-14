@@ -318,6 +318,15 @@ tbody tr:hover td{background:var(--s2)}
 .cal-cell.cal-weekend{opacity:.55}
 .cal-cell.cal-best{border:2px solid #f0b90b;box-shadow:0 0 0 2px rgba(240,185,11,.28),0 0 14px rgba(240,185,11,.35)}
 .cal-cell.cal-best .cal-day{color:#f0b90b;font-weight:800}
+.cal-cell.cal-arch{background:transparent;border-style:dashed;opacity:.72}
+.cal-cell.cal-arch .cal-pnl{font-style:italic;opacity:.9}
+.cal-cell.cal-arch.cal-profit{border-color:rgba(27,175,122,.5)}
+.cal-cell.cal-arch.cal-loss{border-color:rgba(239,68,68,.5)}
+.cal-cell.cal-live{box-shadow:0 0 0 2px var(--purple)}
+.cal-cell.cal-live .cal-day{color:var(--purple);font-weight:800}
+.cal-stagekey{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:10px}
+.cal-stagekey .k{display:inline-flex;align-items:center;gap:5px}
+.cal-stagekey .sw{width:12px;height:12px;border-radius:3px;flex-shrink:0}
 .cal-best-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:20px;background:rgba(240,185,11,.1);border:1px solid rgba(240,185,11,.5);color:#f0b90b;font-size:12.5px;font-weight:700;margin-bottom:12px}
 .cal-day{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px}
 .cal-cell.empty .cal-day{color:var(--muted);opacity:.4}
@@ -832,6 +841,9 @@ function migrateData(){
     if(acc.livePayoutGoal===undefined)acc.livePayoutGoal=0;
     if(acc.resets===undefined)acc.resets=0;
     if(acc.liveDate===undefined)acc.liveDate=null;
+    if(!acc.archivedEntries)acc.archivedEntries=[];
+    if(!acc.archivedPayouts)acc.archivedPayouts=[];
+    if(acc.liveReceivedDate===undefined)acc.liveReceivedDate=null;
     if(acc.payoutBuffer===undefined)acc.payoutBuffer=0;
     if(acc.profitSplit===undefined)acc.profitSplit=100;
   });
@@ -1107,7 +1119,11 @@ function renderDetail(){
       document.getElementById('detailProgress').innerHTML='<div class="prog-lbl"><span><i class="ti ti-cash"></i> Payouts toward Live: '+pn+'/'+g+'</span><span>'+(pn>=g?'<i class="ti ti-confetti"></i> Live eligible!':(g-pn)+' to go')+'</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pp+'%;background:'+(pn>=g?'var(--green)':'var(--blue)')+'"></div></div>'
         +(pn>=g?'<div style="margin-top:10px;padding:1rem;background:var(--lbg);border:1.5px solid var(--purple);border-radius:12px;text-align:center"><div style="font-size:13px;font-weight:600;color:var(--ltx);margin-bottom:10px">All payouts collected — your firm\'s Live program is unlocked!</div><button class="greenbtn" style="margin:0 auto;background:var(--purple)" onclick="goLive()"><i class="ti ti-rocket"></i> Unlock Live Account</button></div>':'');
     }else if(isLive){
-      document.getElementById('detailProgress').innerHTML='<div style="padding:8px 12px;background:var(--lbg);border:.5px solid var(--purple);border-radius:var(--r);font-size:12px;font-weight:600;color:var(--ltx)"><i class="ti ti-star-filled"></i> Live Account'+(acc.liveDate?' — since '+fmtDate(acc.liveDate):'')+' · no payout requirements</div>';
+      document.getElementById('detailProgress').innerHTML='<div style="padding:10px 14px;background:var(--lbg);border:.5px solid var(--purple);border-radius:var(--r)"><div style="font-size:12px;font-weight:600;color:var(--ltx)"><i class="ti ti-star-filled"></i> Live Account'+(acc.liveDate?' — unlocked '+fmtDate(acc.liveDate):'')+' · no payout requirements</div>'
+        +(acc.liveReceivedDate
+          ?'<div style="font-size:11px;color:var(--ltx);opacity:.85;margin-top:6px"><i class="ti ti-circle-check"></i> Account received '+fmtDate(acc.liveReceivedDate)+' <button class="iconbtn" style="font-size:11px;padding:1px 4px" title="Clear" onclick="clearLiveReceived()"><i class="ti ti-x"></i></button></div>'
+          :'<div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><input type="date" id="liveRcvDate" value="'+todayStr()+'" style="max-width:160px;padding:5px 8px;font-size:12px"><button class="chip" style="border-color:var(--purple);color:var(--ltx)" onclick="markLiveReceived()"><i class="ti ti-check"></i> Account Received</button></div>')
+        +'</div>';
     }else document.getElementById('detailProgress').innerHTML='';
     document.getElementById('detailPassSection').innerHTML='';
     if(wd>0){const dots=Array.from({length:wd},(_,i)=>'<div class="pd-dot '+(i<profitDays?'ok':'empty-dot')+'">'+(i<profitDays?'✓':'')+'</div>').join('');document.getElementById('detailDots').innerHTML='<div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+wd+' profitable days required</div><div class="pd-dots">'+dots+'</div>';}
@@ -1268,10 +1284,22 @@ async function passToFunded(){
 async function goLive(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   const acc=accounts[i];
-  if(!await uiConfirm('Unlock Live for "'+acc.name+'"?\n\nThe account moves to the Live stage and restarts from '+fmt(acc.size||0)+'.\nFunded trading history is cleared.',{icon:'<i class="ti ti-rocket"></i>',title:'Unlock Live',okText:'Go Live'}))return;
+  if(!await uiConfirm('Unlock Live for "'+acc.name+'"?\n\nThe account moves to the Live stage and restarts from '+fmt(acc.size||0)+'.\nFunded history stays in the timeline & calendar.',{icon:'<i class="ti ti-rocket"></i>',title:'Unlock Live',okText:'Go Live'}))return;
+  // Keep funded-stage history for the timeline & calendar instead of deleting it
+  acc.archivedPayouts=(acc.archivedPayouts||[]).concat((acc.payouts||[]).map(p=>({id:p.id,date:p.date,amount:p.amount,stage:'funded'})));
+  acc.archivedEntries=(acc.archivedEntries||[]).concat((acc.dailyEntries||[]).map(e=>({id:e.id,date:e.date,pnl:e.pnl,stage:'funded'})));
   acc.status='live';acc.liveDate=todayStr();acc.startDate=todayStr();
   acc.dailyEntries=[];acc.payouts=[];acc.lastPayoutDate=null;acc.lastPayoutAmount=0;acc.payoutPending=null;
   saveAll();triggerConfetti();renderDetail();
+}
+function markLiveReceived(){
+  const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
+  const v=(document.getElementById('liveRcvDate')||{}).value||todayStr();
+  accounts[i].liveReceivedDate=v;saveAll();renderDetail();showToast('Live account marked as received ✓');
+}
+function clearLiveReceived(){
+  const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
+  accounts[i].liveReceivedDate=null;saveAll();renderDetail();
 }
 
 /* ── RESET (blown eval) ── */
@@ -1933,20 +1961,20 @@ function setDetailTab(view){
 function renderTradeCalendar(){
   const acc=accounts.find(a=>a.id===detailAccId);if(!acc)return;
   const el=document.getElementById('calContent');if(!el)return;
-  // Build daily P&L map for current month
+  // Build daily P&L map for current month — current (live/funded) stage
+  const inMonth=ds=>{const d=new Date(ds+'T00:00:00');return d.getFullYear()===calYear&&d.getMonth()===calMonth;};
   const pnlMap={};
-  (acc.dailyEntries||[]).forEach(e=>{
-    const d=new Date(e.date+'T00:00:00');
-    if(d.getFullYear()===calYear&&d.getMonth()===calMonth){
-      const k=e.date;pnlMap[k]=(pnlMap[k]||0)+e.pnl;
-    }
-  });
+  (acc.dailyEntries||[]).forEach(e=>{if(inMonth(e.date))pnlMap[e.date]=(pnlMap[e.date]||0)+e.pnl;});
+  // Archived (previous-stage, e.g. funded before going live) entries — shown but styled apart
+  const archMap={};
+  (acc.archivedEntries||[]).forEach(e=>{if(inMonth(e.date))archMap[e.date]=(archMap[e.date]||0)+e.pnl;});
+  const hasArch=(acc.archivedEntries||[]).length>0;
   const firstDay=new Date(calYear,calMonth,1);
   const lastDay=new Date(calYear,calMonth+1,0);
   const startDow=firstDay.getDay();
   const today=todayStr();
-  // All-time best day of this account
-  const allMap={};(acc.dailyEntries||[]).forEach(e=>{allMap[e.date]=(allMap[e.date]||0)+e.pnl;});
+  // All-time best day across every stage of this account
+  const allMap={};[...(acc.dailyEntries||[]),...(acc.archivedEntries||[])].forEach(e=>{allMap[e.date]=(allMap[e.date]||0)+e.pnl;});
   const bestEntry=Object.entries(allMap).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1])[0];
   const bestDate=bestEntry?bestEntry[0]:null,bestVal=bestEntry?bestEntry[1]:0;
   // Navigation
@@ -1970,22 +1998,28 @@ function renderTradeCalendar(){
     const mo=String(calMonth+1).padStart(2,'0');
     const da=String(d).padStart(2,'0');
     const dateStr=calYear+'-'+mo+'-'+da;
-    const pnl=pnlMap[dateStr];
+    const cur=pnlMap[dateStr],arch=archMap[dateStr];
+    const pnl=cur!==undefined?cur:arch;
+    const isArch=cur===undefined&&arch!==undefined;
     const isToday=dateStr===today;
+    const isLiveStart=acc.status==='live'&&dateStr===acc.liveDate;
     const dow=new Date(calYear,calMonth,d).getDay();
     const isWeekend=dow===0||dow===6;
     let cls='cal-cell';
     if(isToday)cls+=' cal-today';
     if(pnl!==undefined)cls+=pnl>=0?' cal-profit':' cal-loss';
     else if(isWeekend)cls+=' cal-weekend';
+    if(isArch)cls+=' cal-arch';
+    if(isLiveStart)cls+=' cal-live';
     if(dateStr===bestDate)cls+=' cal-best';
-    html+='<div class="'+cls+'">'
-      +'<div class="cal-day">'+d+'</div>'
+    html+='<div class="'+cls+'" title="'+(isLiveStart?'Went Live':isArch?'Funded stage':'')+'">'
+      +'<div class="cal-day">'+d+(isLiveStart?' <i class="ti ti-star-filled" style="font-size:9px;color:var(--purple)"></i>':'')+'</div>'
       +(pnl!==undefined?'<div class="cal-pnl">'+(pnl>=0?'+ ':'− ')+fmt(Math.abs(pnl))+'</div>':'')
       +'</div>';
   }
   html+='</div>';
-  // Month summary
+  if(hasArch)html+='<div class="cal-stagekey"><span class="k"><span class="sw" style="background:var(--green)"></span>Live stage</span><span class="k"><span class="sw" style="background:transparent;border:1px dashed var(--green)"></span><em>Funded stage</em></span>'+(acc.liveDate?'<span class="k"><i class="ti ti-star-filled" style="color:var(--purple)"></i> Went live '+fmtDate(acc.liveDate)+'</span>':'')+'</div>';
+  // Month summary — current-stage days only
   const monthPnl=Object.values(pnlMap).reduce((s,v)=>s+v,0);
   const tradeDays=Object.keys(pnlMap).length;
   const profitDays=Object.values(pnlMap).filter(v=>v>0).length;
@@ -2007,15 +2041,18 @@ function renderTimeline(){
   const events=[];
   events.push({key:'start',date:acc.startDate||todayStr(),type:'start',title:'Account Created',sub:acc.status==='funded'?'Started as Funded Account':'Started Evaluation — $'+Number(acc.size).toLocaleString('en-US')});
   if(acc.fundedDate&&acc.fundedDate!==acc.startDate)events.push({key:'funded',date:acc.fundedDate,type:'funded',title:'Converted to Funded',sub:'Evaluation passed — trading live'});
-  if(acc.liveDate)events.push({key:'live',date:acc.liveDate,type:'live',title:'Went Live ★',sub:'Live program unlocked'});
-  (acc.payouts||[]).forEach((p,i)=>events.push({key:'p'+p.id,date:p.date,type:'payout',title:'Payout #'+(i+1)+' Received',amount:p.amount}));
+  if(acc.liveDate)events.push({key:'live',date:acc.liveDate,type:'live',title:'Live Program Unlocked',sub:'Eligible for the live account'});
+  if(acc.liveReceivedDate)events.push({key:'livercv',date:acc.liveReceivedDate,type:'live',title:'Live Account Received',sub:'Live account is active'});
+  // All payouts across stages, numbered by date order
+  const allPayouts=[...(acc.archivedPayouts||[]).map(p=>({...p,stage:'funded'})),...(acc.payouts||[]).map(p=>({...p,stage:'current',cur:true}))].sort((a,b)=>a.date.localeCompare(b.date));
+  allPayouts.forEach((p,i)=>events.push({key:p.cur?'p'+p.id:'ap'+p.id,date:p.date,type:'payout',title:'Payout #'+(i+1)+' Received'+(p.stage==='funded'?' (funded)':''),amount:p.amount,noEdit:!p.cur}));
   if(acc.payoutPending)events.push({key:'pending',date:acc.payoutPending.requestDate,type:'pending',title:'Payout Pending',sub:'Awaiting firm approval',amount:acc.payoutPending.amount});
   events.sort((a,b)=>b.date.localeCompare(a.date));
   const icons={start:'<i class="ti ti-calendar"></i>',funded:'<i class="ti ti-school"></i>',payout:'<i class="ti ti-cash"></i>',pending:'<i class="ti ti-hourglass"></i>',live:'<i class="ti ti-rocket"></i>'};
   const dotCls={start:'tl-start',funded:'tl-funded',payout:'tl-payout',pending:'tl-pending',live:'tl-live'};
   const dateHtml=ev=>_tlEdit===ev.key
     ?'<div style="display:flex;gap:6px;align-items:center;margin-top:4px;flex-wrap:wrap"><input type="date" id="tlDateInput" value="'+ev.date+'" style="padding:4px 8px;font-size:12px"><button class="chip" onclick="tlSaveDate(\''+ev.key+'\')">✓ Save</button><button class="chip" onclick="_tlEdit=null;renderTimeline()">✕ Cancel</button></div>'
-    :'<div class="tl-sub">'+fmtDate(ev.date)+' <button class="iconbtn" style="font-size:11px;padding:1px 4px" title="Edit date" onclick="tlEditDate(\''+ev.key+'\')"><i class="ti ti-pencil"></i></button></div>';
+    :'<div class="tl-sub">'+fmtDate(ev.date)+(ev.noEdit?'':' <button class="iconbtn" style="font-size:11px;padding:1px 4px" title="Edit date" onclick="tlEditDate(\''+ev.key+'\')"><i class="ti ti-pencil"></i></button>')+'</div>';
   const html=events.length
     ?'<div style="font-size:11px;color:var(--muted);margin-bottom:10px"><i class="ti ti-pencil"></i> Click the pencil next to any date to adjust it to your real timeline.</div><div class="tl-wrap">'+events.map(ev=>'<div class="tl-item"><div class="tl-dot '+dotCls[ev.type]+'">'+icons[ev.type]+'</div><div class="tl-body"><div class="tl-title">'+ev.title+'</div>'+(ev.sub?'<div class="tl-sub">'+ev.sub+'</div>':'')+dateHtml(ev)+(ev.amount?'<div class="tl-amt">+ '+fmt(ev.amount)+'</div>':'')+'</div></div>').join('')+'</div>'
     :'<div class="empty"><i class="ti ti-timeline"></i>No events yet.</div>';
@@ -2028,6 +2065,7 @@ function tlSaveDate(key){
   if(key==='start')acc.startDate=v;
   else if(key==='funded')acc.fundedDate=v;
   else if(key==='live')acc.liveDate=v;
+  else if(key==='livercv')acc.liveReceivedDate=v;
   else if(key==='pending'&&acc.payoutPending)acc.payoutPending.requestDate=v;
   else if(key.startsWith('p')){
     const pid=Number(key.slice(1));
