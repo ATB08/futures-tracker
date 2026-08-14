@@ -1320,7 +1320,9 @@ function toggleAccSettings(){
   const acc=accounts.find(a=>a.id===detailAccId);if(!acc)return;
   const isFundedLike=acc.status!=='eval';
   const goals=[0,3,4,5,6,8,10];if(acc.livePayoutGoal&&!goals.includes(acc.livePayoutGoal))goals.push(acc.livePayoutGoal);
-  f.innerHTML='<div class="fgrid">'
+  const liveHint=acc.status==='live'?'<div style="font-size:11px;color:var(--ltx);background:var(--lbg);border:.5px solid var(--purple);border-radius:8px;padding:8px 10px;margin-bottom:10px"><i class="ti ti-info-circle"></i> Live accounts often start at <strong>$0</strong> with a max drawdown. Set <strong>Starting Balance = 0</strong> and <strong>Loss Limit</strong> to your drawdown (e.g. 2000 → floor at −$2,000).</div>':'';
+  f.innerHTML=liveHint+'<div class="fgrid">'
+    +'<div><label>Starting Balance (USD)</label><input type="number" id="as_size" step="0.01" value="'+(acc.size!==undefined?acc.size:'')+'" placeholder="e.g. 0 for a live account"></div>'
     +'<div><label>Daily Loss Limit — DLL (USD)</label><input type="number" id="as_dll" step="0.01" value="'+(acc.dll||'')+'" placeholder="Optional — orange line on chart"></div>'
     +'<div><label>'+(isFundedLike?'Loss Limit — Funded / Trailing (USD)':'Loss Limit — Eval (USD)')+'</label><input type="number" id="as_loss" step="0.01" value="'+((isFundedLike?acc.lossLimit:acc.evalLossLimit)||'')+'"></div>'
     +(acc.status==='live'?'':'<div><label>Payout Buffer — min. balance (USD)</label><input type="number" id="as_buffer" step="0.01" value="'+(acc.payoutBuffer||'')+'" placeholder="Optional — payouts only above this"></div>')
@@ -1332,6 +1334,7 @@ function toggleAccSettings(){
 function saveAccSettings(){
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   const acc=accounts[i];
+  const sz=document.getElementById('as_size');if(sz&&sz.value!=='')acc.size=parseFloat(sz.value)||0;
   acc.dll=parseFloat(document.getElementById('as_dll').value)||0;
   const loss=parseFloat(document.getElementById('as_loss').value)||0;
   if(acc.status==='eval')acc.evalLossLimit=loss;else acc.lossLimit=loss;
