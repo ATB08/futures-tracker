@@ -1192,7 +1192,7 @@ function renderDetail(){
   renderDetailDayList(acc);
   document.getElementById('detailAddDaySection').innerHTML=isPending
     ?'<div style="padding:10px 14px;background:var(--s2);border-radius:var(--r);border:.5px solid var(--border);font-size:12px;color:var(--muted);text-align:center;margin-bottom:.75rem"><i class="ti ti-lock"></i> Trading paused — payout pending approval</div>'
-    :'<button class="addbtn" style="width:100%;justify-content:center;margin-bottom:.5rem" onclick="toggleDetailDayForm()"><i class="ti ti-plus"></i> Add Trading Day (+/− allowed)</button><div class="day-add-form" id="detailDayForm"><div class="daf-title"><i class="ti ti-circle-plus"></i> Add Trading Day</div><div class="day-add-row"><div><label>Date</label><input type="date" id="dd_date" value="'+todayStr()+'"></div><div><label>Day P&L (USD)</label><input type="number" id="dd_pnl" placeholder="+250 or −150" step="0.01"><div class="pnl-hint">+ for profit · − for loss</div></div></div><button class="day-add-submit" onclick="addDetailDay()"><i class="ti ti-check"></i> Save Day</button></div>';
+    :'<button class="addbtn" style="width:100%;justify-content:center;margin-bottom:.5rem" onclick="toggleDetailDayForm()"><i class="ti ti-plus"></i> Add Trading Day (+/− allowed)</button><div class="day-add-form" id="detailDayForm"><div class="daf-title"><i class="ti ti-circle-plus"></i> Add Trading Day</div><div class="day-add-row"><div><label>Date</label><input type="date" id="dd_date" value="'+todayStr()+'"></div><div><label>Day P&L (USD)</label><input type="number" id="dd_pnl" placeholder="+250 or −150" step="0.01"><div class="pnl-hint">+ for profit · − for loss</div></div></div><div style="margin-top:8px"><label>Pair / Symbol <span style="color:var(--muted);font-weight:400">(optional — type your own)</span></label><input type="text" id="dd_sym" list="symListDD" placeholder="e.g. NQ" autocomplete="off">'+symbolDatalist('symListDD')+'</div><button class="day-add-submit" onclick="addDetailDay()"><i class="ti ti-check"></i> Save Day</button></div>';
 }
 
 function renderDetailDayList(acc){
@@ -1201,7 +1201,7 @@ function renderDetailDayList(acc){
   const all=[...de,...py].sort((a,b)=>b.date.localeCompare(a.date));
   document.getElementById('detailDayList').innerHTML=all.length?'<div class="day-list">'+all.map(item=>item._t==='payout'
     ?'<div class="day-item pay"><div class="day-item-left"><span class="day-item-date">'+fmtDate(item.date)+'</span><span class="day-item-tag">PAYOUT</span></div><span class="day-item-pnl">- '+fmt(item.amount)+'</span></div>'
-    :'<div class="day-item '+(item.pnl>=0?'pos':'neg')+'"><div class="day-item-left"><span class="day-item-date">'+fmtDate(item.date)+'</span><span class="day-item-tag">'+(item.pnl>0?'PROFIT':'LOSS')+'</span></div><div style="display:flex;align-items:center;gap:6px"><span class="day-item-pnl">'+(item.pnl>=0?'+ ':'- ')+fmt(Math.abs(item.pnl))+'</span><button class="iconbtn" onclick="removeDetailDay('+item.id+')" style="font-size:12px"><i class="ti ti-x"></i></button></div></div>'
+    :'<div class="day-item '+(item.pnl>=0?'pos':'neg')+'" style="cursor:pointer" onclick="showCalDayDialog(\''+item.date+'\')" title="Click to edit"><div class="day-item-left"><span class="day-item-date">'+fmtDate(item.date)+'</span><span class="day-item-tag">'+(item.pnl>0?'PROFIT':'LOSS')+'</span>'+(item.symbol?'<span class="day-item-tag" style="background:var(--bbg);color:var(--btx)">'+item.symbol+'</span>':'')+'</div><div style="display:flex;align-items:center;gap:6px"><span class="day-item-pnl">'+(item.pnl>=0?'+ ':'- ')+fmt(Math.abs(item.pnl))+'</span><button class="iconbtn" onclick="event.stopPropagation();removeDetailDay('+item.id+')" style="font-size:12px"><i class="ti ti-x"></i></button></div></div>'
   ).join('')+'</div>':'<div style="text-align:center;padding:16px;font-size:12px;color:var(--muted);background:var(--s2);border-radius:var(--r)">No trading days yet</div>';
 }
 
@@ -1228,10 +1228,12 @@ function renderDetailChart(acc){
 function toggleDetailDayForm(){const el=document.getElementById('detailDayForm');if(!el)return;const o=el.style.display==='block';el.style.display=o?'none':'block';if(!o)setTimeout(()=>{const p=document.getElementById('dd_pnl');if(p)p.focus();},50);}
 function addDetailDay(){
   const date=document.getElementById('dd_date').value,pnl=parseFloat(document.getElementById('dd_pnl').value);
+  const sym=((document.getElementById('dd_sym')||{}).value||'').trim().toUpperCase();
   if(!date){uiAlert('Please enter a date.');return;}if(isNaN(pnl)||pnl===0){uiAlert('Please enter a P&L value.');return;}
   const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;
   if(!accounts[i].dailyEntries)accounts[i].dailyEntries=[];
-  accounts[i].dailyEntries.push({id:Date.now(),date,pnl});accounts[i].dailyEntries.sort((a,b)=>a.date.localeCompare(b.date));
+  const entry={id:Date.now(),date,pnl};if(sym)entry.symbol=sym;
+  accounts[i].dailyEntries.push(entry);accounts[i].dailyEntries.sort((a,b)=>a.date.localeCompare(b.date));
   saveAll();renderDetail();showToast('Trading day saved ✓');
 }
 function removeDetailDay(dayId){const i=accounts.findIndex(a=>a.id===detailAccId);if(i<0)return;accounts[i].dailyEntries=(accounts[i].dailyEntries||[]).filter(e=>e.id!==dayId);saveAll();renderDetail();}
@@ -2079,13 +2081,16 @@ function showCalDayDialog(dateStr){
   const curSum=(acc.dailyEntries||[]).filter(e=>e.date===dateStr).reduce((s,e)=>s+e.pnl,0);
   const archSum=(acc.archivedEntries||[]).filter(e=>e.date===dateStr).reduce((s,e)=>s+e.pnl,0);
   const existing=inCur?curSum:inArch?archSum:null;
+  const existSym=((inCur?acc.dailyEntries:acc.archivedEntries)||[]).filter(e=>e.date===dateStr).map(e=>e.symbol).find(Boolean)||'';
   const isFundedStage=acc.status==='live'&&acc.liveDate&&dateStr<acc.liveDate;
   const stageNote=(existing===null&&isFundedStage)?'<div style="font-size:11px;color:var(--ltx);margin-bottom:10px"><i class="ti ti-info-circle"></i> Before go-live — saved as funded-stage history (does not change the live balance).</div>':'';
+  const inp='width:100%;margin-top:4px;padding:8px 10px;border-radius:8px;border:.5px solid var(--border-s);background:var(--bg);color:var(--text)';
   let ov=document.getElementById('uiModal');
   if(!ov){ov=document.createElement('div');ov.id='uiModal';ov.className='modal-overlay';document.body.appendChild(ov);}
   ov.innerHTML='<div class="modal-card"><div class="modal-icon"><i class="ti ti-calendar-event"></i></div><div class="modal-title">'+(existing!==null?'Edit':'Add')+' P&L — '+fmtDate(dateStr)+'</div>'
     +stageNote
-    +'<div style="margin-bottom:16px"><label style="font-size:11px;color:var(--muted)">Day P&L (USD)</label><input type="number" id="calDayPnl" step="0.01" value="'+(existing!==null?existing:'')+'" placeholder="+250 or −150" style="width:100%;margin-top:4px;padding:8px 10px;border-radius:8px;border:.5px solid var(--border-s);background:var(--bg);color:var(--text)"><div style="font-size:11px;color:var(--muted);margin-top:4px">+ for profit · − for loss</div></div>'
+    +'<div style="margin-bottom:12px"><label style="font-size:11px;color:var(--muted)">Day P&L (USD)</label><input type="number" id="calDayPnl" step="0.01" value="'+(existing!==null?existing:'')+'" placeholder="+250 or −150" style="'+inp+'"><div style="font-size:11px;color:var(--muted);margin-top:4px">+ for profit · − for loss</div></div>'
+    +'<div style="margin-bottom:16px"><label style="font-size:11px;color:var(--muted)">Pair / Symbol <span style="opacity:.7">(optional)</span></label><input type="text" id="calDaySym" list="symListCal" value="'+existSym+'" placeholder="e.g. NQ" autocomplete="off" style="'+inp+'">'+symbolDatalist('symListCal')+'</div>'
     +'<div class="modal-actions">'+(existing!==null?'<button class="modal-btn danger" onclick="removeCalDay(\''+dateStr+'\')"><i class="ti ti-trash"></i> Remove</button>':'')+'<button class="modal-btn" onclick="_uiModalDone(false)">Cancel</button><button class="modal-btn primary" onclick="saveCalDay(\''+dateStr+'\')">Save</button></div></div>';
   ov.classList.add('open');
   ov.onclick=e=>{if(e.target===ov)_uiModalDone(false);};
@@ -2099,16 +2104,17 @@ function saveCalDay(dateStr){
   if(!acc.dailyEntries)acc.dailyEntries=[];if(!acc.archivedEntries)acc.archivedEntries=[];
   const inCur=acc.dailyEntries.some(e=>e.date===dateStr);
   const inArch=acc.archivedEntries.some(e=>e.date===dateStr);
+  const sym=((document.getElementById('calDaySym')||{}).value||'').trim().toUpperCase();
   const toArchived=inArch||(!inCur&&acc.status==='live'&&acc.liveDate&&dateStr<acc.liveDate);
   // replace any existing entries for this date in the target array with one net value
   if(toArchived){
     acc.archivedEntries=acc.archivedEntries.filter(e=>e.date!==dateStr);
-    acc.archivedEntries.push({id:Date.now(),date:dateStr,pnl,stage:'funded'});
-    acc.archivedEntries.sort((a,b)=>a.date.localeCompare(b.date));
+    const e={id:Date.now(),date:dateStr,pnl,stage:'funded'};if(sym)e.symbol=sym;
+    acc.archivedEntries.push(e);acc.archivedEntries.sort((a,b)=>a.date.localeCompare(b.date));
   }else{
     acc.dailyEntries=acc.dailyEntries.filter(e=>e.date!==dateStr);
-    acc.dailyEntries.push({id:Date.now(),date:dateStr,pnl});
-    acc.dailyEntries.sort((a,b)=>a.date.localeCompare(b.date));
+    const e={id:Date.now(),date:dateStr,pnl};if(sym)e.symbol=sym;
+    acc.dailyEntries.push(e);acc.dailyEntries.sort((a,b)=>a.date.localeCompare(b.date));
   }
   _uiModalDone(true);saveAll();renderDetail();setDetailTab('calendar');showToast('Day saved ✓');
 }
@@ -2210,9 +2216,13 @@ function buildInsightsHTML(entries,trades){
   const dowName={0:'Sun',1:'Mon',2:'Tue',3:'Wed',4:'Thu',5:'Fri',6:'Sat'};
   const dows=[1,2,3,4,5,6,0].filter(wd=>dowCnt[wd]).map(wd=>({name:dowName[wd],avg:dowSum[wd]/dowCnt[wd]}));
   const maxAbs=Math.max(...dows.map(x=>Math.abs(x.avg)),1);
-  // symbols
+  // symbols — from symbol-tagged trading days when present, else from journal trades
   const symMap={};
-  trades.forEach(t=>{const s=(t.symbol||'—').toUpperCase();if(!symMap[s])symMap[s]={pnl:0,n:0,wins:0,dates:new Set()};symMap[s].pnl+=t.pnl||0;symMap[s].n++;if(t.result==='win')symMap[s].wins++;symMap[s].dates.add(t.date);});
+  const taggedDays=entries.filter(e=>e.symbol);
+  const symUnits=taggedDays.length
+    ?taggedDays.map(e=>({s:String(e.symbol).toUpperCase(),pnl:e.pnl,win:e.pnl>0,date:e.date}))
+    :trades.map(t=>({s:(t.symbol?futRoot(t.symbol):'—'),pnl:t.pnl||0,win:t.result==='win',date:t.date}));
+  symUnits.forEach(u=>{if(!symMap[u.s])symMap[u.s]={pnl:0,n:0,wins:0,dates:new Set()};symMap[u.s].pnl+=u.pnl;symMap[u.s].n++;if(u.win)symMap[u.s].wins++;symMap[u.s].dates.add(u.date);});
   const syms=Object.entries(symMap).sort((a,b)=>b[1].pnl-a[1].pnl);
   const clr=v=>v>=0?'var(--green)':'var(--red)';
   const stat=(l,v,c)=>'<div class="ins-stat"><div class="l">'+l+'</div><div class="v"'+(c?' style="color:'+c+'"':'')+'>'+v+'</div></div>';
@@ -2238,11 +2248,33 @@ function buildInsightsHTML(entries,trades){
   }
   return html;
 }
+let _insStage='all';
+function setInsStage(s){_insStage=s;renderAccountInsights();}
 function renderAccountInsights(){
   const acc=accounts.find(a=>a.id===detailAccId);if(!acc)return;
-  const entries=[...(acc.dailyEntries||[]),...(acc.archivedEntries||[])];
-  const tr=trades.filter(t=>String(t.accountId)===String(acc.id));
-  document.getElementById('insightsContent').innerHTML=buildInsightsHTML(entries,tr);
+  const arch=acc.archivedEntries||[],cur=acc.dailyEntries||[];
+  const stageEntries={
+    funded:arch.filter(e=>(e.stage||'funded')==='funded').concat(acc.status==='funded'?cur:[]),
+    live:arch.filter(e=>e.stage==='live').concat(acc.status==='live'?cur:[]),
+    eval:arch.filter(e=>e.stage==='eval').concat(acc.status==='eval'?cur:[])
+  };
+  const present=['eval','funded','live'].filter(s=>stageEntries[s].length);
+  if(_insStage!=='all'&&!present.includes(_insStage))_insStage='all';
+  const allTrades=trades.filter(t=>String(t.accountId)===String(acc.id));
+  let ent,tr;
+  if(_insStage==='all'){ent=[...cur,...arch];tr=allTrades;}
+  else{
+    ent=stageEntries[_insStage];
+    if(acc.status==='live'&&acc.liveDate)tr=allTrades.filter(t=>_insStage==='live'?t.date>=acc.liveDate:t.date<acc.liveDate);
+    else tr=(_insStage===acc.status)?allTrades:[];
+  }
+  let chips='';
+  if(present.length>1){
+    const lbl={eval:'Evaluation',funded:'Funded',live:'Live'};
+    const chip=(v,l)=>'<button class="chip'+(_insStage===v?' active':'')+'" onclick="setInsStage(\''+v+'\')">'+l+'</button>';
+    chips='<div class="chips" style="margin-bottom:1rem">'+chip('all','All Stages')+present.map(s=>chip(s,lbl[s])).join('')+'</div>';
+  }
+  document.getElementById('insightsContent').innerHTML=chips+buildInsightsHTML(ent,tr);
 }
 function renderOverallInsights(){
   const el=document.getElementById('overallInsights');if(!el)return;
@@ -2329,6 +2361,9 @@ async function deleteTrade(id){if(!await uiConfirm('Delete this trade?',{icon:'<
 /* ── TRADES CSV IMPORT (TradingView / Tradovate order export) ── */
 const FUT_PT={NQ:20,MNQ:2,ES:50,MES:5,YM:5,MYM:0.5,RTY:50,M2K:5,GC:100,MGC:10,SI:5000,SIL:1000,CL:1000,MCL:100,NG:10000,QM:500,ZB:1000,ZN:1000,ZF:1000,ZT:2000,ZC:50,ZS:50,ZW:50,HG:25000,MHG:2500};
 function futRoot(sym){const m=String(sym||'').trim().toUpperCase().match(/^([A-Z0-9]{1,4}?)[FGHJKMNQUVXZ]\d{1,2}$/);return m?m[1]:String(sym||'').toUpperCase();}
+const DEFAULT_SYMBOLS=['NQ','MNQ','ES','MES','YM','MYM','RTY','M2K','GC','MGC','SI','CL','MCL','NG','ZB','ZN','ZC','ZS','6E','6B','6J','6A','6C','BTC','MBT','ETH'];
+function usedSymbols(){const s=new Set(DEFAULT_SYMBOLS);accounts.forEach(a=>{[...(a.dailyEntries||[]),...(a.archivedEntries||[])].forEach(e=>{if(e.symbol)s.add(String(e.symbol).toUpperCase());});});trades.forEach(t=>{if(t.symbol)s.add(futRoot(t.symbol));});return[...s];}
+function symbolDatalist(id){return '<datalist id="'+id+'">'+usedSymbols().map(s=>'<option value="'+s+'">').join('')+'</datalist>';}
 function parseCSVLine(line){
   const out=[];let cur='',q=false;
   for(let i=0;i<line.length;i++){const ch=line[i];
