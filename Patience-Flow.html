@@ -328,6 +328,20 @@ tbody tr:hover td{background:var(--s2)}
 .cal-stagekey{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:10px}
 .cal-stagekey .k{display:inline-flex;align-items:center;gap:5px}
 .cal-stagekey .sw{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.ins-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:1.1rem 1.25rem;margin-bottom:1rem}
+.ins-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px}
+.ins-stat .l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.ins-stat .v{font-size:21px;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums}
+.ins-dow{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.ins-dow .d{width:34px;font-size:12px;color:var(--text2);font-weight:600;flex-shrink:0}
+.ins-dow .bwrap{flex:1;background:var(--s2);border-radius:6px;height:22px;overflow:hidden;min-width:40px}
+.ins-dow .bar{height:100%;border-radius:6px;min-width:2px}
+.ins-dow .val{width:86px;text-align:right;font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;flex-shrink:0}
+.ins-sym{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.ins-sym-card{background:var(--s2);border:.5px solid var(--border);border-radius:10px;padding:11px 13px}
+.ins-sym-card .s{font-size:14px;font-weight:700}
+.ins-sym-card .p{font-size:15px;font-weight:700;margin:2px 0}
+.ins-sym-card .m{font-size:11px;color:var(--muted)}
 .cal-best-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:20px;background:rgba(240,185,11,.1);border:1px solid rgba(240,185,11,.5);color:#f0b90b;font-size:12.5px;font-weight:700;margin-bottom:12px}
 .cal-day{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px}
 .cal-cell.empty .cal-day{color:var(--muted);opacity:.4}
@@ -465,6 +479,7 @@ tbody tr:hover td{background:var(--s2)}
   <div style="display:flex;gap:8px;margin-bottom:1.25rem">
     <button class="dtab active" data-view="stats" onclick="setDetailTab('stats')"><i class="ti ti-chart-line"></i> Account Stats</button>
     <button class="dtab" data-view="calendar" onclick="setDetailTab('calendar')"><i class="ti ti-calendar-month"></i> Trade Calendar</button>
+    <button class="dtab" data-view="insights" onclick="setDetailTab('insights')"><i class="ti ti-bulb"></i> Insights</button>
     <button class="dtab" data-view="timeline" onclick="setDetailTab('timeline')"><i class="ti ti-timeline"></i> Timeline</button>
   </div>
   <!-- Stats view -->
@@ -487,6 +502,10 @@ tbody tr:hover td{background:var(--s2)}
   <!-- Calendar view -->
   <div id="detail_cal" style="display:none">
     <div id="calContent"></div>
+  </div>
+  <!-- Insights view -->
+  <div id="detail_insights" style="display:none">
+    <div id="insightsContent"></div>
   </div>
   <!-- Timeline view -->
   <div id="detail_timeline" style="display:none">
@@ -734,6 +753,9 @@ tbody tr:hover td{background:var(--s2)}
 
 <!-- TAB: ANALYTICS -->
 <div id="tabAnalytics" class="page" style="display:none">
+  <div class="stitle"><i class="ti ti-bulb"></i> Trading Performance — All Accounts</div>
+  <div id="overallInsights" style="margin-bottom:1.75rem"></div>
+  <div class="stitle"><i class="ti ti-cash"></i> Payouts &amp; Expenses</div>
   <div class="chips" id="periodChips"><button class="pchip active" onclick="setPeriod('ALL',this)">All Time</button><button class="pchip" onclick="setPeriod('1M',this)">1 Month</button><button class="pchip" onclick="setPeriod('3M',this)">3 Months</button><button class="pchip" onclick="setPeriod('6M',this)">6 Months</button><button class="pchip" onclick="setPeriod('1J',this)">1 Year</button></div>
   <div class="krow" id="chartKpi"></div>
   <div class="ccard"><div class="ctitle"><span id="chartTitle">–</span><span style="font-size:11px;color:var(--muted)">Green = Payouts · Red = Expenses</span></div><div class="barchart" id="barChart"><div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;color:var(--muted);font-size:13px">No data yet</div></div><div class="clegend"><div class="cli"><div class="cldot" style="background:var(--green)"></div>Payouts</div><div class="cli"><div class="cldot" style="background:var(--red)"></div>Expenses</div></div></div>
@@ -1083,6 +1105,8 @@ function renderDetail(){
   // Reset tab to stats view
   document.getElementById('detail_stats').style.display='block';
   document.getElementById('detail_cal').style.display='none';
+  document.getElementById('detail_insights').style.display='none';
+  document.getElementById('detail_timeline').style.display='none';
   document.querySelectorAll('.dtab').forEach(t=>t.classList.toggle('active',t.dataset.view==='stats'));
   _detailView='stats';
   const acc=accounts.find(a=>a.id===detailAccId);if(!acc){closeDetail();return;}
@@ -1690,6 +1714,7 @@ function renderCumulativeChart(){
   cumulativeChart=new Chart(ctx,{type:'line',data:{labels:labels.map((l,i)=>i===0?'Start':fmtDate(l)),datasets:[{label:'Cumulative Payouts',data,borderColor:'#3b82f6',backgroundColor:grad,borderWidth:2.5,tension:0.4,fill:true,pointRadius:data.length>15?0:4,pointHoverRadius:6,pointBackgroundColor:'#3b82f6'}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:isDark?'#c3c2b7':'#52514e',usePointStyle:true,font:{size:12}}},tooltip:{backgroundColor:isDark?'#1e1e1c':'#fff',borderColor:isDark?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.1)',borderWidth:1,titleColor:isDark?'#f5f5f0':'#0b0b0b',bodyColor:isDark?'#c3c2b7':'#52514e',padding:10,callbacks:{label:c=>' Total earned: '+fmt(c.parsed.y)}}},scales:{x:{grid:{color:gc},ticks:{color:'#898781',maxTicksLimit:10,font:{size:11}}},y:{grid:{color:gc},ticks:{color:'#898781',font:{size:11},callback:v=>'$'+Math.round(v).toLocaleString('en-US')}}}}});
 }
 function renderAnalytics(){
+  renderOverallInsights();
   const now=new Date(),yr=now.getFullYear(),mo=now.getMonth();let labels=[],pData=[],eData=[],pEntries=[];
   const titles={'1M':'Last Month','3M':'Last 3 Months','6M':'Last 6 Months','1J':'Last Year','ALL':'All Time'};
   document.getElementById('chartTitle').textContent=titles[currentPeriod];
@@ -1962,9 +1987,11 @@ function setDetailTab(view){
   _detailView=view;
   document.getElementById('detail_stats').style.display=view==='stats'?'block':'none';
   document.getElementById('detail_cal').style.display=view==='calendar'?'block':'none';
+  document.getElementById('detail_insights').style.display=view==='insights'?'block':'none';
   document.getElementById('detail_timeline').style.display=view==='timeline'?'block':'none';
   document.querySelectorAll('.dtab').forEach(t=>t.classList.toggle('active',t.dataset.view===view));
   if(view==='calendar'){calYear=new Date().getFullYear();calMonth=new Date().getMonth();renderTradeCalendar();}
+  if(view==='insights')renderAccountInsights();
   if(view==='timeline')renderTimeline();
 }
 
@@ -2157,6 +2184,70 @@ async function removePastPayout(pid){
   if(!await uiConfirm('Remove this past payout from the timeline?',{icon:'<i class="ti ti-trash"></i>',title:'Remove payout',okText:'Remove',danger:true}))return;
   accounts[i].archivedPayouts=(accounts[i].archivedPayouts||[]).filter(p=>p.id!==pid);
   saveAll();renderTimeline();showToast('Payout removed');
+}
+/* ── INSIGHTS ── */
+function buildInsightsHTML(entries,trades){
+  const dayMap={};entries.forEach(e=>{dayMap[e.date]=(dayMap[e.date]||0)+e.pnl;});
+  const days=Object.entries(dayMap);
+  const tradingDays=days.length;
+  if(!tradingDays&&!trades.length)return '<div class="empty"><i class="ti ti-bulb"></i>No data yet — add trading days or trades to see insights.</div>';
+  const dayVals=days.map(([,v])=>v);
+  const totalPnL=dayVals.reduce((s,v)=>s+v,0);
+  const bestDay=dayVals.length?Math.max(...dayVals):0;
+  const worstDay=dayVals.length?Math.min(...dayVals):0;
+  const avgDay=tradingDays?totalPnL/tradingDays:0;
+  const winDays=dayVals.filter(v=>v>0).length;
+  const sortedDays=days.slice().sort((a,b)=>b[0].localeCompare(a[0]));
+  let streak=0,streakLoss=false;for(const[,v]of sortedDays){if(v>0&&!streakLoss)streak++;else if(v<0&&streak===0){streakLoss=true;streak++;}else break;}
+  const nTrades=trades.length;
+  const wins=trades.filter(t=>t.result==='win').length;
+  const winRate=nTrades?(wins/nTrades*100):(tradingDays?(winDays/tradingDays*100):0);
+  const winLbl=nTrades?'Win Rate':'Win Days';
+  const winVal=nTrades?winRate.toFixed(1)+'%':winDays+' / '+tradingDays;
+  // day of week
+  const dowSum={},dowCnt={};
+  days.forEach(([date,v])=>{const wd=new Date(date+'T00:00:00').getDay();dowSum[wd]=(dowSum[wd]||0)+v;dowCnt[wd]=(dowCnt[wd]||0)+1;});
+  const dowName={0:'Sun',1:'Mon',2:'Tue',3:'Wed',4:'Thu',5:'Fri',6:'Sat'};
+  const dows=[1,2,3,4,5,6,0].filter(wd=>dowCnt[wd]).map(wd=>({name:dowName[wd],avg:dowSum[wd]/dowCnt[wd]}));
+  const maxAbs=Math.max(...dows.map(x=>Math.abs(x.avg)),1);
+  // symbols
+  const symMap={};
+  trades.forEach(t=>{const s=(t.symbol||'—').toUpperCase();if(!symMap[s])symMap[s]={pnl:0,n:0,wins:0,dates:new Set()};symMap[s].pnl+=t.pnl||0;symMap[s].n++;if(t.result==='win')symMap[s].wins++;symMap[s].dates.add(t.date);});
+  const syms=Object.entries(symMap).sort((a,b)=>b[1].pnl-a[1].pnl);
+  const clr=v=>v>=0?'var(--green)':'var(--red)';
+  const stat=(l,v,c)=>'<div class="ins-stat"><div class="l">'+l+'</div><div class="v"'+(c?' style="color:'+c+'"':'')+'>'+v+'</div></div>';
+  let html='<div class="ins-card"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">Performance</div><div class="ins-grid">'
+    +stat('Total P&L',fmtS(totalPnL),clr(totalPnL))
+    +stat(winLbl,winVal,winRate>=50?'var(--green)':'var(--text)')
+    +stat('Trading Days',tradingDays,'var(--text)')
+    +stat('Total Trades',nTrades||'—','var(--text)')
+    +stat('Best Day',fmtS(bestDay),'var(--green)')
+    +stat('Worst Day',fmtS(worstDay),clr(worstDay))
+    +stat('Avg / Day',fmtS(avgDay),clr(avgDay))
+    +stat('Win Streak',streak?(streak+(streakLoss?'L':'W')):'—',streak&&!streakLoss?'var(--amber)':streakLoss?'var(--red)':'var(--muted)')
+    +'</div></div>';
+  if(dows.length){
+    html+='<div class="ins-card"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">Avg P&L by Day of Week</div>'
+      +dows.map(x=>'<div class="ins-dow"><div class="d">'+x.name+'</div><div class="bwrap"><div class="bar" style="width:'+Math.round(Math.abs(x.avg)/maxAbs*100)+'%;background:'+clr(x.avg)+'"></div></div><div class="val" style="color:'+clr(x.avg)+'">'+fmtS(x.avg)+'</div></div>').join('')
+      +'</div>';
+  }
+  if(syms.length){
+    html+='<div class="ins-card"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">Symbols</div><div class="ins-sym">'
+      +syms.map(([s,d])=>'<div class="ins-sym-card"><div class="s">'+s+'</div><div class="p" style="color:'+clr(d.pnl)+'">'+fmtS(d.pnl)+'</div><div class="m">'+d.n+' trade'+(d.n>1?'s':'')+' · '+Math.round(d.wins/d.n*100)+'% win · '+d.dates.size+'d</div></div>').join('')
+      +'</div></div>';
+  }
+  return html;
+}
+function renderAccountInsights(){
+  const acc=accounts.find(a=>a.id===detailAccId);if(!acc)return;
+  const entries=[...(acc.dailyEntries||[]),...(acc.archivedEntries||[])];
+  const tr=trades.filter(t=>String(t.accountId)===String(acc.id));
+  document.getElementById('insightsContent').innerHTML=buildInsightsHTML(entries,tr);
+}
+function renderOverallInsights(){
+  const el=document.getElementById('overallInsights');if(!el)return;
+  const entries=[];accounts.forEach(a=>{(a.dailyEntries||[]).forEach(e=>entries.push(e));(a.archivedEntries||[]).forEach(e=>entries.push(e));});
+  el.innerHTML=buildInsightsHTML(entries,trades.slice());
 }
 function tlEditDate(key){_tlEdit=key;renderTimeline();}
 function tlSaveDate(key){
