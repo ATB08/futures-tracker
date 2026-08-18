@@ -2140,7 +2140,7 @@ function renderTimeline(){
   if(acc.liveDate)events.push({key:'live',date:acc.liveDate,type:'live',title:'Live Program Unlocked',sub:'Eligible for the live account'});
   if(acc.liveReceivedDate)events.push({key:'livercv',date:acc.liveReceivedDate,type:'live',title:'Live Account Received',sub:'Live account is active'});
   // All payouts across stages, numbered by date order
-  const allPayouts=[...(acc.archivedPayouts||[]).map(p=>({...p,stage:'funded'})),...(acc.payouts||[]).map(p=>({...p,stage:acc.status==='live'?'live':'current',cur:true}))].sort((a,b)=>a.date.localeCompare(b.date));
+  const allPayouts=[...(acc.archivedPayouts||[]).map(p=>({...p,stage:p.stage||'funded'})),...(acc.payouts||[]).map(p=>({...p,stage:acc.status==='live'?'live':'current',cur:true}))].sort((a,b)=>a.date.localeCompare(b.date));
   allPayouts.forEach((p,i)=>{const isLive=p.stage==='live';events.push({key:p.cur?'p'+p.id:'ap'+p.id,date:p.date,type:'payout',title:'Payout #'+(i+1)+' Received'+(p.stage==='funded'?' (funded)':isLive?' (live)':''),amount:p.amount,noEdit:!p.cur,removable:!p.cur,pid:p.id,livePay:isLive});});
   if(acc.payoutPending)events.push({key:'pending',date:acc.payoutPending.requestDate,type:'pending',title:'Payout Pending',sub:'Awaiting firm approval',amount:acc.payoutPending.amount});
   events.sort((a,b)=>b.date.localeCompare(a.date));
@@ -2178,11 +2178,14 @@ function confirmAddPastPayout(){
   if(amt<=0){uiAlert('Please enter an amount.');return;}
   const acc=accounts[i];
   if(!acc.archivedPayouts)acc.archivedPayouts=[];
+  // Stage by date: on a live account, a payout on/after the go-live date is a live-stage payout
+  const stage=(acc.status==='live'&&acc.liveDate&&date>=acc.liveDate)?'live':'funded';
   const pid=Date.now();
-  acc.archivedPayouts.push({id:pid,date,amount:amt,stage:'funded'});
+  acc.archivedPayouts.push({id:pid,date,amount:amt,stage});
   acc.archivedPayouts.sort((a,b)=>a.date.localeCompare(b.date));
   if(alsoEntry){
-    entries.push({id:pid+1,date,type:'payout',amount:amt,cat:'profit',note:'Past payout — '+acc.name});
+    const split=accSplit(acc),rec=splitAmount(amt,split);
+    entries.push({id:pid+1,date,type:'payout',amount:rec,cat:'profit',note:'Past payout — '+acc.name+(split<100?' ('+split+'% of '+fmt(amt)+')':'')});
     entries.sort((a,b)=>b.date.localeCompare(a.date));
   }
   _uiModalDone(true);
