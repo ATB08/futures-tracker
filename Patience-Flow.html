@@ -363,6 +363,9 @@ tbody tr:hover td{background:var(--s2)}
 .tl-dot.tl-payout{background:var(--gbg);border-color:var(--green)}
 .tl-dot.tl-pending{background:var(--abg);border-color:var(--amber)}
 .tl-dot.tl-live{background:var(--lbg);border-color:var(--purple)}
+.tl-item.tl-live-payout .tl-body{background:var(--lbg);border:1px solid var(--purple);border-radius:10px;padding:8px 12px;margin-top:-4px}
+.tl-item.tl-live-payout .tl-dot.tl-payout{background:var(--lbg);border-color:var(--purple)}
+.tl-item.tl-live-payout .tl-amt{color:var(--ltx)}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);z-index:10000;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
 .modal-card{background:var(--surface);border:.5px solid var(--border-s);border-radius:14px;padding:1.4rem 1.5rem;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:modalIn .16s ease}
@@ -2137,8 +2140,8 @@ function renderTimeline(){
   if(acc.liveDate)events.push({key:'live',date:acc.liveDate,type:'live',title:'Live Program Unlocked',sub:'Eligible for the live account'});
   if(acc.liveReceivedDate)events.push({key:'livercv',date:acc.liveReceivedDate,type:'live',title:'Live Account Received',sub:'Live account is active'});
   // All payouts across stages, numbered by date order
-  const allPayouts=[...(acc.archivedPayouts||[]).map(p=>({...p,stage:'funded'})),...(acc.payouts||[]).map(p=>({...p,stage:'current',cur:true}))].sort((a,b)=>a.date.localeCompare(b.date));
-  allPayouts.forEach((p,i)=>events.push({key:p.cur?'p'+p.id:'ap'+p.id,date:p.date,type:'payout',title:'Payout #'+(i+1)+' Received'+(p.stage==='funded'?' (funded)':''),amount:p.amount,noEdit:!p.cur,removable:!p.cur,pid:p.id}));
+  const allPayouts=[...(acc.archivedPayouts||[]).map(p=>({...p,stage:'funded'})),...(acc.payouts||[]).map(p=>({...p,stage:acc.status==='live'?'live':'current',cur:true}))].sort((a,b)=>a.date.localeCompare(b.date));
+  allPayouts.forEach((p,i)=>{const isLive=p.stage==='live';events.push({key:p.cur?'p'+p.id:'ap'+p.id,date:p.date,type:'payout',title:'Payout #'+(i+1)+' Received'+(p.stage==='funded'?' (funded)':isLive?' (live)':''),amount:p.amount,noEdit:!p.cur,removable:!p.cur,pid:p.id,livePay:isLive});});
   if(acc.payoutPending)events.push({key:'pending',date:acc.payoutPending.requestDate,type:'pending',title:'Payout Pending',sub:'Awaiting firm approval',amount:acc.payoutPending.amount});
   events.sort((a,b)=>b.date.localeCompare(a.date));
   const icons={start:'<i class="ti ti-calendar"></i>',funded:'<i class="ti ti-school"></i>',payout:'<i class="ti ti-cash"></i>',pending:'<i class="ti ti-hourglass"></i>',live:'<i class="ti ti-rocket"></i>'};
@@ -2148,7 +2151,7 @@ function renderTimeline(){
     :'<div class="tl-sub">'+fmtDate(ev.date)+(ev.noEdit?'':' <button class="iconbtn" style="font-size:11px;padding:1px 4px" title="Edit date" onclick="tlEditDate(\''+ev.key+'\')"><i class="ti ti-pencil"></i></button>')+'</div>';
   const topBar='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px"><div style="font-size:11px;color:var(--muted)"><i class="ti ti-pencil"></i> Click the pencil next to any date to adjust it.</div><button class="addbtn" style="margin-bottom:0" onclick="showAddPayoutDialog()"><i class="ti ti-plus"></i> Add Past Payout</button></div>';
   const html=events.length
-    ?topBar+'<div class="tl-wrap">'+events.map(ev=>'<div class="tl-item"><div class="tl-dot '+dotCls[ev.type]+'">'+icons[ev.type]+'</div><div class="tl-body"><div class="tl-title">'+ev.title+'</div>'+(ev.sub?'<div class="tl-sub">'+ev.sub+'</div>':'')+dateHtml(ev)+(ev.amount?'<div class="tl-amt">+ '+fmt(ev.amount)+'</div>':'')+(ev.removable?'<button class="chip" style="margin-top:6px" onclick="removePastPayout('+ev.pid+')"><i class="ti ti-trash"></i> Remove</button>':'')+'</div></div>').join('')+'</div>'
+    ?topBar+'<div class="tl-wrap">'+events.map(ev=>'<div class="tl-item'+(ev.livePay?' tl-live-payout':'')+'"><div class="tl-dot '+dotCls[ev.type]+'">'+icons[ev.type]+'</div><div class="tl-body"><div class="tl-title">'+ev.title+'</div>'+(ev.sub?'<div class="tl-sub">'+ev.sub+'</div>':'')+dateHtml(ev)+(ev.amount?'<div class="tl-amt">+ '+fmt(ev.amount)+'</div>':'')+(ev.removable?'<button class="chip" style="margin-top:6px" onclick="removePastPayout('+ev.pid+')"><i class="ti ti-trash"></i> Remove</button>':'')+'</div></div>').join('')+'</div>'
     :topBar+'<div class="empty"><i class="ti ti-timeline"></i>No events yet.</div>';
   document.getElementById('timelineContent').innerHTML=html;
 }
