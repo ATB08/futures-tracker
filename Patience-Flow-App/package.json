@@ -1,0 +1,14 @@
+{
+  "name": "patience-flow",
+  "version": "1.0.0",
+  "description": "Futures Trading Tracker",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-packager . Patience-Flow --platform=darwin --arch=arm64 --out=dist --overwrite --icon=icon.icns --app-bundle-id=com.atb08.patienceflow && codesign --force --deep --sign - dist/Patience-Flow-darwin-arm64/Patience-Flow.app && xattr -cr dist/Patience-Flow-darwin-arm64/Patience-Flow.app"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-packager": "^17.1.2"
+  }
+}
