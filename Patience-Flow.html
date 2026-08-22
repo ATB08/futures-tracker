@@ -1017,9 +1017,14 @@ async function cloudSyncStartup(){
       localStorage.setItem('pf_syncStamp',cloud.exported);
       location.reload();return true;
     }
-    // local is newest → publish it to iCloud
+    // Only SEED the cloud on startup if it is still empty. Do NOT re-publish our
+    // local state on every open — that could overwrite the other Mac's changes
+    // that simply haven't finished syncing to this Mac yet. Real edits publish
+    // via autoBackup anyway.
     _syncReady=true;
-    try{const b=gatherBackup();b.exported=_nextExported((cloud&&cloud.exported)||'');localStorage.setItem('pf_syncStamp',b.exported);window.patienceDesktop.backup(JSON.stringify(b));}catch(e){}
+    if(!cloud||!cloud.data){
+      try{const b=gatherBackup();b.exported=_nextExported('');localStorage.setItem('pf_syncStamp',b.exported);window.patienceDesktop.backup(JSON.stringify(b));}catch(e){}
+    }
     return false;
   }catch(e){_syncReady=true;return false;}
 }
