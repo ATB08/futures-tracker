@@ -2825,6 +2825,25 @@ migrateData();initTheme();
     cloudSyncStartup().then(reloading=>{if(!reloading)done();}).catch(()=>{_syncReady=true;done();});
   }else{_syncReady=true;done();}
 })();
+// Re-check iCloud whenever the window regains focus, so changes made on the
+// other Mac appear here without needing a restart.
+let _syncFocusBusy=false;
+async function cloudSyncOnFocus(){
+  if(!_syncReady||_syncFocusBusy)return;
+  if(!(window.patienceDesktop&&window.patienceDesktop.getSyncData))return;
+  _syncFocusBusy=true;
+  try{
+    let s=null;try{s=await window.patienceDesktop.getSyncData();}catch(e){}
+    const cloud=s&&s.cloud,localStamp=localStorage.getItem('pf_syncStamp')||'';
+    if(cloud&&cloud.exported&&cloud.exported>localStamp){
+      try{window.patienceDesktop.safetyBackup(JSON.stringify(gatherBackup()));}catch(e){}
+      applyBackupData(cloud.data);
+      localStorage.setItem('pf_syncStamp',cloud.exported);
+      location.reload();return;
+    }
+  }finally{_syncFocusBusy=false;}
+}
+window.addEventListener('focus',cloudSyncOnFocus);
 if(window.patienceDesktop&&window.patienceDesktop.onQuickAdd)window.patienceDesktop.onQuickAdd(d=>{
   const a=accounts.find(x=>String(x.id)===String(d.accountId));
   const pnl=parseFloat(d.pnl);

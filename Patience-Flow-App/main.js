@@ -297,15 +297,22 @@ ipcMain.handle('get-sync-data', () => {
   return { cloud: read(icloudDataFile()), local: read(backupFile()) };
 });
 
-app.whenReady().then(() => {
-  createWindow();
-  createTray();
-  if (loadState().visible !== false) createWidget();
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-    else showApp();
+// Only ever allow ONE Patience-Flow running at a time (across all copies),
+// otherwise multiple instances stomp on the same localStorage / iCloud file.
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+} else {
+  app.on('second-instance', () => showApp());
+  app.whenReady().then(() => {
+    createWindow();
+    createTray();
+    if (loadState().visible !== false) createWidget();
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) createWindow();
+      else showApp();
+    });
   });
-});
+}
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
