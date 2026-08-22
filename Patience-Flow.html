@@ -977,11 +977,16 @@ function exportData(){
 }
 /* Auto-backup to a single file in the desktop app (debounced, always overwritten) */
 let _autoBackupTimer=null,_syncReady=false;
+// Make the sync timestamp MONOTONIC across both Macs: it must always be greater
+// than whatever is already in iCloud, so it never goes backwards even if the two
+// computers' clocks differ (clock skew otherwise breaks two-way sync).
+function _nextExported(cloudExp){return new Date(Math.max(Date.now(),(Date.parse(cloudExp)||0)+1000)).toISOString();}
+async function _cloudExported(){try{if(window.patienceDesktop&&window.patienceDesktop.getSyncData){const s=await window.patienceDesktop.getSyncData();return (s&&s.cloud&&s.cloud.exported)||'';}}catch(e){}return '';}
 function autoBackup(){
   if(!(window.patienceDesktop&&window.patienceDesktop.backup))return;
   if(!_syncReady)return; // wait until the initial iCloud reconciliation is done
   clearTimeout(_autoBackupTimer);
-  _autoBackupTimer=setTimeout(()=>{try{const b=gatherBackup();localStorage.setItem('pf_syncStamp',b.exported);window.patienceDesktop.backup(JSON.stringify(b));}catch(e){}},1500);
+  _autoBackupTimer=setTimeout(async ()=>{try{const b=gatherBackup();b.exported=_nextExported(await _cloudExported());localStorage.setItem('pf_syncStamp',b.exported);window.patienceDesktop.backup(JSON.stringify(b));}catch(e){}},1500);
 }
 /* Reconcile local data with the shared iCloud file on startup. Returns true if it
    triggered a reload (caller should stop). Never destructive: keeps a safety copy
@@ -1014,7 +1019,7 @@ async function cloudSyncStartup(){
     }
     // local is newest → publish it to iCloud
     _syncReady=true;
-    try{const b=gatherBackup();localStorage.setItem('pf_syncStamp',b.exported);window.patienceDesktop.backup(JSON.stringify(b));}catch(e){}
+    try{const b=gatherBackup();b.exported=_nextExported((cloud&&cloud.exported)||'');localStorage.setItem('pf_syncStamp',b.exported);window.patienceDesktop.backup(JSON.stringify(b));}catch(e){}
     return false;
   }catch(e){_syncReady=true;return false;}
 }
@@ -1025,7 +1030,7 @@ async function importData(input){
   if(!data||!Object.keys(data).some(k=>k.startsWith('af_'))){uiAlert('This file is not a valid Patience-Flow backup.',{icon:'<i class="ti ti-alert-triangle"></i>',title:'Import failed'});return;}
   if(!await uiConfirm('This replaces ALL current data here with the data from the backup file.\n\nContinue?',{icon:'<i class="ti ti-database-import"></i>',title:'Import backup',okText:'Import',danger:true}))return;
   applyBackupData(data);
-  localStorage.setItem('pf_syncStamp',new Date().toISOString());
+  localStorage.setItem('pf_syncStamp',_nextExported(await _cloudExported()));
   location.reload();
 }
 async function restoreAutoBackup(json){
@@ -1034,7 +1039,7 @@ async function restoreAutoBackup(json){
   if(!data||!Object.keys(data).some(k=>k.startsWith('af_'))){uiAlert('No valid auto-backup found yet.',{icon:'<i class="ti ti-alert-triangle"></i>',title:'Restore'});return;}
   if(!await uiConfirm('Restore your data from the automatic backup?\n\nThis replaces ALL current data with the last saved state.',{icon:'<i class="ti ti-history"></i>',title:'Restore auto-backup',okText:'Restore',danger:true}))return;
   applyBackupData(data);
-  localStorage.setItem('pf_syncStamp',new Date().toISOString());
+  localStorage.setItem('pf_syncStamp',_nextExported(await _cloudExported()));
   location.reload();
 }
 
