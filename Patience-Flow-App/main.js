@@ -9,9 +9,34 @@ const backupFile = () => path.join(app.getPath('userData'), 'Patience-Flow-Backu
 const preSyncBackupFile = () => path.join(app.getPath('userData'), 'Patience-Flow-PreSync-Backup.json');
 
 /* ── iCloud sync (shared between this user's Macs via the same Apple ID) ── */
-const icloudDir = () => path.join(os.homedir(), 'Library', 'Mobile Documents', 'com~apple~CloudDocs', 'Patience-Flow');
+const icloudRoot = () => path.join(os.homedir(), 'Library', 'Mobile Documents', 'com~apple~CloudDocs');
+const icloudDir = () => path.join(icloudRoot(), 'Claude Code', 'Patience-Flow');
+const oldIcloudDir = () => path.join(icloudRoot(), 'Patience-Flow'); // pre-2026-08-23 location
 const icloudDataFile = () => path.join(icloudDir(), 'data', 'Patience-Flow-Data.json');
 const icloudHtmlFile = () => path.join(icloudDir(), 'app', 'Patience-Flow.html');
+
+// One-time move of the sync folder from the old top-level location into the
+// "Claude Code" folder. Self-healing: runs on every Mac at startup.
+function migrateIcloudFolder() {
+  try {
+    const oldD = oldIcloudDir(), newD = icloudDir();
+    if (!fs.existsSync(oldD)) return;
+    ensureDir(path.dirname(newD));
+    const oldData = path.join(oldD, 'data', 'Patience-Flow-Data.json');
+    const newData = path.join(newD, 'data', 'Patience-Flow-Data.json');
+    if (fs.existsSync(oldData) && !fs.existsSync(newData)) {
+      // copy old → new (data + app), preserving the newest content
+      const cp = (rel) => {
+        const s = path.join(oldD, rel), d = path.join(newD, rel);
+        if (fs.existsSync(s)) { ensureDir(path.dirname(d)); try { fs.copyFileSync(s, d); const m = fs.statSync(s).mtime; fs.utimesSync(d, m, m); } catch (e) {} }
+      };
+      cp(path.join('data', 'Patience-Flow-Data.json'));
+      cp(path.join('app', 'Patience-Flow.html'));
+    }
+    // remove the old folder once the new one holds the data
+    if (fs.existsSync(newData)) { try { fs.rmSync(oldD, { recursive: true, force: true }); } catch (e) {} }
+  } catch (e) {}
+}
 const htmlWorkFile = () => path.join(app.getPath('userData'), 'app', 'Patience-Flow.html');
 const bundledHtml = () => path.join(__dirname, 'Patience-Flow.html');
 
@@ -304,6 +329,7 @@ if (!app.requestSingleInstanceLock()) {
 } else {
   app.on('second-instance', () => showApp());
   app.whenReady().then(() => {
+    migrateIcloudFolder();
     createWindow();
     createTray();
     if (loadState().visible !== false) createWidget();
