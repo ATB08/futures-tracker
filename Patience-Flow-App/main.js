@@ -1,10 +1,42 @@
 const { app, BrowserWindow, Menu, Tray, ipcMain, nativeImage, screen, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
 let win = null, widgetWin = null, quickWin = null, tray = null, lastStats = null;
 const stateFile = () => path.join(app.getPath('userData'), 'widget-state.json');
 const backupFile = () => path.join(app.getPath('userData'), 'Patience-Flow-Backup.json');
+const preSyncBackupFile = () => path.join(app.getPath('userData'), 'Patience-Flow-PreSync-Backup.json');
+
+/* ── iCloud sync (shared between this user's Macs via the same Apple ID) ── */
+const icloudDir = () => path.join(os.homedir(), 'Library', 'Mobile Documents', 'com~apple~CloudDocs', 'Patience-Flow');
+const icloudDataFile = () => path.join(icloudDir(), 'data', 'Patience-Flow-Data.json');
+const icloudHtmlFile = () => path.join(icloudDir(), 'app', 'Patience-Flow.html');
+const htmlWorkFile = () => path.join(app.getPath('userData'), 'app', 'Patience-Flow.html');
+const bundledHtml = () => path.join(__dirname, 'Patience-Flow.html');
+
+function ensureDir(p) { try { fs.mkdirSync(p, { recursive: true }); } catch (e) {} }
+function mtimeOf(p) { try { return fs.statSync(p).mtimeMs; } catch (e) { return 0; } }
+
+/* Resolve which app HTML to load, keeping a stable work-copy path (so localStorage
+   is never orphaned) and converging the newest version between bundle and iCloud. */
+function resolveAppHtml() {
+  const bundled = bundledHtml(), work = htmlWorkFile(), cloud = icloudHtmlFile();
+  ensureDir(path.dirname(work));
+  const mB = mtimeOf(bundled), mW = mtimeOf(work), mC = mtimeOf(cloud);
+  // newest source among bundled (this install) and iCloud (pushed from another Mac)
+  let src = bundled, srcM = mB;
+  if (mC > srcM) { src = cloud; srcM = mC; }
+  if (srcM > 0 && (mW === 0 || mW < srcM)) {
+    try { fs.copyFileSync(src, work); const t = new Date(srcM); fs.utimesSync(work, t, t); } catch (e) {}
+  }
+  // publish our (possibly newer) version to iCloud so the other Mac picks it up
+  const mWnow = mtimeOf(work);
+  if (mWnow > 0 && mWnow > mtimeOf(cloud)) {
+    try { ensureDir(path.dirname(cloud)); fs.copyFileSync(work, cloud); const t = new Date(mWnow); fs.utimesSync(cloud, t, t); } catch (e) {}
+  }
+  return fs.existsSync(work) ? work : bundled;
+}
 
 const fmt = (n) => (n < 0 ? '-$' : '$') + Math.abs(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
 const fmtS = (n) => (n >= 0 ? '+$' : '-$') + Math.abs(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
@@ -34,7 +66,7 @@ function createWindow() {
     title: 'Patience Flow',
   });
 
-  win.loadFile(path.join(__dirname, 'Patience-Flow.html'));
+  win.loadFile(resolveAppHtml());
   win.on('closed', () => { win = null; });
 
   const menuTemplate = [
@@ -47,6 +79,7 @@ function createWindow() {
         { type: 'separator' },
         { label: 'Reveal Auto-Backup File', click: () => { if (fs.existsSync(backupFile())) shell.showItemInFolder(backupFile()); } },
         { label: 'Restore from Auto-Backup', click: () => restoreFromBackup() },
+        { label: 'Open iCloud Sync Folder', click: () => { ensureDir(icloudDir()); shell.openPath(icloudDir()); } },
         { type: 'separator' },
         { role: 'hide', label: 'Hide' },
         { role: 'hideOthers' },
@@ -253,6 +286,15 @@ ipcMain.on('quick-add-submit', (_e, d) => {
 ipcMain.on('quick-add-close', () => { if (quickWin && !quickWin.isDestroyed()) quickWin.close(); });
 ipcMain.on('backup', (_e, json) => {
   try { fs.writeFileSync(backupFile(), json); } catch (e) {}
+  // mirror to the shared iCloud data file so the other Mac stays in sync
+  try { ensureDir(path.dirname(icloudDataFile())); fs.writeFileSync(icloudDataFile(), json); } catch (e) {}
+});
+ipcMain.on('safety-backup', (_e, json) => {
+  try { fs.writeFileSync(preSyncBackupFile(), json); } catch (e) {}
+});
+ipcMain.handle('get-sync-data', () => {
+  const read = (p) => { try { const o = JSON.parse(fs.readFileSync(p, 'utf8')); if (o && o.data) return { exported: o.exported || '', data: o.data }; } catch (e) {} return null; };
+  return { cloud: read(icloudDataFile()), local: read(backupFile()) };
 });
 
 app.whenReady().then(() => {

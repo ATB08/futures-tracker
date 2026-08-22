@@ -811,7 +811,7 @@ const CATS={profit:'Profit Withdrawal',fee:'Platform Fee',subscription:'Subscrip
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const FEMOJI={'#3b82f6':'<i class="ti ti-folder"></i>','#1baf7a':'<i class="ti ti-folder-open"></i>','#f97316':'<i class="ti ti-folders"></i>','#8b5cf6':'<i class="ti ti-clipboard"></i>','#ec4899':'<i class="ti ti-pin"></i>','#f59e0b':'<i class="ti ti-star"></i>','#ef4444':'<i class="ti ti-trophy"></i>','#14b8a6':'<i class="ti ti-paperclip"></i>','#6b7280':'<i class="ti ti-archive"></i>'};
 
-let entries=[],accounts=[],folders=[],trades=[],playbooks=[],filter='all',editId=null,currentPeriod='ALL',currentTab='dashboard';
+let entries=[],accounts=[],archivedAccounts=[],folders=[],trades=[],playbooks=[],filter='all',editId=null,currentPeriod='ALL',currentTab='dashboard';
 let accGroups=[],accFilter='all',groupManage=false,_tlEdit=null;
 let taxConfig={deductibleCats:{fee:true,subscription:true,reset:true,news:true,hardware:true,other:false}},currentTaxYear=null;
 let taxMode='year',taxMonth=null,taxFrom='',taxTo='';
@@ -874,6 +874,7 @@ function migrateData(){
     if(acc.profitSplit===undefined)acc.profitSplit=100;
   });
   try{const g=localStorage.getItem('af_accgroups');if(g)accGroups=JSON.parse(g);}catch(e){}
+  try{const aa=localStorage.getItem('af_archaccs');if(aa)archivedAccounts=JSON.parse(aa);}catch(e){}
   try{const f=localStorage.getItem('af_folders');if(f)folders=JSON.parse(f);}catch(e){}
   try{const n=localStorage.getItem('af_notes');if(n)notes=JSON.parse(n);}catch(e){}
   try{const t=localStorage.getItem('af_trades');if(t)trades=JSON.parse(t);}catch(e){}
@@ -882,7 +883,7 @@ function migrateData(){
   try{const tc=localStorage.getItem('af_taxconfig');if(tc)taxConfig=Object.assign(taxConfig,JSON.parse(tc));}catch(e){}
   saveAll();
 }
-function saveAll(){try{localStorage.setItem('af_entries',JSON.stringify(entries));}catch(e){}try{localStorage.setItem('af_accs',JSON.stringify(accounts));}catch(e){}try{localStorage.setItem('af_folders',JSON.stringify(folders));}catch(e){uiAlert('Storage limit reached.');}try{localStorage.setItem('af_trades',JSON.stringify(trades));}catch(e){}try{localStorage.setItem('af_playbooks',JSON.stringify(playbooks));}catch(e){}try{localStorage.setItem('af_taxconfig',JSON.stringify(taxConfig));}catch(e){}try{localStorage.setItem('af_accgroups',JSON.stringify(accGroups));}catch(e){}pushDesktopStats();checkPayoutReadyNotify();autoBackup();}
+function saveAll(){try{localStorage.setItem('af_entries',JSON.stringify(entries));}catch(e){}try{localStorage.setItem('af_accs',JSON.stringify(accounts));}catch(e){}try{localStorage.setItem('af_folders',JSON.stringify(folders));}catch(e){uiAlert('Storage limit reached.');}try{localStorage.setItem('af_trades',JSON.stringify(trades));}catch(e){}try{localStorage.setItem('af_playbooks',JSON.stringify(playbooks));}catch(e){}try{localStorage.setItem('af_taxconfig',JSON.stringify(taxConfig));}catch(e){}try{localStorage.setItem('af_accgroups',JSON.stringify(accGroups));}catch(e){}try{localStorage.setItem('af_archaccs',JSON.stringify(archivedAccounts));}catch(e){}pushDesktopStats();checkPayoutReadyNotify();autoBackup();}
 
 /* ── DESKTOP APP: menu bar + mini widget stats ── */
 function pushDesktopStats(){
@@ -942,8 +943,10 @@ function uiDialog(msg,opts){
       +(opts.title?'<div class="modal-title">'+esc(opts.title)+'</div>':'')
       +'<div class="modal-msg">'+esc(msg)+'</div>'
       +'<div class="modal-actions">'
-      +(opts.confirm?'<button class="modal-btn" onclick="_uiModalDone(false)">Cancel</button>':'')
-      +'<button class="modal-btn '+(opts.danger?'danger':'primary')+'" onclick="_uiModalDone(true)">'+esc(opts.okText||'OK')+'</button>'
+      +(opts.buttons
+        ?opts.buttons.map(b=>'<button class="modal-btn '+(b.cls||'')+'" onclick="_uiModalDone(\''+b.value+'\')">'+esc(b.label)+'</button>').join('')
+        :(opts.confirm?'<button class="modal-btn" onclick="_uiModalDone(false)">Cancel</button>':'')
+          +'<button class="modal-btn '+(opts.danger?'danger':'primary')+'" onclick="_uiModalDone(true)">'+esc(opts.okText||'OK')+'</button>')
       +'</div></div>';
     ov.classList.add('open');
     ov.onclick=e=>{if(e.target===ov&&opts.confirm)_uiModalDone(false);};
@@ -973,11 +976,47 @@ function exportData(){
   showToast('Backup downloaded ✓ — import it in the app to transfer your data');
 }
 /* Auto-backup to a single file in the desktop app (debounced, always overwritten) */
-let _autoBackupTimer=null;
+let _autoBackupTimer=null,_syncReady=false;
 function autoBackup(){
   if(!(window.patienceDesktop&&window.patienceDesktop.backup))return;
+  if(!_syncReady)return; // wait until the initial iCloud reconciliation is done
   clearTimeout(_autoBackupTimer);
-  _autoBackupTimer=setTimeout(()=>{try{window.patienceDesktop.backup(JSON.stringify(gatherBackup()));}catch(e){}},1500);
+  _autoBackupTimer=setTimeout(()=>{try{const b=gatherBackup();localStorage.setItem('pf_syncStamp',b.exported);window.patienceDesktop.backup(JSON.stringify(b));}catch(e){}},1500);
+}
+/* Reconcile local data with the shared iCloud file on startup. Returns true if it
+   triggered a reload (caller should stop). Never destructive: keeps a safety copy
+   before adopting cloud data, and can recover from the local auto-backup too. */
+async function cloudSyncStartup(){
+  try{
+    if(!(window.patienceDesktop&&window.patienceDesktop.getSyncData)){_syncReady=true;return false;}
+    let s=null;try{s=await window.patienceDesktop.getSyncData();}catch(e){}
+    const cloud=s&&s.cloud,local=s&&s.local;
+    const haveLocal=(accounts&&accounts.length>0)||Object.keys(localStorage).some(k=>k.indexOf('af_')===0);
+    const localStamp=localStorage.getItem('pf_syncStamp')||'';
+    if(!haveLocal){
+      // fresh install or app-path change: pull the newest data we can find
+      let pick=null;
+      if(cloud&&cloud.exported)pick=cloud;
+      if(local&&local.exported&&(!pick||local.exported>pick.exported))pick=local;
+      if(pick&&pick.data){
+        applyBackupData(pick.data);
+        localStorage.setItem('pf_syncStamp',(cloud&&cloud.exported)?cloud.exported:pick.exported);
+        location.reload();return true;
+      }
+      _syncReady=true;return false;
+    }
+    if(cloud&&cloud.exported&&cloud.exported>localStamp){
+      // the other Mac has newer data → adopt it, keeping a safety copy first
+      try{window.patienceDesktop.safetyBackup(JSON.stringify(gatherBackup()));}catch(e){}
+      applyBackupData(cloud.data);
+      localStorage.setItem('pf_syncStamp',cloud.exported);
+      location.reload();return true;
+    }
+    // local is newest → publish it to iCloud
+    _syncReady=true;
+    try{const b=gatherBackup();localStorage.setItem('pf_syncStamp',b.exported);window.patienceDesktop.backup(JSON.stringify(b));}catch(e){}
+    return false;
+  }catch(e){_syncReady=true;return false;}
 }
 async function importData(input){
   const file=input.files&&input.files[0];input.value='';if(!file)return;
@@ -986,6 +1025,7 @@ async function importData(input){
   if(!data||!Object.keys(data).some(k=>k.startsWith('af_'))){uiAlert('This file is not a valid Patience-Flow backup.',{icon:'<i class="ti ti-alert-triangle"></i>',title:'Import failed'});return;}
   if(!await uiConfirm('This replaces ALL current data here with the data from the backup file.\n\nContinue?',{icon:'<i class="ti ti-database-import"></i>',title:'Import backup',okText:'Import',danger:true}))return;
   applyBackupData(data);
+  localStorage.setItem('pf_syncStamp',new Date().toISOString());
   location.reload();
 }
 async function restoreAutoBackup(json){
@@ -993,7 +1033,9 @@ async function restoreAutoBackup(json){
   try{const p=JSON.parse(json);if(p&&p.data)data=p.data;}catch(e){}
   if(!data||!Object.keys(data).some(k=>k.startsWith('af_'))){uiAlert('No valid auto-backup found yet.',{icon:'<i class="ti ti-alert-triangle"></i>',title:'Restore'});return;}
   if(!await uiConfirm('Restore your data from the automatic backup?\n\nThis replaces ALL current data with the last saved state.',{icon:'<i class="ti ti-history"></i>',title:'Restore auto-backup',okText:'Restore',danger:true}))return;
-  applyBackupData(data);location.reload();
+  applyBackupData(data);
+  localStorage.setItem('pf_syncStamp',new Date().toISOString());
+  location.reload();
 }
 
 /* ── BALANCE & STATS ── */
@@ -1560,7 +1602,41 @@ function saveAccount(){
     lastPayoutDate:null,lastPayoutAmount:0,dailyEntries:[],payouts:[],payoutPending:null});
   saveAll();renderAccounts();document.getElementById('accForm').style.display='none';showToast('Account created ✓');
 }
-async function deleteAccount(id,e){e.stopPropagation();if(!await uiConfirm('Delete this account?\n\nAll its trading days and settings are removed.',{icon:'<i class="ti ti-trash"></i>',title:'Delete account',okText:'Delete',danger:true}))return;accounts=accounts.filter(a=>a.id!==id);saveAll();renderAccounts();}
+async function deleteAccount(id,e){
+  e.stopPropagation();
+  const acc=accounts.find(a=>a.id===id);if(!acc)return;
+  const choice=await uiDialog('What do you want to do with "'+acc.name+'"?\n\nArchive keeps all its trades, payouts and history (e.g. for a blown account) — out of your active list and stats.\nDelete removes everything permanently.',{
+    icon:'<i class="ti ti-trash"></i>',title:'Remove account',
+    buttons:[
+      {label:'Archive',value:'archive',cls:'primary'},
+      {label:'Delete permanently',value:'delete',cls:'danger'},
+      {label:'Cancel',value:'cancel',cls:''}
+    ]});
+  if(choice==='archive'){
+    acc.archived=true;acc.archivedAt=todayStr();
+    archivedAccounts.push(acc);accounts=accounts.filter(a=>a.id!==id);
+    saveAll();renderAccounts();showToast('Account archived ✓');
+  }else if(choice==='delete'){
+    if(!await uiConfirm('Permanently delete "'+acc.name+'"?\n\nAll its trading days and settings are removed. This cannot be undone.',{icon:'<i class="ti ti-trash"></i>',title:'Delete account',okText:'Delete',danger:true}))return;
+    accounts=accounts.filter(a=>a.id!==id);saveAll();renderAccounts();showToast('Account deleted');
+  }
+}
+function restoreAccount(id,e){
+  e.stopPropagation();
+  const i=archivedAccounts.findIndex(a=>a.id===id);if(i<0)return;
+  const acc=archivedAccounts[i];delete acc.archived;delete acc.archivedAt;
+  archivedAccounts.splice(i,1);accounts.push(acc);
+  if(!archivedAccounts.length&&accFilter==='archived')accFilter='all';
+  saveAll();renderAccounts();showToast('Account restored ✓');
+}
+async function purgeAccount(id,e){
+  e.stopPropagation();
+  const acc=archivedAccounts.find(a=>a.id===id);if(!acc)return;
+  if(!await uiConfirm('Permanently delete "'+acc.name+'"?\n\nThis archived account and all its data will be removed for good. This cannot be undone.',{icon:'<i class="ti ti-trash"></i>',title:'Delete forever',okText:'Delete',danger:true}))return;
+  archivedAccounts=archivedAccounts.filter(a=>a.id!==id);
+  if(!archivedAccounts.length&&accFilter==='archived')accFilter='all';
+  saveAll();renderAccounts();showToast('Account deleted');
+}
 function toggleStatus(id,e){e.stopPropagation();const i=accounts.findIndex(a=>a.id===id);if(i<0)return;const s=accounts[i].status;accounts[i].status=s==='eval'?'funded':s==='funded'?'live':'eval';if(accounts[i].status==='live'&&!accounts[i].liveDate)accounts[i].liveDate=todayStr();saveAll();renderAccounts();}
 
 /* ── ACCOUNT FILTER / CUSTOM GROUPS ── */
@@ -1570,6 +1646,7 @@ function renderAccFilterBar(){
   const chip=(v,l)=>'<button class="chip'+(accFilter===v?' active':'')+'" onclick="setAccFilter(\''+v+'\')">'+l+'</button>';
   let h=chip('all','All')+chip('eval','<i class="ti ti-target"></i> Evaluation')+chip('funded','<i class="ti ti-circle-check"></i> Funded')+chip('live','<i class="ti ti-star-filled"></i> Live');
   h+=accGroups.map(g=>chip('g'+g.id,'<i class="ti ti-folder"></i> '+g.name)).join('');
+  if(archivedAccounts.length)h+=chip('archived','<i class="ti ti-archive"></i> Archived ('+archivedAccounts.length+')');
   h+=groupCreating
     ?'<span style="display:inline-flex;gap:6px;align-items:center"><input type="text" id="newGroupName" placeholder="Group name" style="padding:5px 12px;font-size:12px;border-radius:16px;border:.5px solid var(--blue);background:var(--surface);color:var(--text);width:150px;outline:none" onkeydown="if(event.key===\'Enter\')confirmAccGroup();else if(event.key===\'Escape\'){groupCreating=false;renderAccounts();}"><button class="chip" style="border-color:var(--green);color:var(--gtx)" onclick="confirmAccGroup()">✓</button><button class="chip" onclick="groupCreating=false;renderAccounts()">✕</button></span>'
     :'<button class="chip" title="Create a custom group" onclick="groupCreating=true;renderAccounts();setTimeout(()=>{const e=document.getElementById(\'newGroupName\');if(e)e.focus();},50)">+ Group</button>';
@@ -1605,6 +1682,7 @@ function toggleAccInGroup(id,e){
 function renderAccounts(){
   renderAccFilterBar();
   const grid=document.getElementById('accGrid'),empty=document.getElementById('accEmpty'),bar=document.getElementById('portfolioBar');
+  if(accFilter==='archived'){renderArchivedAccounts(grid,empty,bar);return;}
   if(!accounts.length){grid.innerHTML='';empty.style.display='block';empty.innerHTML='<i class="ti ti-layout-cards"></i>No accounts yet.';if(bar)bar.style.display='none';return;}
   const gid=String(accFilter).startsWith('g')?Number(String(accFilter).slice(1)):null;
   let vis=accounts;
@@ -1680,6 +1758,25 @@ function renderAccounts(){
       +(isFunded&&acc.livePayoutGoal>0?'<div style="font-size:12px;color:var(--muted);margin-top:2px"><i class="ti ti-cash"></i> '+(acc.payouts||[]).length+'/'+acc.livePayoutGoal+' payouts → Live'+((acc.payouts||[]).length>=acc.livePayoutGoal?' <span style="color:var(--green);font-weight:600">✓ Eligible</span>':'')+'</div>':'')
       +(winStreak>=2?'<div class="streak-box" style="margin-top:2px"><i class="ti ti-flame"></i> '+winStreak+'-day win streak</div>':'')
       +'<div class="card-hint"><i class="ti ti-chart-line" style="font-size:12px"></i> Click for chart & details</div></div>';
+  }).join('');
+}
+
+function renderArchivedAccounts(grid,empty,bar){
+  if(bar)bar.style.display='none';
+  grid.classList.remove('list-mode');
+  if(!archivedAccounts.length){grid.innerHTML='';empty.style.display='block';empty.innerHTML='<i class="ti ti-archive"></i>No archived accounts.';return;}
+  empty.style.display='none';
+  grid.innerHTML=archivedAccounts.map(acc=>{
+    const bal=getBalance(acc);
+    const st=acc.status==='live'?'Live':acc.status==='funded'?'Funded':'Evaluation';
+    const stIcon=acc.status==='live'?'ti-star-filled':acc.status==='funded'?'ti-circle-check':'ti-target';
+    const stCls=acc.status==='live'?'bl':acc.status==='eval'?'ba':'bg';
+    return '<div class="acccard" style="opacity:.9">'
+      +'<div class="acchead"><div class="acchead-left"><div class="accname">'+acc.name+'</div>'+(acc.number?'<div class="accnumber"><i class="ti ti-hash" style="font-size:11px"></i>'+acc.number+'</div>':'')+'</div>'
+      +'<div style="display:flex;gap:3px"><button class="iconbtn" title="Restore to active accounts" onclick="restoreAccount('+acc.id+',event)"><i class="ti ti-restore"></i></button><button class="iconbtn" title="Delete permanently" onclick="purgeAccount('+acc.id+',event)"><i class="ti ti-trash"></i></button></div></div>'
+      +'<div class="acc-status-row"><span class="badge ba"><i class="ti ti-archive"></i> Archived</span><span class="badge '+stCls+'"><i class="ti '+stIcon+'"></i> '+st+'</span><span style="font-size:11px;color:var(--muted);margin-left:auto">$'+Number(acc.size).toLocaleString('en-US')+'</span></div>'
+      +'<div class="balance-box"><div><div class="balance-label">Final Balance</div><div style="font-size:22px;font-weight:700;color:'+(bal>=(acc.size||0)?'var(--blue)':'var(--red)')+'">'+fmt(bal)+'</div></div>'+(acc.archivedAt?'<div style="text-align:right"><div class="balance-change-label">Archived</div><div style="font-size:13px;font-weight:600;color:var(--muted)">'+acc.archivedAt+'</div></div>':'')+'</div>'
+      +'</div>';
   }).join('');
 }
 
@@ -2721,7 +2818,13 @@ function exportTaxCSV(){
 
 /* ── INIT ── */
 if(navigator.userAgent.includes('Electron'))document.body.classList.add('electron');
-migrateData();initTheme();renderDashboard();initNotifications();
+migrateData();initTheme();
+(function(){
+  const done=()=>{renderDashboard();initNotifications();};
+  if(window.patienceDesktop&&window.patienceDesktop.getSyncData){
+    cloudSyncStartup().then(reloading=>{if(!reloading)done();}).catch(()=>{_syncReady=true;done();});
+  }else{_syncReady=true;done();}
+})();
 if(window.patienceDesktop&&window.patienceDesktop.onQuickAdd)window.patienceDesktop.onQuickAdd(d=>{
   const a=accounts.find(x=>String(x.id)===String(d.accountId));
   const pnl=parseFloat(d.pnl);
